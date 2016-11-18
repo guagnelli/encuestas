@@ -1,0 +1,2584 @@
+<?php   defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Encuestas_model extends CI_Model {
+  	public function __construct() {
+          // Call the CI_Model constructor
+          parent::__construct();
+          $this->config->load('general');
+          $this->load->database();
+
+    }
+    
+    public function total_encuestas(){
+        $resultado = array('result'=>false, 'data'=>null);
+        
+        $query = $this->db->count_all('encuestas.sse_encuestas'); //Obtener total de encuestas
+        //pr($query);
+        if ($query > 0){
+            $resultado['result'] = true;
+            $resultado['data'] = $query;
+        
+        }
+
+        //pr($this->db->last_query());
+        return $resultado;
+    }
+
+    public function get_encuestas(){
+        $resultado = array();
+        
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+    public function get_encuesta_curso(){
+        $resultado = array();
+        
+        $query = $this->db->get('encuestas.sse_encuesta_curso'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+        
+    }
+
+    public function get_preguntas_encuesta($params=array()){
+        $resultado = array('result'=>false, 'data'=>null);
+        $this->db->where($params);
+        $this->db->order_by('orden','ASC');
+        $query = $this->db->get('encuestas.sse_preguntas'); //Obtener conjunto de registros
+        //pr($query);
+        if ($query->num_rows()>0){
+            $resultado['result'] = true;
+            $resultado['data'] = $query->result_array();
+        }
+
+        //pr($this->db->last_query());
+        return $resultado;
+    }
+
+    public function get_id_regla($params=array())
+    {
+        $resultado = array('result'=>false, 'id'=>0);
+        $this->db->where($params);
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion'); //Obtener conjunto de registros
+        //pr($query);
+        if ($query->num_rows()>0){
+            $resultado['result'] = true;
+            $resultado['id'] = $query->result_array()[0];
+        }
+
+        //pr($this->db->last_query());
+        return $resultado;   
+    }
+
+    public function regla_disponible($rol_evaluador='', $rol_a_evaluar ='')
+    {
+        $resultado = array('result'=>false, 'id'=>null);
+
+        $params = array(
+                    'rol_evaluado_cve'=>$rol_a_evaluar,
+                    'rol_evaluador_cve'=>$rol_evaluador
+                );
+
+        $id_regla_evaluacion = $this->get_id_regla($params);
+
+        $this->db->where('reglas_evaluacion_cve', $id_regla_evaluacion['id']['reglas_evaluacion_cve']);
+        $this->db->where('is_bono = 1');
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de registros
+        //pr($query);
+        if ($query->num_rows()>0){
+            $resultado['result'] = true;
+            $resultado['id'] = $query->result_array()[0];
+        }
+
+        //pr($this->db->last_query());
+        return $resultado;  
+
+    }
+    public function listado_reglas_evaluacion($params=null)
+    {
+
+        $resultado = array('result'=>false, 'reglas_evaluacion'=>null);
+        if (isset($params) && !empty($params) && is_array($params)) {
+            $this->db->where($params);
+
+        }
+
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion');
+        
+        if ($query->num_rows()>0){
+            $resultado['result'] = true;
+            $resultado['reglas_evaluacion'] = $query->result_array();
+        
+        }
+
+        return $resultado;
+
+    }
+
+    function carga_csv_instrumentos($data)
+    {
+        $resultado = array('success'=> FALSE);
+        $this->db->trans_begin(); // inicio de transaccion
+            
+            
+        $instrumento;
+        $seccion;
+        $indicador;
+        foreach ($data as $row)
+        {
+            //preguntas_instrumentopr($row); 
+            //exit();
+            if (!empty($instrumento)){  // si la variable instrumento esta vaica
+
+                if ($instrumento['id_instrumento_enc'] != $row['id_instrumento_enc']) { // si la variable $instrumento['id_instrumento_enc'] es diferente de $row['id_instrumento_enc']                        
+                        
+                    $roles_regla = array(
+                                'rol_evaluador_cve'=>$row['rol_evaluador'], 
+                                'rol_evaluado_cve'=>$row['rol_a_evaluar']
+                        );
+
+                    $registro_en_regla = $this->get_id_regla($roles_regla);
+                    $row['reglas_evaluacion_cve'] = $registro_en_regla['id']['reglas_evaluacion_cve'];
+
+                    $instrumento = $this->guarda_instrumento($row); //cargar nuevo instrumento
+
+                }
+
+                    if (empty($seccion)) {  //si la variable seccion esta vacia 
+                            //$seccion_bd = $this->get_seccion($row['descripcion']);
+
+                            //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                //$seccion = $seccion_bd[0]['seccion_cve'];
+                            //}else{
+                                $seccion = $this->guarda_seccion($row); // guardar la primera sección del instrumento
+                            //}
+                    }else{  //si la variable seccion NO esta vacia 
+                        if ($seccion['id_seccion_enc'] != $row['id_seccion_enc']) {    // si la variable id_seccion no coincide con la variable seccion almacenada local
+                                //$seccion_bd = $this->get_seccion($row['descripcion']);
+                                //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                    //$seccion = $seccion_bd[0]['seccion_cve'];
+                                //}else{
+                                    $seccion = $this->guarda_seccion($row); // guardar la primera sección del instrumento
+                                //}
+                        }
+
+                    }
+
+                    /*Indicador*/
+                    if (empty($indicador)) {  //si la variable seccion esta vacia 
+                            //$seccion_bd = $this->get_seccion($row['descripcion']);
+
+                            //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                //$seccion = $seccion_bd[0]['seccion_cve'];
+                            //}else{
+                                $indicador = $this->guarda_indicador($row); // guardar la primera sección del instrumento
+                            //}
+                    }else{  //si la variable seccion NO esta vacia 
+                        if ($indicador['id_indicador_enc'] != $row['id_indicador_enc']) {    // si la variable id_seccion no coincide con la variable seccion almacenada local
+                                //$seccion_bd = $this->get_seccion($row['descripcion']);
+                                //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                    //$seccion = $seccion_bd[0]['seccion_cve'];
+                                //}else{
+                                    $indicador = $this->guarda_indicador($row); // guardar la primera sección del instrumento
+                                //}
+                        }
+
+
+                    } 
+
+                    /**/  
+
+
+
+
+
+
+                }else{  // si la variable instrumento NO esta vacia
+                    $roles_regla = array(
+                                    'rol_evaluador_cve'=>$row['rol_evaluador'], 
+                                    'rol_evaluado_cve'=>$row['rol_a_evaluar']
+                                );
+
+                    $registro_en_regla = $this->get_id_regla($roles_regla);
+                    $row['reglas_evaluacion_cve'] = $registro_en_regla['id']['reglas_evaluacion_cve'];
+
+                    $instrumento = $this->guarda_instrumento($row); //guardar el primer instrumento
+
+                    if (empty($seccion)) {  //si la variable seccion esta vacia 
+                            //$seccion_bd = $this->get_seccion($row['descripcion']);
+                            //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                //$seccion = $seccion_bd[0]['seccion_cve'];
+                            //}else{
+                                $seccion = $this->guarda_seccion($row); // guardar la primera sección del instrumento
+                            //} // guardar la primera sección del instrumento
+                            
+                    }else{
+                        if ($seccion['id_seccion_enc'] != $row['id_seccion_enc']) {    // si la variable id_seccion no coincide con la variable seccion almacenada local
+                            //$seccion_bd = $this->get_seccion($row['descripcion']);
+                            //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                //$seccion = $seccion_bd[0]['seccion_cve'];
+                            //}else{
+                                $seccion = $this->guarda_seccion($row); // guardar la primera sección del instrumento
+                            //} // guardar una nueva sección
+                        }
+
+                    }
+
+
+                    /*Indicador*/
+                    if (empty($indicador)) {  //si la variable seccion esta vacia 
+                            //$seccion_bd = $this->get_seccion($row['descripcion']);
+
+                            //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                //$seccion = $seccion_bd[0]['seccion_cve'];
+                            //}else{
+                                $indicador = $this->guarda_indicador($row); // guardar la primera sección del instrumento
+                            //}
+                    }else{  //si la variable seccion NO esta vacia 
+                        if ($indicador['id_indicador_enc'] != $row['id_indicador_enc']) {    // si la variable id_seccion no coincide con la variable seccion almacenada local
+                                //$seccion_bd = $this->get_seccion($row['descripcion']);
+                                //if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                                    //$seccion = $seccion_bd[0]['seccion_cve'];
+                                //}else{
+                                    $indicador = $this->guarda_indicador($row); // guardar la primera sección del instrumento
+                                //}
+                        }
+
+
+                    } 
+
+                    /**/ 
+                    
+
+
+
+
+
+
+                }
+
+                if (isset($instrumento) && !empty($instrumento)) {
+
+                    if (isset($row['tipo_pregunta']['reactivos'])) {
+
+                        /* # Guardado de preguntas # */
+                        //pr($row);
+                        $pregunta = $this->guarda_pregunta($row, $instrumento['insert_id'], $seccion['insert_id'],$indicador['insert_id']);   //guardar pregunta
+
+
+                        foreach ($row['tipo_pregunta']['reactivos'] as $row_respuesta) {
+                            $condicion_pregunta;
+                            $respuesta = $this->guarda_respuesta($row_respuesta, $pregunta, $instrumento['insert_id']);
+                            /*if (isset($row['tipo_pregunta']['respuesta_esperada']) && !empty($row['tipo_pregunta']['respuesta_esperada']) && (md5($row_respuesta['texto']) == md5($row['tipo_pregunta']['respuesta_esperada']) ) ){
+                                $condicion_pregunta = $this->guarda_condicion_pregunta($respuesta);
+                                $pregunta_padre = $this->get_pregunta_padre($instrumento['insert_id'], $row['orden_pregunta_padre']);
+
+                                $condicion_accion = $this->guarda_condicion_accion($condicion_pregunta, $pregunta_padre['preguntas_cve']);
+                            }*/
+                        }
+
+
+
+                    }
+
+                }
+                
+            }
+            
+            $this->db->trans_complete();
+        if ($this->db->trans_status() == TRUE) { // condición para ver si la transaccion se efectuara correctamente                
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                $resultado['success']=TRUE;
+                return $resultado;
+
+        } else {
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+                $resultado['success']=FALSE;
+                return $resultado;
+                
+        }
+
+
+    }
+
+    public function guarda_edita_instrumento($encuesta_cve, $valores=array())
+    {
+        /*
+        [is_bono] => 1
+        [status] => 1
+        [descripcion_encuestas] => Encuesta ccttna prueba 2016
+        [cve_corta_encuesta] => CCTTNA2016
+        [regla_evaluacion_cve] => 1
+        [btn_submit] => Guardar instrumento
+        */
+        $this->db->trans_begin();
+
+        $this->db->where('sse_encuestas.encuesta_cve', $encuesta_cve);
+
+        $datos_actualiza = array(
+                'is_bono'=>((isset($valores['is_bono']) && !empty($valores['is_bono'])) ? $valores['is_bono'] : 0 ),
+                'status'=>((isset($valores['status']) && !empty($valores['status'])) ? $valores['status'] : 0 ),
+                'descripcion_encuestas'=>$valores['descripcion_encuestas'],
+                'cve_corta_encuesta'=>$valores['cve_corta_encuesta'],
+                'reglas_evaluacion_cve'=>$valores['regla_evaluacion_cve'],
+                'tipo_encuesta'=>$valores['tipo_instrumento'],
+                'eva_tipo'=>$valores['eva_tipo'],
+            );
+
+        $this->db->update('encuestas.sse_encuestas', $datos_actualiza);
+
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        }else{
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+        }
+
+    }
+
+    public function guarda_instrumento($instrumento=array())
+    {        
+            /*# guarda el nombre del instrumento...            
+                descripcion_encuesta
+
+             *# retorna el id del instrumento y el id creado para identificar las preguntas...
+                encuesta_cve
+                id_instrumento_enc
+            */
+            //pr($instrumento);
+            //exit();
+            $data['descripcion_encuestas']=$instrumento['descripcion_encuestas'];
+            //$data['is_bono']=$instrumento['descripcion_encuestas'];
+            //$data['rol_id']=$instrumento['rol_instrumento'];
+            //$data['tutorizado']=$instrumento['instrumento_tutorizado'];
+
+            //pr($instrumento['eva_tipo']['valor']);
+            //die();
+            $data['status']=0;
+            $data['cve_corta_encuesta']=$instrumento['cve_corta_encuesta'];
+            $data['reglas_evaluacion_cve']=$instrumento['reglas_evaluacion_cve']; 
+            $data['tipo_encuesta']=$instrumento['tipo_encuesta'];
+            $data['eva_tipo']=$instrumento['eva_tipo']['valor'];
+
+
+
+            $data['fecha_creacion'] = date('Y-m-d');
+            
+            $this->db->insert('encuestas.sse_encuestas', $data);
+            $insert_id = $this->db->insert_id();
+
+            $row = array(
+                            'insert_id'=> $insert_id,
+                            'id_instrumento_enc'=> $instrumento['id_instrumento_enc']
+                        );
+            //echo" {";
+            return $row;
+
+    }
+
+    public function instrumento_bono($id_encuesta)
+    {
+
+            $data = array(
+                   'is_bono' => 1
+                );
+
+            $this->db->where('encuesta_cve', $id_encuesta);
+            $this->db->update('encuestas.sse_encuestas', $data); 
+
+    }
+
+    public function guarda_seccion($seccion=array())
+    {        
+            /*# guarda el nombre de la sección...            
+                descripcion
+
+             *# retorna el id de la sección y el id creado para identificar las preguntas...
+                seccion_cve
+                id_seccion_enc
+            */
+            $seccion_bd = $this->get_seccion($seccion['descripcion']);
+            if (isset($seccion_bd[0]['seccion_cve']) && $seccion_bd[0]['seccion_cve']>0) {
+                    //$seccion = $seccion_bd[0]['seccion_cve'];
+                    $row = array(
+                            'insert_id'=> $seccion_bd[0]['seccion_cve'],
+                            'id_seccion_enc'=> $seccion['id_seccion_enc']
+                        );
+            }else{
+                    $data['descripcion']=$seccion['descripcion'];
+                    $this->db->insert('encuestas.sse_seccion', $data);
+                    $insert_id = $this->db->insert_id();
+
+                    $row = array(
+                            'insert_id'=> $insert_id,
+                            'id_seccion_enc'=> $seccion['id_seccion_enc']
+                        );
+            }
+            //echo '<br>], sec: '.$row['insert_id'].' [';
+            return $row;
+            
+    }
+
+    public function guarda_nueva_pregunta($pregunta=array(),$instrumento_id=null,$seccion_id=null)
+    {
+        $this->db->trans_begin();
+
+        $indicador_id=$pregunta['tipo_indicador_cve'];
+        $id_pregunta = $this->guarda_pregunta($pregunta,$instrumento_id,$seccion_id,$indicador_id);
+        
+        $respuestas_nuevas = (isset($pregunta['respuestas']) && is_array($pregunta['respuestas']))? $pregunta['respuestas'] : '';
+        
+        if (is_array($respuestas_nuevas)) {
+            foreach ($respuestas_nuevas as $respuesta)
+            {
+                $this->guarda_respuesta($respuesta, $id_pregunta, $instrumento_id);
+
+            }
+
+        }//else trans_complete () trans_rollback return false
+
+        $this->db->trans_complete();        
+        if ($this->db->trans_status() != true) {
+            $this->db->trans_rollback();       
+            $resultado['success']=FALSE;
+            return $resultado;
+            
+        }  else {
+            $this->db->trans_commit();
+            $resultado['success']=TRUE;
+            return $resultado;
+            
+        }
+
+
+    }
+    
+    public function guarda_pregunta($pregunta=array(),$instrumento_id=null,$seccion_id=null,$indicador_id=null)
+    {
+ 
+           
+            $data['encuesta_cve']=$instrumento_id;
+            $data['seccion_cve']=$seccion_id;
+
+            $data['tipo_pregunta_cve']=$pregunta['tipo_pregunta']['tipo_pregunta_cve'];
+            $data['pregunta']=$pregunta['pregunta'];
+            $data['orden']=isset($pregunta['orden_pregunta']) ? $pregunta['orden_pregunta']: 0;
+            $data['obligada']=isset($pregunta['pregunta_obligada']) ? $pregunta['pregunta_obligada'] : 0;
+            $data['is_bono']=isset($pregunta['pregunta_bono']) ? $pregunta['pregunta_bono'] : 0;
+            
+            $data['tipo_indicador_cve']=$indicador_id;
+            $data['valido_no_aplica']=isset($pregunta['valido_no_aplica']) ? $pregunta['valido_no_aplica'] : 0;
+
+
+            if ($pregunta['pregunta_bono'] === 1) {
+                $this->instrumento_bono($instrumento_id);
+
+            }
+
+            if (isset($pregunta['orden_pregunta_padre']) && isset($pregunta['respuesta_esperada']) && !empty($pregunta['orden_pregunta_padre']) && !empty($pregunta['respuesta_esperada'])) {
+                $pregunta_padre = $this->get_pregunta_padre($instrumento_id, $pregunta['orden_pregunta_padre'], $seccion_id);
+                
+                //pr($pregunta_padre);
+
+                if ($pregunta_padre != FALSE) {
+                    $data['pregunta_padre']=$pregunta_padre['preguntas_cve'];
+                    //pr($pregunta);
+                    $respuesta_esperada = $this->get_reactivos_cve($pregunta_padre['preguntas_cve'], $pregunta['tipo_pregunta']['respuesta_esperada']);
+                    //pr($respuesta_esperada);
+                    //exit();
+
+                    if(!empty($respuesta_esperada)){
+                        $data['val_ref']=$respuesta_esperada[0]['reactivos_cve'];
+
+                    }// else no existe la respeuesta esperada en la pregunta padre
+
+                }// else la pregunta padre no existe
+
+            }
+            
+            $this->db->insert('encuestas.sse_preguntas', $data);
+            $insert_id = $this->db->insert_id();
+           //echo '<br>], prg: '.$insert_id.' [';
+
+            return $insert_id;
+            
+    }
+
+    function update_pregunta($id_pregunta = null, $params=null) {
+        
+        
+        $pregunta_anterior = isset($params['pregunta_anterior'][0]) ? $params['pregunta_anterior'][0] : ''; // obtenemos los datos anteriores de la pregunta
+
+        $pregunta_padre = 0; // variable pregunta padre
+        $val_ref= 0; // variable valor de referancia
+        if (isset($params['tiene_pregunta_padre']) && $params['tiene_pregunta_padre'] == true) { // si tiene pregunta padre esta activo
+            // verificar si en base de datos existen los datos val ref y pregunta_padre
+            $pregunta_padre = isset($params['pregunta_padre']) ? $params['pregunta_padre'] : 0; // asignamos el valor que viene en pregunta padre
+            $val_ref = isset($params['val_ref']) ? $params['val_ref'] : 0; // asignamos el valor que viene en valor de referencia
+        }
+
+        $tiene_hijas = $this->tiene_preguntas_hija($id_pregunta); // buscamos si tiene preguntas hija
+        //pr($tiene_hijas);
+        //exit();
+        
+        if ($pregunta_anterior['tipo_pregunta_cve'] != $params['tipo_pregunta_cve']) { // si el tipo de pregunta cambio
+
+            if (isset($tiene_hijas['tiene_hijas']) && $tiene_hijas['tiene_hijas']>0) { // si 
+                $resultado['success']= FALSE;
+                $resultado['error'] = 'No puede modificar el tipo de respuestas ya que existen preguntas que dependen de esta pregunta.';                
+
+                return $resultado;
+                //exit();
+            }
+
+        }
+
+        $this->db->trans_begin();
+        $datos=array(
+                        'seccion_cve'=>$params['seccion_cve'],
+                        'tipo_pregunta_cve'=>$params['tipo_pregunta_cve'],
+                        'pregunta'=>$params['pregunta'],
+                        'obligada'=> isset($params['obligada']) ? $params['obligada'] : 0,
+                        'is_bono'=> isset($params['is_bono']) ? $params['is_bono'] : 0,
+                        'pregunta_padre'=>$pregunta_padre,
+                        'val_ref'=>$val_ref,
+                        'tipo_indicador_cve'=>$params['tipo_indicador_cve'],
+                        'valido_no_aplica'=>$params['valido_no_aplica']
+                    );
+        $this->db->where('preguntas_cve',$id_pregunta);
+        $this->db->update('encuestas.sse_preguntas', $datos);        
+
+        $respuestas_nuevas = (isset($params['respuestas']) && is_array($params['respuestas']))? $params['respuestas'] : '';
+        if (!empty($respuestas_nuevas) && $pregunta_anterior['tipo_pregunta_cve'] != $params['tipo_pregunta_cve']) {
+            $this->db->where('sse_respuestas.preguntas_cve', $id_pregunta);
+            $this->db->delete('encuestas.sse_respuestas');
+            
+            foreach ($respuestas_nuevas as $respuesta) {
+                $this->guarda_respuesta($respuesta, $id_pregunta, $pregunta_anterior['encuesta_cve']);
+
+            }
+        }
+
+        $this->db->trans_complete();        
+        if ($this->db->trans_status() === true) {
+            $this->db->trans_rollback();       
+            $resultado['success']=FALSE;
+            return $resultado;
+            
+        }  else {
+            $this->db->trans_commit();
+            $resultado['success']=TRUE;
+            return $resultado;
+            
+        }
+    }
+    
+    public function tiene_preguntas_hija($id_pregunta=null)
+    {
+        $this->db->select("COUNT(*) AS tiene_hijas"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_preguntas.pregunta_padre', $id_pregunta);
+        $query = $this->db->get('encuestas.sse_preguntas');
+
+        $resultado = $query->result_array();
+
+        return $resultado[0];
+
+    }
+
+    public function guarda_respuesta($respuesta=array(),$pregunta_id = null, $instrumento_id)
+    {            
+            $data['preguntas_cve']=$pregunta_id;
+            $data['encuesta_cve']=$instrumento_id;
+            $data['ponderacion']=$respuesta['ponderacion'];
+            $data['texto']=$respuesta['texto'];
+            $this->db->insert('encuestas.sse_respuestas', $data);                
+            
+            $insert_id = $this->db->insert_id();
+            //echo '[res: '.$insert_id.'], ';
+            return $insert_id;
+    }
+
+    public function guarda_condicion_pregunta($pregunta_id=null)
+    {
+            $data['reactivos_cve']=$pregunta_id;
+            $this->db->insert('encuestas.sse_condicionales_pregunta', $data);                
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+    }
+
+    public function guarda_condicion_accion($condicion_pregunta_id = null, $pregunta_padre_id=null)
+    {
+            $data['condicion_pregunta_cve']=$condicion_pregunta_id;
+            $data['preguntas_cve']=$pregunta_padre_id;
+            $this->db->insert('encuestas.sse_condicion_accion', $data);                
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+    }
+
+    public function duplica_instrumento($id_instrumento=null)
+    {
+        $resultado=array();
+
+        $this->db->trans_begin(); // inicio de transaccion
+
+            $primer_instrumento=$this->get_instrumento_detalle($id_instrumento);
+            $preguntas = $this->preguntas_instrumento($id_instrumento);
+            /*
+                fecha_creacion
+                reglas_evaluacion_cve
+                cve_corta_encuesta
+                status
+                is_bono
+                descripcion_encuestas
+                encuesta_cve
+            */
+            $nuevo_folio=$primer_instrumento[0]['cve_corta_encuesta'].'-'.rand(5, 15);
+            $segundo_instrumento=array(
+
+                                    'descripcion_encuestas'=>$primer_instrumento[0]['descripcion_encuestas'],
+                                    'is_bono'=>$primer_instrumento[0]['is_bono'],
+                                    //'rol_id'=>$primer_instrumento[0]['rol_id'],
+                                    //'tutorizado'=>$primer_instrumento[0]['tutorizado'],
+                                    'status'=>0,
+                                    'reglas_evaluacion_cve'=>$primer_instrumento[0]['reglas_evaluacion_cve'],
+                                    'cve_corta_encuesta'=>$nuevo_folio,
+                                    'tipo_encuesta'=>$primer_instrumento[0]['tipo_encuesta'],
+                                    'eva_tipo'=>$primer_instrumento[0]['eva_tipo'],
+                                    'fecha_creacion'=>date('Y-m-d')
+                                    );
+
+            $this->db->insert('encuestas.sse_encuestas', $segundo_instrumento);
+            $segundo_instrumento_cve = $this->db->insert_id();
+            
+            $resultado['instrumento_id'] = $segundo_instrumento_cve;
+
+            $primera_pregunta_cve='';
+            $segunda_pregunta_cve='';
+            foreach ($preguntas as $row){
+                        /*
+                            [preguntas_cve] => 846
+                            [seccion_cve] => 142
+                            [encuesta_cve] => 65
+                            [tipo_pregunta_cve] => 1
+                            [pregunta] => Notificó al coordinador de curso la validación de las calificaciones de todos los alumnos
+                            [obligada] => 0
+                            [orden] => 1
+                            [is_bono] => 0
+                            [val_ref] => 
+                            [pregunta_padre] => 
+                            [reactivos_cve] => 2969
+                            [ponderacion] => 1
+                            [texto] => Si
+                        */
+                    if($row['preguntas_cve']!=$primera_pregunta_cve){
+                            $data_pregunta = array(
+                                                'seccion_cve'=>$row['seccion_cve'],
+                                                'encuesta_cve'=>$segundo_instrumento_cve,
+                                                'tipo_pregunta_cve'=>$row['tipo_pregunta_cve'],
+                                                'pregunta'=>$row['pregunta'],
+                                                'obligada'=>$row['obligada'],
+                                                'orden'=>$row['orden'],
+                                                'is_bono'=>$row['is_bono'],
+                                                'tipo_indicador_cve'=>$row['tipo_indicador_cve'],
+                                                'valido_no_aplica'=>$row['valido_no_aplica']
+                                                
+                                            );
+
+                            if (isset($row['pregunta_padre']) && isset($row['val_ref']) && !empty($row['pregunta_padre']) && !empty($row['val_ref'])) {
+                                    $pregunta_padre = $this->get_pregunta_padre_nuevo_instrumento($segundo_instrumento_cve, $row['pregunta_padre'], $row['seccion_cve']);                                    
+                                    
+                                    //pr($pregunta_padre);
+
+                                    if ($pregunta_padre != FALSE) {
+                                        $data_pregunta['pregunta_padre']=$pregunta_padre['preguntas_cve'];
+                                        //pr($pregunta);
+                                        $respuesta_esperada = $this->get_reactivos_cve($pregunta_padre['preguntas_cve'], $this->get_reactivo_texto($row['val_ref']));
+                                        //pr($respuesta_esperada);
+                                        //exit();
+
+                                        if(!empty($respuesta_esperada)){
+                                            $data_pregunta['val_ref']=$respuesta_esperada[0]['reactivos_cve'];
+
+                                        }// else no existe la respeuesta esperada en la pregunta padre
+
+                                    }// else la pregunta padre no existe
+
+                                }
+                                
+                                //pr($data_pregunta);
+                                $this->db->insert('encuestas.sse_preguntas', $data_pregunta);
+
+                                $primera_pregunta_cve = $row['preguntas_cve'];
+                                $segunda_pregunta_cve = $this->db->insert_id();
+
+                                $this->guarda_respuesta($row,$segunda_pregunta_cve, $segundo_instrumento_cve);
+
+                    }else{
+                        
+                        $this->guarda_respuesta($row,$segunda_pregunta_cve, $segundo_instrumento_cve);
+
+                    }
+                    
+                        
+            }
+
+        $this->db->trans_complete();
+        if ($this->db->trans_status() == TRUE) { // condición para ver si la transaccion se efectuara correctamente                
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                $resultado['success']=TRUE;
+                return $resultado;
+
+        } else {
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+                $resultado['success']=FALSE;
+                return $resultado;
+                
+        }
+
+         
+    }
+
+    public function get_pregunta_padre_nuevo_instrumento($instrumento_nuevo=null, $preguntas_cve=null, $seccion_cve=null)
+    {
+        $busqueda = array('sse_preguntas.preguntas_cve');
+
+        $this->db->select("sse_preguntas.pregunta"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_preguntas.seccion_cve', $seccion_cve);
+        $this->db->where('sse_preguntas.preguntas_cve', $preguntas_cve);
+        //$texto_pregunta = $this->db->get_compiled_select('encuestas.sse_preguntas');
+        $query1 =$this->db->get('encuestas.sse_preguntas');
+        $pregunta = $query1->result_array(); 
+        //pr($pregunta);
+        $texto_pregunta = $pregunta[0];
+
+        //pr($texto_pregunta); exit();
+        //$texto_pregunta = $this->db->get_compiled_select('encuestas.sse_preguntas');
+
+        $this->db->select("sse_preguntas.preguntas_cve");
+        $this->db->where('sse_preguntas.seccion_cve', $seccion_cve);
+        $this->db->where('sse_preguntas.encuesta_cve', $instrumento_nuevo);
+        $this->db->where('sse_preguntas.pregunta', $texto_pregunta['pregunta']);        
+        $query = $this->db->get('encuestas.sse_preguntas');
+        //pr($this->db->last_query());
+
+        $resultado = $query->result_array();
+        //pr($resultado); exit();
+        if(isset($resultado[0]['preguntas_cve'])){
+            return $resultado[0];
+        }else{
+            return FALSE;
+        }
+            
+
+    }
+
+    public function get_pregunta_padre($instrumento_id=null, $orden_pregunta=null, $seccion=null)
+    {
+        $busqueda = array('sse_preguntas.preguntas_cve');
+
+        $this->db->where('sse_preguntas.seccion_cve', $seccion);
+        $this->db->where('sse_preguntas.encuesta_cve', $instrumento_id);
+        $this->db->where('sse_preguntas.orden', $orden_pregunta);
+        $this->db->select($busqueda);
+        $query = $this->db->get('encuestas.sse_preguntas');
+
+        $resultado = $query->result_array();
+
+        if(isset($resultado[0]['preguntas_cve'])){
+            return $resultado[0];
+        }else{
+            return FALSE;
+        }
+
+    }
+
+    public function get_reactivo_texto($reactivos_cve=null)
+    {
+
+        $this->db->where('sse_respuestas.reactivos_cve', $reactivos_cve);
+        $this->db->select('sse_respuestas.texto');
+        $query = $this->db->get('encuestas.sse_respuestas');
+
+        $resultado = $query->result_array();
+
+        return $resultado[0]['texto'];
+
+    }
+
+    public function get_preguntas_padre($instrumento_id=null, $seccion=null)
+    {
+        $busqueda = array('sse_preguntas.preguntas_cve');
+        $this->db->where('sse_preguntas.seccion_cve', $seccion);
+        $this->db->where('sse_preguntas.encuesta_cve', $instrumento_id);
+        //$this->db->where('sse_preguntas.orden', $orden_pregunta);
+        $this->db->select($busqueda);
+        $query = $this->db->get('encuestas.sse_preguntas');
+
+        $resultado = $query->result_array();
+
+        return $resultado;
+
+    }
+
+    public function get_reactivos_cve($preguntas_cve=null, $texto=null)
+    {
+        //pr($preguntas_cve);
+        //pr($texto);
+        $busqueda = array('sse_respuestas.reactivos_cve');
+
+        $this->db->where('sse_respuestas.preguntas_cve', $preguntas_cve);
+        $this->db->where('sse_respuestas.texto', $texto);
+        $this->db->select($busqueda);
+        $query = $this->db->get('encuestas.sse_respuestas');
+
+        $resultado = $query->result_array();
+
+        return $resultado;
+
+    }
+
+    public function guarda_orden_preguntas($orden=null)
+    {
+        $this->db->trans_begin();
+
+        foreach ($orden as $row)
+        {
+            $data=array('orden'=>$row['orden']);
+            $this->db->where('sse_preguntas.preguntas_cve', $row['preguntas_cve']);
+            $this->db->update('encuestas.sse_preguntas', $data); 
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        }else{
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+        }
+    }
+
+    public function get_instrumento_detalle($id_instrumento=null)
+    {
+            /*
+                SELECT * FROM encuestas.sse_encuestas en
+                LEFT JOIN encuestas.sse_preguntas pre ON en.encuesta_cve=pre.encuesta_cve
+                LEFT JOIN encuestas.sse_respuestas res ON res.preguntas_cve=pre.preguntas_cve
+                WHERE en.encuesta_cve=11;
+            */
+            /*
+
+            [encuesta_cve] => 85
+            [descripcion_encuestas] => alumno - titular - tutorizado
+            [is_bono] => 0
+            [status] => 1
+            [cve_corta_encuesta] => JHF32FGJK
+            [reglas_evaluacion_cve] => 1
+            [fecha_creacion] => 2016-08-11
+            [rol_evaluado_cve] => 32
+            [rol_evaluador_cve] => 5
+            [is_excepcion] => 8
+            [tutorizado] => 1
+            [id] => 32
+            [name] => Tutor Titular
+            [shortname] => tutortitular
+            [description] => 
+            [sortorder] => 13
+            [archetype] => teacher
+
+            */
+            $this->db->select("mdl_role.name"); //////Ejemplo de compilación de consulta
+            $this->db->where('sse_reglas_evaluacion.rol_evaluador_cve=mdl_role.id');
+            $rol_evaluador = $this->db->get_compiled_select('public.mdl_role');
+
+            $select_data = array(
+                    'sse_encuestas.encuesta_cve',
+                    'sse_encuestas.descripcion_encuestas',
+                    'sse_encuestas.tipo_encuesta',
+                    'sse_encuestas.eva_tipo',
+                    'sse_encuestas.is_bono',
+                    'sse_encuestas.status',
+                    'sse_encuestas.cve_corta_encuesta',
+                    'sse_encuestas.reglas_evaluacion_cve',
+                    'sse_reglas_evaluacion.rol_evaluado_cve',
+                    'sse_reglas_evaluacion.rol_evaluador_cve',
+                    'sse_reglas_evaluacion.is_excepcion',
+                    'sse_reglas_evaluacion.tutorizado',
+                    'mdl_role.id',
+                    'mdl_role.name',
+                    'mdl_role.shortname',
+                    'mdl_role.description',
+                    'mdl_role.sortorder',
+                    'mdl_role.archetype',
+                    '('.$rol_evaluador.') AS evaluador'
+                );
+                
+            $this->db->where('sse_encuestas.encuesta_cve', $id_instrumento);            
+            $this->db->join('encuestas.sse_reglas_evaluacion', 'sse_reglas_evaluacion.reglas_evaluacion_cve=sse_encuestas.reglas_evaluacion_cve');
+            $this->db->join('public.mdl_role', 'sse_reglas_evaluacion.rol_evaluado_cve=mdl_role.id');
+            $this->db->select($select_data);
+            $query = $this->db->get('encuestas.sse_encuestas');
+
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function get_secciones()
+    {
+            
+            $query = $this->db->get('encuestas.sse_seccion');
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function get_seccion($descripcion='')
+    {   
+            $this->db->select('sse_seccion.seccion_cve');
+            $this->db->where('sse_seccion.descripcion', $descripcion);
+            $query = $this->db->get('encuestas.sse_seccion');
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function get_tipo_pregunta()
+    {
+            
+            $query = $this->db->get('encuestas.sse_tipo_pregunta');
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function listado_preguntas_seccion($id_encuesta = null, $id_seccion=null, $id_pregunta_hija){
+        $resultado = array();
+        $this->db->where('sse_preguntas.encuesta_cve', $id_encuesta);
+        $this->db->where('sse_preguntas.seccion_cve', $id_seccion);
+        $this->db->where('sse_preguntas.preguntas_cve < '.$id_pregunta_hija.'');
+        $query = $this->db->get('encuestas.sse_preguntas'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+    public function listado_respuestas_pregunta($pregunta_id = null){
+        $resultado = array();
+        $this->db->where('sse_respuestas.preguntas_cve', $pregunta_id);
+        $query = $this->db->get('encuestas.sse_respuestas'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+    public function get_pregunta_detalle($id_pregunta=null, $id_instrumento=null)
+    {
+            $this->db->where('sse_preguntas.encuesta_cve', $id_instrumento);
+            $this->db->where('sse_preguntas.preguntas_cve', $id_pregunta);
+            $query = $this->db->get('encuestas.sse_preguntas');
+
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function preguntas_instrumento($id_instrumento=null)
+    {
+            /*
+                SELECT * FROM encuestas.sse_preguntas pre 
+                LEFT JOIN encuestas.sse_respuestas res ON res.preguntas_cve=pre.preguntas_cve
+                WHERE pre.encuesta_cve=33;
+            */
+
+                /*SELECT "sse_preguntas"."preguntas_cve", "sse_preguntas"."seccion_cve", "sse_preguntas"."encuesta_cve", "sse_preguntas"."tipo_pregunta_cve", 
+"sse_preguntas"."pregunta", "sse_preguntas"."obligada", "sse_preguntas"."orden", "sse_preguntas"."is_bono", "sse_preguntas"."val_ref", 
+"sse_preguntas"."pregunta_padre", "sse_respuestas"."reactivos_cve", "sse_respuestas"."ponderacion", "sse_respuestas"."texto", 
+"sse_seccion"."descripcion", "sse_preguntas"."tipo_indicador_cve", "sse_preguntas"."valido_no_aplica", "sse_seccion"."descripcion","sse_indicador"."descripcion" 
+FROM "encuestas"."sse_preguntas" 
+JOIN "encuestas"."sse_respuestas" ON "sse_respuestas"."preguntas_cve"="sse_preguntas"."preguntas_cve" 
+JOIN "encuestas"."sse_seccion" ON "sse_seccion"."seccion_cve"="sse_preguntas"."seccion_cve" 
+JOIN "encuestas"."sse_indicador" ON "sse_indicador"."indicador_cve"="sse_preguntas"."tipo_indicador_cve" 
+WHERE "sse_preguntas"."encuesta_cve" = '514' ORDER BY "orden" ASC*/
+            
+            $busqueda = array(
+                            'sse_preguntas.preguntas_cve',
+                            'sse_preguntas.seccion_cve', 
+                            'sse_preguntas.encuesta_cve', 
+                            'sse_preguntas.tipo_pregunta_cve', 
+                            'sse_preguntas.pregunta', 
+                            'sse_preguntas.obligada', 
+                            'sse_preguntas.orden', 
+                            'sse_preguntas.is_bono',
+                            'sse_preguntas.val_ref', 
+                            'sse_preguntas.pregunta_padre', 
+                            'sse_respuestas.reactivos_cve', 
+                            'sse_respuestas.ponderacion', 
+                            'sse_respuestas.texto', 
+                            'sse_seccion.descripcion',
+                            'sse_preguntas.tipo_indicador_cve',
+                            'sse_preguntas.valido_no_aplica',
+                            'sse_seccion.descripcion',
+                            'sse_indicador.descripcion as indicador',
+
+                            );
+
+            $this->db->join('encuestas.sse_respuestas', 'sse_respuestas.preguntas_cve=sse_preguntas.preguntas_cve');
+            $this->db->join('encuestas.sse_seccion', 'sse_seccion.seccion_cve=sse_preguntas.seccion_cve');
+            $this->db->join('encuestas.sse_indicador', 'sse_indicador.indicador_cve=sse_preguntas.tipo_indicador_cve');
+            $this->db->where('sse_preguntas.encuesta_cve', $id_instrumento);
+            $this->db->select($busqueda);
+            //$this->db->order_by('seccion_cve','ASC');
+            $this->db->order_by('orden','ASC');
+            $query = $this->db->get('encuestas.sse_preguntas');
+            //pr($this->db->last_query());
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function listado_instrumentos($params=null)
+    {
+        $resultado = array();
+        
+        $this->db->select("COUNT(*) AS existe_evaluacion"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_encuestas.encuesta_cve=sse_evaluacion.encuesta_cve');
+        $evaluaciones = $this->db->get_compiled_select('encuestas.sse_evaluacion');
+
+        $this->db->select("mdl_role.name"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve=mdl_role.id');
+        $rol_evaluar = $this->db->get_compiled_select('public.mdl_role');
+
+        $this->db->select("mdl_role.name"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_reglas_evaluacion.rol_evaluador_cve=mdl_role.id');
+        $rol_evaluador = $this->db->get_compiled_select('public.mdl_role');
+
+        $this->db->start_cache();
+        $this->db->select('sse_encuestas.encuesta_cve');
+        
+        $busqueda = array();
+
+        if(isset($params['descripcion_encuestas']) && !empty($params['descripcion_encuestas'])){ ////// Ejemplo - Like 
+            $this->db->like('sse_encuestas.descripcion_encuestas',$params['descripcion_encuestas']);
+            //$guarda_busqueda = true;
+        
+        }
+        
+        /**/
+        if(isset($params['rol_id']) && !empty($params['rol_id']))
+        {
+            //$guarda_busqueda = true;
+            $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve',$params['rol_id']);
+
+        } 
+        
+        if(isset($params['is_bono']) && !empty($params['is_bono']))
+        {
+            //$guarda_busqueda = true;
+            $this->db->where('sse_encuestas.is_bono',$params['is_bono']);
+
+        }
+
+        /*if(isset($params['tutorizado']) && !empty($params['tutorizado']))
+        {
+            //$guarda_busqueda = true;
+            $this->db->where('sse_encuestas.tutorizado',$params['tutorizado']);            
+        }*/
+        //reglas_evaluacion_cve
+        $this->db->join('encuestas.sse_reglas_evaluacion', 'sse_reglas_evaluacion.reglas_evaluacion_cve=sse_encuestas.reglas_evaluacion_cve');
+        //$this->db->join('public.mdl_role', 'mdl_role.id=sse_encuestas.rol_id');
+
+        $this->db->stop_cache();
+        /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
+
+        ///////////////////////////// Obtener número de registros ///////////////////////////////
+        $nr = $this->db->get_compiled_select('encuestas.sse_encuestas'); //Obtener el total de registros
+        $num_rows = $this->db->query("SELECT count(*) AS total FROM (".$nr.") AS temp")->result();
+        //pr($this->db1->last_query());
+        /////////////////////////////// FIN número de registros /////////////////////////////////
+        $busqueda = array(
+                    'sse_encuestas.encuesta_cve',
+                    'sse_encuestas.reglas_evaluacion_cve',
+                    'sse_encuestas.descripcion_encuestas',
+                    'sse_encuestas.cve_corta_encuesta', 
+                    'sse_encuestas.is_bono',
+                    'sse_encuestas.status',
+                    'sse_reglas_evaluacion.rol_evaluador_cve',
+                    'sse_reglas_evaluacion.rol_evaluado_cve',
+                    'sse_reglas_evaluacion.tutorizado', 
+                    //'mdl_role.name', 
+                    '('.$rol_evaluar.') AS rol_evaluar', 
+                    '('.$rol_evaluador.') AS rol_evaluador', 
+                    '('.$evaluaciones.') AS tiene_evaluaciones'
+                    );
+
+        $this->db->select($busqueda);
+
+        if(isset($params['order']) && !empty($params['order'])){
+            $tipo_orden = (isset($params['order_type']) && !empty($params['order_type'])) ? $params['order_type'] : "ASC";
+            $this->db->order_by($params['order'], $tipo_orden);
+        }
+        if(isset($params['per_page']) && isset($params['current_row'])){ //Establecer límite definido para paginación 
+            $this->db->limit($params['per_page'], $params['current_row']);
+        }
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de registros
+        //pr($this->db->last_query());                                  
+        $resultado['total']=$num_rows[0]->total;
+        $resultado['columns']=$query->list_fields();
+        $resultado['data']=$query->result_array();
+        //pr($resultado['data']);
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+        /*         
+        if(isset($guarda_busqueda) && $guarda_busqueda == true){                    
+            $this->guarda_busqueda($params);                                        
+        }*/
+            
+        return $resultado;
+    }
+
+    public function tiene_evaluaciones($id_instrumento=null)
+    {
+        $this->db->select("COUNT(*) AS tiene_evaluacion"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_evaluacion.encuesta_cve', $id_instrumento);
+        $query = $this->db->get('encuestas.sse_evaluacion');
+
+        $resultado = $query->result_array();
+
+        return $resultado;
+
+    }
+
+    public function block_instrumento($id_instrumento=null)
+    {
+
+            $data = array(
+                   'status' => 0
+                );
+        $this->db->trans_begin(); // inicio de transaccion
+
+            $this->db->where('encuesta_cve', $id_instrumento);
+            $this->db->update('encuestas.sse_encuestas', $data);
+            $this->db->trans_complete();
+        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        } else {
+
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+            
+        } 
+
+    }
+
+    public function unlock_instrumento($id_instrumento=null)
+    {
+
+            $data = array(
+                   'status' => 1
+                );
+        $this->db->trans_begin(); // inicio de transaccion
+
+            $this->db->where('encuesta_cve', $id_instrumento);
+            $this->db->update('encuestas.sse_encuestas', $data);
+            $this->db->trans_complete();
+        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        } else {
+
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+            
+        } 
+
+    }
+
+    public function drop_instrumento($encuesta_cve=null)
+    {
+
+        /*
+        begin;
+            delete from encuestas.sse_respuestas where preguntas_cve in (select preguntas_cve from encuestas.sse_preguntas where encuesta_cve in (select encuesta_cve from encuestas.sse_encuestas WHERE encuesta_cve=11));
+            delete from encuestas.sse_preguntas where encuesta_cve in (select encuesta_cve from encuestas.sse_encuestas WHERE encuesta_cve=11);
+            delete from encuestas.sse_encuestas WHERE encuesta_cve=11;
+        commit;
+        */
+        $this->db->select("encuesta_cve"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_encuestas.encuesta_cve', $encuesta_cve);
+        $query1 =$this->db->get('encuestas.sse_encuestas');
+        $encuesta = $query1->result_array(); 
+        $encuesta_drop = $encuesta[0];
+
+        $this->db->select("preguntas_cve"); //////Ejemplo de compilación de consulta
+        $this->db->where_in('sse_preguntas.encuesta_cve', $encuesta_drop);
+        $query2 =$this->db->get('encuestas.sse_preguntas');
+        $preguntas = $query2->result_array(); 
+
+        $preguntas_drop = array();
+        foreach ($preguntas as $key => $value) {
+            $preguntas_drop[] = $value['preguntas_cve'];
+        }
+        //pr($preguntas_drop);
+
+        $this->db->trans_begin(); // inicio de transaccion
+
+        $this->db->where_in('sse_respuestas.preguntas_cve', $preguntas_drop);
+        $this->db->delete('encuestas.sse_respuestas');
+        $this->db->where_in('sse_preguntas.encuesta_cve', $encuesta_drop);
+        $this->db->delete('encuestas.sse_preguntas');
+        $this->db->where_in('sse_encuesta_curso.encuesta_cve', $encuesta_drop);
+        $this->db->delete('encuestas.sse_encuesta_curso');
+        $this->db->where('sse_encuestas.encuesta_cve', $encuesta_cve);        
+        $this->db->delete('encuestas.sse_encuestas');
+        $this->db->trans_complete();
+        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        } else {
+
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+            
+        }
+    }
+
+    public function drop_pregunta($pregunta_cve=null)
+    {   
+        $this->db->select("preguntas_cve"); //////Ejemplo de compilación de consulta
+        $this->db->where('sse_preguntas.preguntas_cve', $pregunta_cve);
+        $query1 =$this->db->get('encuestas.sse_preguntas');
+        $preguntas_hija = $query1->result_array(); 
+
+        $this->db->trans_begin(); // inicio de transaccion
+        if (isset($preguntas_hija[0]) && !empty($preguntas_hija[0]) ) {
+
+            //pr($preguntas_hija[0]);
+            //exit();
+            $this->db->where_in('sse_respuestas.preguntas_cve', $preguntas_hija[0]);
+            $this->db->delete('encuestas.sse_respuestas');
+
+            $this->db->where_in('sse_preguntas.pregunta_padre', $preguntas_hija[0]);
+            $this->db->delete('encuestas.sse_preguntas');        
+
+        }
+        
+        $this->db->where('sse_respuestas.preguntas_cve', $pregunta_cve);
+        $this->db->delete('encuestas.sse_respuestas');
+        
+        $this->db->where('sse_preguntas.preguntas_cve', $pregunta_cve);
+        $this->db->delete('encuestas.sse_preguntas');
+
+        $this->db->trans_complete();
+        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        } else {
+
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+            
+        }
+           
+    }
+
+
+
+    public function listado_encuestas_curso($params=null)
+    {
+
+        /*select encuestas.sse_encuestas.encuesta_cve,encuestas.sse_encuestas.descripcion_encuestas, encuestas.sse_encuestas.is_bono, encuestas.sse_encuestas.status,encuestas.sse_reglas_evaluacion.tutorizado
+        from encuestas.sse_encuesta_curso
+        inner join encuestas.sse_encuestas  on encuestas.sse_encuestas.encuesta_cve=encuestas.sse_encuesta_curso.encuesta_cve
+        inner join encuestas.sse_reglas_evaluacion on encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve
+        where sse_encuesta_curso.course_cve=797*/
+
+
+        /*select encuestas.sse_encuestas.encuesta_cve,encuestas.sse_encuestas.descripcion_encuestas, encuestas.sse_encuestas.is_bono, encuestas.sse_encuestas.status,encuestas.sse_reglas_evaluacion.tutorizado,
+        (select encuestas.sse_encuestas.encuesta_cve in (select encuesta_cve from encuestas.sse_encuesta_curso where course_cve=797)) as asig
+        from encuestas.sse_encuestas
+        left join encuestas.sse_encuesta_curso on   encuestas.sse_encuesta_curso.encuesta_cve=encuestas.sse_encuestas.encuesta_cve
+        left join  encuestas.sse_reglas_evaluacion on encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve
+        where encuestas.sse_reglas_evaluacion.tutorizado=1*/
+
+
+        /*select encuestas.sse_encuestas.encuesta_cve,encuestas.sse_encuestas.descripcion_encuestas, encuestas.sse_encuestas.is_bono, encuestas.sse_encuestas.status,encuestas.sse_reglas_evaluacion.tutorizado,
+        (select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluado_cve) evaluado,(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluador_cve) as evaluador,
+        (select encuestas.sse_encuestas.encuesta_cve in (select encuesta_cve from encuestas.sse_encuesta_curso where course_cve=797)) as asig
+        from encuestas.sse_encuestas
+        left join encuestas.sse_encuesta_curso on   encuestas.sse_encuesta_curso.encuesta_cve=encuestas.sse_encuestas.encuesta_cve
+        left join  encuestas.sse_reglas_evaluacion on encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve
+        where encuestas.sse_reglas_evaluacion.tutorizado=1*/
+
+        /*select encuestas.sse_encuestas.encuesta_cve,encuestas.sse_encuestas.descripcion_encuestas, encuestas.sse_encuestas.is_bono, encuestas.sse_encuestas.status,encuestas.sse_reglas_evaluacion.tutorizado,
+        (select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluado_cve) evaluado,(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluador_cve) as evaluador,
+        (select encuestas.sse_encuestas.encuesta_cve in (select encuesta_cve from encuestas.sse_encuesta_curso where course_cve=761)) as asig 
+        from encuestas.sse_encuestas 
+        left join  encuestas.sse_reglas_evaluacion on encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve
+        where encuestas.sse_reglas_evaluacion.tutorizado=1*/
+
+
+        $resultado = array();
+        ///////////////////// Iniciar almacenado de parámetros en cache /////////////////////////
+        $this->db->start_cache();
+        $this->db->select('encuestas.sse_encuestas.encuesta_cve');
+   
+       /* if(isset($params['curso']) && !empty($params['curso']))
+        {
+            //$guarda_busqueda = true;
+            $this->db->where('sse_encuesta_curso.course_cve',$params['curso']);             
+        } */
+
+
+        /*if(isset($params['tutorizado']) && $params['tutorizado'] >= 0 && !empty($params['tutorizado']) )
+        {*/
+            //$guarda_busqueda = true;
+            $this->db->where('sse_reglas_evaluacion.tutorizado',$params['tutorizado']);             
+       //}
+        /*if(isset($params['anio']) && !empty($params['anio']))
+        {
+            //$guarda_busqueda = true;
+            $this->db->where("TO_CHAR(TO_TIMESTAMP(mdl_course.startdate),'YYYY')='".$params['anio']."'");             
+        }*/
+
+              
+        $this->db->where('sse_encuestas.status','1');             
+        //$this->db->join('encuestas.sse_encuestas', 'sse_encuestas.encuesta_cve=sse_encuesta_curso.encuesta_cve');
+        //$this->db->join('encuestas.sse_reglas_evaluacion','sse_reglas_evaluacion.reglas_evaluacion_cve=sse_encuestas.reglas_evaluacion_cve');
+       
+        //$this->db->join('encuestas.sse_encuesta_curso', 'sse_encuesta_curso.encuesta_cve=sse_encuestas.encuesta_cve','left');
+        $this->db->join('encuestas.sse_reglas_evaluacion','sse_reglas_evaluacion.reglas_evaluacion_cve=sse_encuestas.reglas_evaluacion_cve','left');
+       
+
+
+
+        $this->db->stop_cache();
+        /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
+
+        ///////////////////////////// Obtener número de registros ///////////////////////////////
+        $nr = $this->db->get_compiled_select('encuestas.sse_encuestas'); //Obtener el total de registros
+        $num_rows = $this->db->query("SELECT count(*) AS total FROM (".$nr.") AS temp")->result();
+        //pr($this->db1->last_query());
+        /////////////////////////////// FIN número de registros /////////////////////////////////
+        $busqueda = array(
+                    'sse_encuestas.encuesta_cve as encuesta',
+                    'sse_encuestas.cve_corta_encuesta as encuestaclavecorta',
+                    'sse_encuestas.descripcion_encuestas as descrip', 
+                    'sse_encuestas.is_bono as bono', 
+                    'sse_encuestas.status as estatus',
+                    'sse_reglas_evaluacion.tutorizado as tutorizado',
+                    '(select sse_encuestas.encuesta_cve in (select encuesta_cve from encuestas.sse_encuesta_curso where course_cve='.$params['curso'].') :: int) as asig',
+                    '(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluado_cve) as evaluado',
+                    '(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluador_cve) as evaluador',
+                    );
+        
+        $this->db->select($busqueda);
+        if(isset($params['order']) && !empty($params['order'])){
+            $tipo_orden = (isset($params['order_type']) && !empty($params['order_type'])) ? $params['order_type'] : "ASC";
+            $this->db->order_by($params['order'], $tipo_orden);
+        }
+        if(isset($params['per_page']) && isset($params['current_row'])){ //Establecer límite definido para paginación 
+            $this->db->limit($params['per_page'], $params['current_row']);
+        }
+
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de registros
+        
+        //pr($this->db1->last_query());                                  
+        $resultado['total']=$num_rows[0]->total;
+        $resultado['columns']=$query->list_fields();
+        $resultado['data']=$query->result_array();
+        //pr($resultado['data']);
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+        
+            
+        return $resultado;
+    }
+
+
+     public function insertar_asoc($encuestacve=array(),$curso=null)
+    {        
+        //if(isset($params['encuesta']) && !empty($params['encuesta'])){
+        $row['ingresado']=array();
+        $row['existe']=array();
+        
+        if(isset($encuestacve) && !empty($encuestacve)){    
+            //pr($encuestacve);
+            foreach($encuestacve as $value)
+            {
+
+                 $existe = $this->get_encuestac($value,$curso);
+                 if(!$existe)
+                 {
+                    //si no existe insertarlo
+                    $data=array(
+                                'mdl_groups_cve' => '0',
+                                'course_cve' =>  $curso,
+                                'encuesta_cve' => $value,
+                                'alcance_curso_cve' => '0'
+                                 );
+                    $this->db->insert('sse_encuesta_curso', $data);                      
+                    $insert_id = $this->db->insert_id();
+                    $row['ingresado']=$insert_id;
+                 }
+                 else
+                 {
+                    $row['existe']=$value;
+                 }
+
+            }
+        }else 
+        {
+            # code...
+            $row['error']='No hubo seleccion';
+        }        
+
+            return $row;
+            
+    }
+
+    public function get_encuestac($encuesta=null,$curso=null){
+        //$resultado = array();        
+        
+        $this->db->where('course_cve',$curso);
+        $this->db->where('encuesta_cve',$encuesta); 
+        $query = $this->db->get('encuestas.sse_encuesta_curso'); //Obtener conjunto de encuestas            
+
+        $resultado = $query->result_array();
+
+        if(isset($resultado[0]['encuesta_curso_cve']))
+        {
+            return $resultado[0];
+        }
+        else{
+            return FALSE;
+        }
+
+
+        $query->free_result(); //Libera la memoria
+
+       
+        
+    }
+
+
+    public function get_datos_usuarios($params=null){
+    $resultado = array();
+    $arrol=array();
+
+   /*      SELECT c.id AS cve_curso,  u.id AS cve_usuario, u.username AS nom_nombre, u.firstname AS nom, u.lastname AS pat, ' ' AS mat, g.id AS cve_grupo, g.name AS grupo_nombre, r.id AS cve_rol, r.name AS rol_nombre, u.cve_departamental
+   FROM mdl_user u
+   JOIN mdl_role_assignments ra ON ra.userid = u.id
+   JOIN mdl_context ct ON ct.id = ra.contextid
+   JOIN mdl_course c ON c.id = ct.instanceid
+   JOIN mdl_role r ON r.id = ra.roleid
+   right JOIN mdl_groups g ON g.courseid = c.id
+   right JOIN mdl_groups_members gm ON gm.userid = u.id AND gm.groupid = g.id
+   JOIN mdl_enrol en ON en.courseid = c.id
+   JOIN mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id
+   where c.id=103 and u.id=7178*/
+
+/*SELECT mdl_role.id FROM mdl_course
+
+INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
+
+INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
+
+INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
+
+INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
+
+WHERE mdl_course.id=761 and mdl_user.id=7848*/
+
+    $sql="SELECT mdl_role.id FROM mdl_course
+    INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
+    INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
+    INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
+    INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
+    WHERE mdl_course.id=".$params['cur_id']." and mdl_user.id=".$params['user_id'];
+        
+        $result = $this->db->query($sql);
+        if($result->num_rows() > 0){
+
+        $usuariosrol = $result->result_array();
+        $result->free_result();
+        foreach($usuariosrol as $index=>$value){    
+             
+             $arrol[]=$value['id'];
+             }
+
+        }
+ 
+
+
+
+        if(in_array(5,$arrol))
+        {
+          //Buscar en moodle
+
+            
+            if(isset($params['user_id']) && !empty($params['user_id']))
+            {
+                 $this->db->where('u.id',$params['user_id']);
+            } 
+           if(isset($params['cur_id']) && !empty($params['cur_id']))
+            {
+                 $this->db->where('c.id',$params['cur_id']);
+            } 
+
+            $this->db->join('public.mdl_role_assignments ra', 'ra.userid = u.id');
+            $this->db->join('public.mdl_context ct','ct.id = ra.contextid');
+            $this->db->join('public.mdl_course c', 'c.id = ct.instanceid');
+            $this->db->join('public.mdl_role r','r.id = ra.roleid');
+            $this->db->join('public.mdl_groups g', 'g.courseid = c.id','right');
+            $this->db->join('public.mdl_groups_members gm','gm.userid = u.id AND gm.groupid = g.id','right');
+            $this->db->join('public.mdl_enrol en', 'en.courseid = c.id');
+            $this->db->join('public.mdl_user_enrolments ue','ue.enrolid = en.id AND ue.userid = u.id');
+        
+            $busqueda = array(
+                    'c.id AS cve_curso',   
+                    'u.firstname AS nombres', 
+                    'u.lastname AS apellidos',
+                    'g.id AS cve_grupo', 
+                    'g.name AS nom_grupo', 
+                    'r.id AS cve_rol', 
+                    'r.name AS rol_nombre');
+
+            $this->db->select($busqueda);
+
+
+            $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
+
+        }
+        else
+        {
+          //Buscar en sied
+        /*select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, 
+        public.mdl_groups.name, public.mdl_course.id ,*
+        from tutorias.mdl_userexp 
+        inner join public.mdl_user on public.mdl_user.id= tutorias.mdl_userexp.userid
+        inner join public.mdl_role on public.mdl_role.id= tutorias.mdl_userexp.role
+        inner join public.mdl_groups on public.mdl_groups.id=tutorias.mdl_userexp.grupoid
+        inner join public.mdl_course on public.mdl_course.id=tutorias.mdl_userexp.cursoid
+        where cursoid=761 and mdl_user.id=7848*/
+            if(isset($params['rol_evaluado_cve']) && !empty($params['rol_evaluado_cve']))
+            {
+                 $this->db->where_not_in('public.mdl_role.id',$params['rol_evaluado_cve']);
+            }
+
+            if(isset($params['user_id']) && !empty($params['user_id']))
+            {
+                 $this->db->where('public.mdl_user.id',$params['user_id']);
+            } 
+           if(isset($params['cur_id']) && !empty($params['cur_id']))
+            {
+                 $this->db->where('tutorias.mdl_userexp.cursoid',$params['cur_id']);
+            } 
+
+            $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            $this->db->join('public.mdl_role','public.mdl_role.id= tutorias.mdl_userexp.role');
+            $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+            $this->db->join('public.mdl_course','public.mdl_course.id=tutorias.mdl_userexp.cursoid');
+            
+            $busqueda = array(
+                    'public.mdl_course.id as cve_curso', 
+                    'public.mdl_user.firstname as nombres', 
+                    'public.mdl_user.lastname as apellidos', 
+                    'public.mdl_groups.id AS cve_grupo', 
+                    'public.mdl_groups.name as nom_grupo', 
+                    'public.mdl_role.id AS cve_rol', 
+                    'public.mdl_role.name AS rol_nombre');
+            $this->db->select($busqueda);
+
+
+            $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
+
+
+
+        }    
+        
+       
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+   public function get_reglas_validas_curso($params=null)
+   {
+       // $resultado = array();
+       /*select re.reglas_evaluacion_cve,re.rol_evaluado_cve,re.is_excepcion,en.encuesta_cve
+from encuestas.sse_reglas_evaluacion re 
+inner join encuestas.sse_encuestas en on en.reglas_evaluacion_cve=re.reglas_evaluacion_cve
+inner join encuestas.sse_encuesta_curso enc on enc.encuesta_cve=en.encuesta_cve
+where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18) and enc.course_cve=979 */
+
+
+        if(isset($params['role_evaluador']) && !empty($params['role_evaluador']))
+        {
+             $this->db->where('sse_reglas_evaluacion.rol_evaluador_cve',$params['role_evaluador']);
+        }
+        if(isset($params['tutorizado']) && !empty($params['tutorizado']))
+        {
+             $this->db->where('sse_reglas_evaluacion.tutorizado',$params['tutorizado']);
+        }
+        /*if(isset($params['bono']) && !empty($params['bono']))
+        {
+             $this->db->where('sse_reglas_evaluacion.is_bono',$params['bono']);
+        }*/
+        if(isset($params['cur_id']) && !empty($params['cur_id']))
+        {
+             $this->db->where('sse_encuesta_curso.course_cve',$params['cur_id']);
+        }
+        
+         //$cadena_equipo = implode(",", $params['role_evaluado']);
+
+        //condicionantes de acuerdo a la existencia de los roles
+         if(isset($params['role_evaluado']) && !empty($params['role_evaluado']) && !in_array(0,$params['role_evaluado']))
+        {
+            /*foreach ($params['role_evaluado'] as $value) {
+
+            $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve',$value);
+            # code...
+             }*/
+//            $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve',$cadena_equipo); 
+
+         
+            $this->db->where_in('sse_reglas_evaluacion.rol_evaluado_cve', $params['role_evaluado']);
+        }
+
+
+
+        
+        $this->db->join('encuestas.sse_encuestas', 'sse_encuestas.reglas_evaluacion_cve=sse_reglas_evaluacion.reglas_evaluacion_cve');
+        $this->db->join('encuestas.sse_encuesta_curso','sse_encuesta_curso.encuesta_cve=sse_encuestas.encuesta_cve');
+            
+        $busqueda = array(
+                    'sse_reglas_evaluacion.reglas_evaluacion_cve',  
+                    'sse_reglas_evaluacion.rol_evaluado_cve', 
+                    'sse_reglas_evaluacion.is_excepcion',
+                    'sse_encuestas.encuesta_cve'
+                    );
+      
+        $this->db->select($busqueda);
+       
+
+
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion');
+        //$resultado['data']=$query->result_array();
+        $resultado = $query->result_array();
+        
+        
+
+
+
+
+
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+      
+        
+
+        return $resultado;
+
+    }
+
+    public function get_roles_curso_gpo($idcurso,$idgpo,$roleevaluador)
+   {
+
+       $resultado = array();
+        
+     /*SELECT distinct (mdl_role.id) FROM mdl_course
+     INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
+     INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
+     INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
+     where mdl_course.id=103*/
+
+     /*select public.mdl_role.id,public.mdl_role.name 
+        from tutorias.mdl_userexp 
+        inner join public.mdl_user on public.mdl_user.id= tutorias.mdl_userexp.userid
+        inner join public.mdl_role on public.mdl_role.id= tutorias.mdl_userexp.role
+        inner join public.mdl_groups on public.mdl_groups.id=tutorias.mdl_userexp.grupoid
+        where cursoid=103 and grupoid=761*/
+        $this->db->where('tutorias.mdl_userexp.cursoid',$idcurso);
+        $this->db->where('public.mdl_groups.id',$idgpo);
+
+        $this->db->where('tutorias.mdl_userexp.role not in(14,30)');
+        $this->db->where('tutorias.mdl_userexp.role not in('.$roleevaluador.')');
+
+        $this->db->select('distinct (mdl_role.id) as roles');
+
+        /*$this->db->join('public.mdl_context', 'mdl_context.instanceid = mdl_course.id');
+        $this->db->join('public.mdl_role_assignments','mdl_context.id = mdl_role_assignments.contextid');
+        $this->db->join('public.mdl_role','mdl_role.id = mdl_role_assignments.roleid');*/
+
+
+
+        $this->db->join('public.mdl_user','public.mdl_user.id=tutorias.mdl_userexp.userid');
+        $this->db->join('public.mdl_role','public.mdl_role.id= tutorias.mdl_userexp.role');
+        $this->db->join('public.mdl_groups','public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+
+        //$query = $this->db->get('public.mdl_course'); //Obtener conjunto de encuestas
+
+        $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        foreach ($query->result_array() as $row)
+        {
+           $varole[]=$row['roles'];
+        }
+
+        $query->free_result(); //Libera la memoria
+
+        return $varole;
+
+    }
+
+    public function listado_eval($params=null)
+   {
+       // $resultado = array();
+
+        /*select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, public.mdl_groups.name 
+        from tutorias.mdl_userexp 
+        inner join public.mdl_user on public.mdl_user.id= tutorias.mdl_userexp.userid
+        inner join public.mdl_role on public.mdl_role.id= tutorias.mdl_userexp.role
+        inner join public.mdl_groups on public.mdl_groups.id=tutorias.mdl_userexp.grupoid
+        where cursoid=103 and grupoid=761 and role=0*/
+
+/*$params['cur_id']=761;
+        $params['role_evaluado']=33;
+        $params['gpo_evaluador']=8623;*/
+        
+        /*$this->db->where('encuesta_cve',$params['encuesta_cve']);
+        $this->db->where('course_cve',$params['cur_id']);
+        $this->db->where('group_id',$params['gpo_evaluador']);
+        $this->db->where('evaluador_user_cve',$params['user_evaluador_cve']);
+
+        $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
+        if ($query->num_rows()>0){
+
+             $realizado=1;
+        }
+        else
+        {
+             $realizado=0;   
+        } */ 
+        $this->db->where('tutorias.mdl_userexp.cursoid',$params['cur_id']);
+
+
+        if(isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador']))
+        {
+
+
+            $this->db->where('tutorias.mdl_userexp.cursoid',$params['cur_id']);
+            //$this->db->where('tutorias.mdl_userexp.role',$params['role_evaluado']);
+            $this->db->where('tutorias.mdl_userexp.grupoid',$params['gpo_evaluador']);
+
+            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
+
+            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_groups.name as ngpo, 
+                (select public.mdl_role.name from public.mdl_role where id='.$params['role_evaluador'].') as evaluador,'. 
+                $params['encuesta_cve']. ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
+                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion where encuesta_cve='. $params['encuesta_cve'].' and course_cve='.$params['cur_id'].' and group_id='.$params['gpo_evaluador'].' 
+                    and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve='.$params['evaluador_user_cve'].')  as realizado');
+
+            $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            $this->db->join('public.mdl_role','public.mdl_role.id= tutorias.mdl_userexp.role');
+            $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+        }
+        else
+        {
+
+
+            $params['gpo_evaluador']=0;
+            $consulta='public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role,'. $params['gpo_evaluador'].' as ngpo,
+              (select public.mdl_role.name from public.mdl_role where id='.$params['role_evaluador'].') as evaluador,'. 
+                    $params['encuesta_cve']. ' as regla, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
+                    (select evaluacion_resul_cve from encuestas.sse_result_evaluacion where encuesta_cve='. $params['encuesta_cve'].' and course_cve='.$params['cur_id'].' 
+                        and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve='.$params['evaluador_user_cve'].')  as realizado';
+         
+
+            
+
+            $this->db->distinct($consulta);
+            $this->db->select($consulta);
+
+            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
+
+                
+            $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            $this->db->join('public.mdl_role','public.mdl_role.id= tutorias.mdl_userexp.role');
+
+        }
+
+        $query = $this->db->get('tutorias.mdl_userexp'); 
+
+        /*if ($query->num_rows() > 0){
+            //$resultado['result'] = true;
+            //$resultado['data'] = $query->result_array();
+            $resultado = $query->result_array();
+
+        }*/
+
+        $resultado = $query->result_array();
+        //$this->db->flush_cache();
+        //$query->free_result(); //Libera la memoria                                
+      
+        
+
+        return $resultado;
+   }
+
+   public function get_reglas_encuesta($encuesta_cve=NULL){
+        /*select sse_reglas_evaluacion.rol_evaluador_cve,sse_reglas_evaluacion.rol_evaluado_cve 
+        from encuestas.sse_encuestas
+        inner join encuestas.sse_reglas_evaluacion on encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve
+        where encuestas.sse_encuestas.encuesta_cve=74
+        */
+        $resultado = array();
+        $this->db->select('sse_reglas_evaluacion.rol_evaluador_cve,sse_reglas_evaluacion.rol_evaluado_cve');
+        $this->db->where('encuestas.sse_encuestas.encuesta_cve', $encuesta_cve);
+
+        $this->db->join('encuestas.sse_reglas_evaluacion', 'encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve');
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+    public function guarda_reactivos_evaluacion($params=null)
+    {        
+        $ob_si=0;
+        $ob_no=0;
+        $notob_si=0;
+        $notob_no=0;
+        $total_reactivos=0; 
+
+        $encuesta_cve=$params['encuesta_cve'];
+        $course_cve=$params['curso_cve'];
+        $group_id =$params['grupo_cve'];
+        $evaluado_user_cve =$params['evaluado_user_cve'];
+        $evaluador_user_cve = $params['evaluador_user_cve'];
+
+
+        
+        $this->db->trans_begin(); // inicio de transaccion
+        //pr($params['reactivos']);
+        foreach ($params['reactivos'] as $key => $value) {
+              # code...
+               $pregunta=$key;
+               $respuesta=$value; 
+               
+               $data = array(
+                    'encuesta_cve' => $encuesta_cve,
+                    'preguntas_cve' => $pregunta,
+                    'reactivos_cve' => $respuesta,
+                    'course_cve' => $course_cve,
+                    'group_id' => $group_id,
+                    'evaluado_user_cve' => $evaluado_user_cve,
+                    'evaluado_rol_id' => $params['evaluado_rol_id'],
+                    'evaluador_user_cve' => $evaluador_user_cve,
+                    'evaluador_rol_id' => $params['evaluador_rol_id'],
+                    'respuesta_abierta' => $params['respuesta_abierta'],
+                    'fecha' => $params['fecha']
+                    );
+                
+                
+
+                $this->db->where('encuesta_cve',$params['encuesta_cve']);
+                $this->db->where('evaluado_user_cve',$params['evaluado_user_cve']);
+                $this->db->where('evaluador_user_cve',$params['evaluador_user_cve']);
+                $this->db->where('course_cve',$params['curso_cve']);
+                $this->db->where('group_id',$params['grupo_cve']);
+                $this->db->where('preguntas_cve',$pregunta);
+                $this->db->where('reactivos_cve',$respuesta);
+
+                $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
+                //pr($query);
+                if ($query->num_rows()== 0){
+
+                    $pregresp= $this->get_pregunta_respuesta($pregunta,$respuesta);
+                    
+                    if($pregresp[0]['obligada'] == 1)
+                    {
+                      if($pregresp[0]['ponderacion'] == 1)
+                      {
+                         $ob_si++;  
+                      }
+                      else
+                      {
+                         $ob_no++;    
+                      }  
+                    
+                    }
+                    else 
+                    {
+                       if($pregresp[0]['ponderacion'] == 1)
+                      {
+                         $notob_si++;  
+                      }
+                      else
+                      {
+                         $notob_no++;    
+                      }         # code...
+                    }    
+                    
+
+                     $this->db->insert('encuestas.sse_evaluacion', $data);
+                }
+
+               
+
+
+        }
+
+        /*pr($ob_si);
+        pr($ob_no);
+        pr($notob_si);
+        pr($notob_no);*/
+        $calif_emitida = 0;
+        $total_reactivos=$ob_si+$ob_no+$notob_si;
+        $total_si=$ob_si+$notob_si;
+
+        if ($total_si != 0) {
+            $calif_emitida=($total_si*100)/$total_reactivos;
+
+        }
+        //GUARDAR EN RESUL_ENCUESTA
+        $datares = array(
+                    'encuesta_cve' => $encuesta_cve,        
+                    'course_cve' => $course_cve,
+                    'group_id' => $group_id,
+                    'evaluado_user_cve' => $evaluado_user_cve,
+                    'evaluador_user_cve' => $evaluador_user_cve,
+                    'ob_si' =>$ob_si,
+                    'ob_no' =>$ob_no,
+                    'notob_si' => $notob_si,
+                    'notob_no' => $notob_no,
+                    'total_reactivos' => $total_reactivos,
+                    'total_si' => $total_si,
+                    'calif_emitida' => $calif_emitida
+                    );
+
+
+
+        $this->db->insert('encuestas.sse_result_evaluacion', $datares);
+
+
+
+
+        $this->db->trans_complete();
+        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+                return false;
+        } else {
+
+                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+                return true;
+            
+        } 
+
+            //$this->db->insert('encuestas.sse_evaluacion', $data);
+            //$insert_id = $this->db->insert_id();
+
+            //return $insert_id;
+
+   }
+
+
+    public function get_pregunta_respuesta($pregunta=null, $respuesta=null)
+    {
+        
+        $resultado = array();
+        $this->db->select('sse_preguntas.obligada,sse_respuestas.ponderacion');
+        $this->db->where('sse_preguntas.preguntas_cve', $pregunta);
+        $this->db->where('reactivos_cve', $respuesta);
+
+        $this->db->join('encuestas.sse_respuestas', 'sse_respuestas.preguntas_cve=sse_preguntas.preguntas_cve');
+        $query = $this->db->get('encuestas.sse_preguntas'); //Obtener conjunto de encuestas
+       
+        $resultado = $query->result_array();
+        
+
+        return $resultado;
+
+    }
+
+     public function encuestas_realizadas($evaluador_user_cve,$cursoid,$evaluado_user_cve,$grupo_cve,$encuestacve)
+    {
+        
+        $resultado = array();
+        
+        $this->db->where('encuesta_cve', $encuestacve);
+        $this->db->where('course_cve', $cursoid);
+        $this->db->where('group_id', $grupo_cve);
+        $this->db->where('evaluado_user_cve', $evaluado_user_cve);
+        $this->db->where('evaluador_user_cve', $evaluador_user_cve);
+        
+        $query = $this->db->get('encuestas.sse_result_evaluacion'); //Obtener conjunto de encuestas
+       
+        $resultado = $query->result_array();
+        
+        if ($query->num_rows() == 0){
+            return false;
+        }
+        else
+        {
+            return true;    # code...
+        }    
+        
+   }
+
+
+   public function listado_evaluados($params=null)
+    {
+
+        /*select u.username as matricula,
+       concat(u.firstname,' ',u.lastname) as nombre,
+       c.shortname as clave_curso,c.fullname as desc_curso,
+       re.rol_evaluado_cve as role,(select name from public.mdl_role where id=re.rol_evaluado_cve) as nrol,re.rol_evaluador_cve as idrol,count(*) as evaluaciones
+
+from encuestas.sse_result_evaluacion ee
+left join public.mdl_user u on u.id=ee.evaluado_user_cve
+left join public.mdl_course c on c.id=ee.course_cve
+inner join encuestas.sse_encuestas en on en.encuesta_cve=ee.encuesta_cve 
+inner join encuestas.sse_reglas_evaluacion re on re.reglas_evaluacion_cve=en.reglas_evaluacion_cve
+
+
+where ee.course_cve=823
+group by u.username, u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.rol_evaluador_cve
+order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.rol_evaluador_cve*/
+
+        $resultado = array();
+        ///////////////////// Iniciar almacenado de parámetros en cache /////////////////////////
+        $this->db->start_cache();
+        $this->db->select('encuestas.sse_result_evaluacion.evaluacion_resul_cve');
+        $this->db->where('encuestas.sse_result_evaluacion.course_cve', $params['curso']);
+
+        
+        $this->db->join('public.mdl_user', 'public.mdl_user.id=encuestas.sse_result_evaluacion.evaluado_user_cve','left');
+        $this->db->join('public.mdl_course', 'public.mdl_course.id=encuestas.sse_result_evaluacion.course_cve','left');
+        $this->db->join('encuestas.sse_encuestas', 'encuestas.sse_encuestas.encuesta_cve=encuestas.sse_result_evaluacion.encuesta_cve');
+        $this->db->join('encuestas.sse_reglas_evaluacion', 'encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve');
+
+        $this->db->stop_cache();
+        /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
+
+        ///////////////////////////// Obtener número de registros ///////////////////////////////
+        $nr = $this->db->get_compiled_select('encuestas.sse_result_evaluacion'); //Obtener el total de registros
+        $num_rows = $this->db->query("SELECT count(*) AS total FROM (".$nr.") AS temp")->result();
+        //pr($this->db1->last_query());
+        /////////////////////////////// FIN número de registros /////////////////////////////////
+        $busqueda = array(
+                    'mdl_user.username as matricula',  
+                    'mdl_user.firstname as nombre', 
+                    'mdl_user.lastname as apellidos',
+                    'mdl_course.shortname as clave_curso',
+                    'mdl_course.fullname as desc_curso',
+                    'encuestas.sse_reglas_evaluacion.rol_evaluado_cve as evaluado',  
+                    '(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluado_cve) as nrolevaluado', 
+                    'sse_reglas_evaluacion.rol_evaluador_cve as evaluador',
+                    '(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluador_cve) as nrolevaluador', 
+                    'count(*) as evaluaciones',
+                    'encuestas.sse_result_evaluacion.group_id as grupo_id',
+                    'encuestas.sse_result_evaluacion.calif_emitida as calif_emitida',
+                    '(select name from public.mdl_groups where id=encuestas.sse_result_evaluacion.group_id) as ngrupo',
+                    '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion.evaluador_user_cve) as nombreevaluador' 
+
+                    );
+        
+        $this->db->select($busqueda);
+        if(isset($params['order']) && !empty($params['order'])){
+            $tipo_orden = (isset($params['order_type']) && !empty($params['order_type'])) ? $params['order_type'] : "ASC";
+            $this->db->order_by($params['order'], $tipo_orden);
+        }
+        if(isset($params['per_page']) && isset($params['current_row'])){ //Establecer límite definido para paginación 
+            $this->db->limit($params['per_page'], $params['current_row']);
+        }
+
+        $this->db->group_by('sse_result_evaluacion.evaluacion_resul_cve,mdl_user.username, mdl_user.firstname,mdl_user.lastname,mdl_course.shortname,mdl_course.fullname,
+            sse_reglas_evaluacion.rol_evaluado_cve,sse_reglas_evaluacion.rol_evaluador_cve');
+
+        $query = $this->db->get('encuestas.sse_result_evaluacion'); //Obtener conjunto de registros
+        
+        //pr($this->db1->last_query());                                  
+        $resultado['total']=$num_rows[0]->total;
+        $resultado['columns']=$query->list_fields();
+        $resultado['data']=$query->result_array();
+        //pr($resultado['data']);
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+        
+            
+        return $resultado;
+    }
+    
+    public function usuario_existe($id=NULL){
+     /*"SELECT DISTINCT ro.id as idtipo, op.username, op.password, op.id,
+            op.firstname || ' ' || op.lastname as operador, ro.name as tipousuario
+            FROM public.mdl_user op
+            LEFT JOIN public.mdl_role_assignments ra ON op.id = ra.userid
+            LEFT JOIN public.mdl_role ro ON ro.id = ra.roleid
+            WHERE op.id =".$iduser." 
+            */
+
+        $resultado = array();
+        $this->db->select('distinct(us.id) as idtipo, us.username, us.id, us.firstname as nombre,us.lastname as apellidos');
+        $this->db->where('us.id', $id);
+
+        $this->db->join('public.mdl_role_assignments ra', 'us.id = ra.userid','left');
+        $this->db->join('public.mdl_role ro', 'ro.id = ra.roleid','left');
+
+
+        $query = $this->db->get('public.mdl_user us'); //Obtener conjunto de encuestas
+        $resultado = $query->result_array();
+        $row = $query->row(); 
+
+        
+
+
+        if ($query->num_rows() == 0){
+        //Checar si es admin     
+           
+            $this->db->where('name', 'siteadmins');
+            $q = $this->db->get('public.mdl_config'); //Obtener conjunto de encuestas
+            
+            foreach ($q->result_array() as $row)
+            {
+               $admins=explode(",",$row['value']);
+               if(in_array($id,$admins)){
+                 $this->db->select('us.username, us.id, us.firstname as nombre,us.lastname as apellidos');
+                 $this->db->where('id', $id);
+                 $qadmin = $this->db->get('public.mdl_user us');
+                 $dato=$qadmin->row();
+               }
+               else
+               {
+                  $dato=FALSE;
+               } 
+
+            }
+        }
+        else
+        {
+        //Usuario perfil no admin
+            $dato=$query->row(); 
+        }
+
+
+        $query->free_result(); //Libera la memoria
+
+        return $dato;
+
+    } 
+
+    public function existe_clave($cve_corta_encuesta=null)
+    {
+        $resultado = array('result'=>false, 'id'=>0);
+        $this->db->where('cve_corta_encuesta',$cve_corta_encuesta);
+        $query = $this->db->get('encuestas.sse_encuestas'); //Obtener conjunto de registros
+        //pr($query);
+        if ($query->num_rows()>0){
+           return TRUE;
+        }
+        else
+           return FALSE; 
+    }
+    
+
+    public function get_reglas_evaluacion()
+    {
+        $select_params = array(
+            'reglas_evaluacion_cve',
+            'CONCAT(
+                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluado_cve" = "mdl_role"."id"), 
+                    \' - \',
+                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluador_cve" = "mdl_role"."id"),
+                    \' - \',
+                    CASE WHEN tutorizado=1 THEN \'tutorizado\'
+                        WHEN tutorizado=0 THEN \'no tutorizado\'
+                        ELSE \'otro\'
+                    END                    
+                ) AS nom_regla_desc'
+            );
+
+        $this->db->select($select_params);
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion');
+
+        return $query->result_array();
+
+    }
+
+    public function desasociar_instrumento($id_encuesta=null,$id_curso=null)
+    {
+        //Buscar si existen encuestas respondidas
+        $resultado = array('result'=>false, 'id'=>0);
+        $this->db->where('encuesta_cve',$id_encuesta);
+        $this->db->where('course_cve',$id_curso);
+
+        $query = $this->db->get('encuestas.sse_result_evaluacion'); //Obtener conjunto de registros
+        if ($query->num_rows()==0){
+
+            $this->db->delete('encuestas.sse_encuesta_curso', array('encuesta_cve' => $id_encuesta,'course_cve' => $id_curso)); 
+            return TRUE;
+        }
+        return FALSE; 
+    }
+     public function get_roles_usercurso($params=null)
+    {
+        
+        $resultado = array();
+        $sql="SELECT mdl_role.id FROM mdl_course
+    INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
+    INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
+    INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
+    INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
+    WHERE mdl_course.id=".$params['cur_id']." and mdl_user.id=".$params['user_id'];
+        
+        $result = $this->db->query($sql);
+        if($result->num_rows() > 0){
+
+        $usuariosrol = $result->result_array();
+        $result->free_result();
+        foreach($usuariosrol as $index=>$value){    
+             
+             $arrol[]=$value['id'];
+             }
+
+        }
+
+      
+
+        return $arrol;
+
+    }
+
+   
+   public function get_reglas_validas_cur($params=null)
+   {
+       // $resultado = array();
+       /*select re.reglas_evaluacion_cve,re.rol_evaluado_cve,re.is_excepcion,en.encuesta_cve,en.tipo_encuesta,en.eva_tipo,re.ord_prioridad
+from encuestas.sse_reglas_evaluacion re 
+inner join encuestas.sse_encuestas en on en.reglas_evaluacion_cve=re.reglas_evaluacion_cve
+inner join encuestas.sse_encuesta_curso enc on enc.encuesta_cve=en.encuesta_cve
+where  re.rol_evaluador_cve=18 and re.tutorizado=1 and enc.course_cve=823
+order by ord_prioridad*/
+
+
+        if(isset($params['role_evaluador']) && !empty($params['role_evaluador']))
+        {
+             $this->db->where('sse_reglas_evaluacion.rol_evaluador_cve',$params['role_evaluador']);
+        }
+        if(isset($params['tutorizado']) && !empty($params['tutorizado']))
+        {
+             $this->db->where('sse_reglas_evaluacion.tutorizado',$params['tutorizado']);
+        }
+
+        if(isset($params['cur_id']) && !empty($params['cur_id']))
+        {
+             $this->db->where('sse_encuesta_curso.course_cve',$params['cur_id']);
+        }
+        
+         //$cadena_equipo = implode(",", $params['role_evaluado']);
+
+        //condicionantes de acuerdo a la existencia de los roles
+         if(isset($params['role_evaluado']) && !empty($params['role_evaluado']) && !in_array(0,$params['role_evaluado']))
+        {
+            /*foreach ($params['role_evaluado'] as $value) {
+
+            $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve',$value);
+            # code...
+             }*/
+//            $this->db->where('sse_reglas_evaluacion.rol_evaluado_cve',$cadena_equipo); 
+
+         
+            $this->db->where_in('sse_reglas_evaluacion.rol_evaluado_cve', $params['role_evaluado']);
+        }
+
+
+         if(isset($params['cur_id']) && !empty($params['cur_id']))
+        {
+             $this->db->where_in('sse_reglas_evaluacion.ord_prioridad',$params['ord_prioridad']);
+        }
+
+
+        
+        
+        $this->db->join('encuestas.sse_encuestas', 'sse_encuestas.reglas_evaluacion_cve=sse_reglas_evaluacion.reglas_evaluacion_cve');
+        $this->db->join('encuestas.sse_encuesta_curso','sse_encuesta_curso.encuesta_cve=sse_encuestas.encuesta_cve');
+            
+        $busqueda = array(
+                    'sse_reglas_evaluacion.reglas_evaluacion_cve',  
+                    'sse_reglas_evaluacion.rol_evaluado_cve', 
+                    'sse_reglas_evaluacion.is_excepcion',
+                    'sse_encuestas.encuesta_cve',
+                    'sse_encuestas.tipo_encuesta',
+                    'sse_encuestas.eva_tipo',
+                    'sse_reglas_evaluacion.ord_prioridad'
+
+                    );
+      
+        $this->db->select($busqueda);
+        
+       
+
+
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion');
+        //$resultado['data']=$query->result_array();
+        $resultado = $query->result_array();
+        
+        
+
+
+
+
+
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+      
+        
+
+        return $resultado;
+
+    }
+
+    public function listado_evaluados_detalle($params=null)
+    {
+
+        /*
+        SELECT * FROM
+(select encuestas.sse_encuestas.encuesta_cve,descripcion_encuestas,
+(select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve) as cvedepevaluador,
+(select * from departments.get_rama_json((select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve), 7)) as ramaevaluador,
+(select username from public.mdl_user where id=evaluador_user_cve) as matevaluador,
+(select firstname || ' ' || lastname from public.mdl_user where id=evaluador_user_cve) as evaluador,
+(select name from public.mdl_role where id=evaluador_rol_id) as rolevaluador, 
+(select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluado_user_cve) and id_curso=course_cve) as cvedepevaluado,
+
+(select username from public.mdl_user where id=evaluado_user_cve) as matevaluado,
+(select firstname || ' ' || lastname from public.mdl_user where id=evaluado_user_cve) as evaluado,
+(select name from public.mdl_role where id=evaluado_rol_id) as rolevaluado, 
+
+(select pregunta from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as pregunta,
+(select orden from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as orden,
+(select texto from encuestas.sse_respuestas where reactivos_cve=encuestas.sse_evaluacion.reactivos_cve) as respuesta
+
+from encuestas.sse_evaluacion
+inner join encuestas.sse_encuestas  on  encuestas.sse_encuestas.encuesta_cve= encuestas.sse_evaluacion.encuesta_cve 
+inner join encuestas.sse_reglas_evaluacion  on  encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve
+where course_cve=824 and evaluador_rol_id=5
+UNION all 
+
+select encuestas.sse_encuestas.encuesta_cve,descripcion_encuestas,
+(select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and id_curso=course_cve) as cvedepevaluador,
+(select * from departments.get_rama_json((select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and id_curso=course_cve), 7)) as ramaevaluado,
+(select username from public.mdl_user where id=evaluador_user_cve) as matevaluador,
+(select firstname || ' ' || lastname from public.mdl_user where id=evaluador_user_cve) as evaluador,
+(select name from public.mdl_role where id=evaluador_rol_id) as rolevaluador, 
+(select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluado_user_cve) and id_curso=course_cve) as cvedepevaluado,
+
+(select username from public.mdl_user where id=evaluado_user_cve) as matevaluado,
+(select firstname || ' ' || lastname from public.mdl_user where id=evaluado_user_cve) as evaluado,
+(select name from public.mdl_role where id=evaluado_rol_id) as rolevaluado, 
+
+(select pregunta from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as pregunta,
+(select orden from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as orden,
+(select texto from encuestas.sse_respuestas where reactivos_cve=encuestas.sse_evaluacion.reactivos_cve) as respuesta
+
+from encuestas.sse_evaluacion
+inner join encuestas.sse_encuestas  on  encuestas.sse_encuestas.encuesta_cve= encuestas.sse_evaluacion.encuesta_cve 
+inner join encuestas.sse_reglas_evaluacion  on  encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve where course_cve=824 and evaluador_rol_id <> 5) as t
+
+
+group by t.encuesta_cve,t.descripcion_encuestas,t.pregunta,t.orden,t.cvedepevaluador,t.ramaevaluador,t.evaluador,t.rolevaluador,t.cvedepevaluado,
+t.matevaluado,t.evaluado,t.rolevaluado,t.respuesta,t.matevaluador
+
+order by t.encuesta_cve,t.matevaluado,t.orden
+*/
+
+        $resultado = array();
+        ///////////////////// Iniciar almacenado de parámetros en cache /////////////////////////
+        $this->db->start_cache();
+        $this->db->select('*');
+        /*$this->db->where('encuestas.sse_result_evaluacion.course_cve', $params['curso']);
+
+        
+        $this->db->join('public.mdl_user', 'public.mdl_user.id=encuestas.sse_result_evaluacion.evaluado_user_cve','left');
+        $this->db->join('public.mdl_course', 'public.mdl_course.id=encuestas.sse_result_evaluacion.course_cve','left');
+        $this->db->join('encuestas.sse_encuestas', 'encuestas.sse_encuestas.encuesta_cve=encuestas.sse_result_evaluacion.encuesta_cve');
+        $this->db->join('encuestas.sse_reglas_evaluacion', 'encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve');
+*/
+        $this->db->stop_cache();
+        /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
+
+        ///////////////////////////// Obtener número de registros ///////////////////////////////
+        $nr = $this->db->get_compiled_select('encuestas.sse_result_evaluacion'); //Obtener el total de registros
+        $num_rows = $this->db->query("SELECT count(*) AS total FROM (".$nr.") AS temp")->result();
+        //pr($this->db1->last_query());
+        /////////////////////////////// FIN número de registros /////////////////////////////////
+
+        
+        $this->db->select('*');
+
+
+        $this->db->from('(select encuestas.sse_encuestas.encuesta_cve,descripcion_encuestas,
+        (select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve) as cvedepevaluador,
+        (select * from departments.get_rama_completa((select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve), 7)) as ramaevaluador,
+        (select username from public.mdl_user where id=evaluador_user_cve) as matevaluador,
+        (select firstname || \' \' || lastname from public.mdl_user where id=evaluador_user_cve) as evaluador,
+        (select name from public.mdl_role where id=evaluador_rol_id) as rolevaluador, 
+        (select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluado_user_cve) and id_curso=course_cve) as cvedepevaluado,
+
+        (select username from public.mdl_user where id=evaluado_user_cve) as matevaluado,
+        (select firstname || \' \' || lastname from public.mdl_user where id=evaluado_user_cve) as evaluado,
+        (select name from public.mdl_role where id=evaluado_rol_id) as rolevaluado, 
+
+        (select pregunta from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as pregunta,
+        (select orden from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as orden,
+        (select texto from encuestas.sse_respuestas where reactivos_cve=encuestas.sse_evaluacion.reactivos_cve) as respuesta
+
+        from encuestas.sse_evaluacion
+        inner join encuestas.sse_encuestas  on  encuestas.sse_encuestas.encuesta_cve= encuestas.sse_evaluacion.encuesta_cve 
+        inner join encuestas.sse_reglas_evaluacion  on  encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve
+        where course_cve='.$params['curso'].' and evaluador_rol_id=5
+        UNION all 
+
+        select encuestas.sse_encuestas.encuesta_cve,descripcion_encuestas,
+        (select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and id_curso=course_cve) as cvedepevaluador,
+        (select * from departments.get_rama_completa((select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and id_curso=course_cve), 7)) as ramaevaluado,
+        (select username from public.mdl_user where id=evaluador_user_cve) as matevaluador,
+        (select firstname || \' \' || lastname from public.mdl_user where id=evaluador_user_cve) as evaluador,
+        (select name from public.mdl_role where id=evaluador_rol_id) as rolevaluador, 
+        (select cve_departamento from tutorias.mdl_usertutor where nom_usuario like (select username from public.mdl_user where id=evaluado_user_cve) and id_curso=course_cve) as cvedepevaluado,
+
+        (select username from public.mdl_user where id=evaluado_user_cve) as matevaluado,
+        (select firstname || \' \' || lastname from public.mdl_user where id=evaluado_user_cve) as evaluado,
+        (select name from public.mdl_role where id=evaluado_rol_id) as rolevaluado, 
+
+        (select pregunta from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as pregunta,
+        (select orden from encuestas.sse_preguntas where preguntas_cve=encuestas.sse_evaluacion.preguntas_cve) as orden,
+        (select texto from encuestas.sse_respuestas where reactivos_cve=encuestas.sse_evaluacion.reactivos_cve) as respuesta
+
+        from encuestas.sse_evaluacion
+        inner join encuestas.sse_encuestas  on  encuestas.sse_encuestas.encuesta_cve= encuestas.sse_evaluacion.encuesta_cve 
+        inner join encuestas.sse_reglas_evaluacion  on  encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve= encuestas.sse_encuestas.reglas_evaluacion_cve 
+        where course_cve='.$params['curso'].' and evaluador_rol_id <> 5) as t');
+
+      
+        /*if(isset($params['order']) && !empty($params['order'])){
+            $tipo_orden = (isset($params['order_type']) && !empty($params['order_type'])) ? $params['order_type'] : "ASC";
+            $this->db->order_by($params['order'], $tipo_orden);
+        }*/
+        if(isset($params['per_page']) && isset($params['current_row'])){ //Establecer límite definido para paginación 
+            $this->db->limit($params['per_page'], $params['current_row']);
+        }
+
+        $this->db->group_by('t.encuesta_cve,t.descripcion_encuestas,t.pregunta,t.orden,t.cvedepevaluador,t.ramaevaluador,t.evaluador,t.rolevaluador,t.cvedepevaluado,
+        t.matevaluado,t.evaluado,t.rolevaluado,t.respuesta,t.matevaluador');
+
+        $this->db->order_by('t.encuesta_cve,t.matevaluado,t.orden');
+
+        $query = $this->db->get(); //Obtener conjunto de registros
+        
+        //pr($this->db1->last_query());                                  
+        $resultado['total']=$num_rows[0]->total;
+        $resultado['columns']=$query->list_fields();
+        $resultado['data']=$query->result_array();
+        //pr($resultado['data']);
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+        
+            
+        return $resultado;
+    }
+
+    public function get_indicador($descripcion='')
+    {   
+            $this->db->select('sse_indicador.indicador_cve');
+            $this->db->where('sse_indicador.descripcion', $descripcion);
+            $query = $this->db->get('encuestas.sse_indicador');
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+    public function guarda_indicador($indicador=array())
+    {        
+            /*# guarda el nombre de la sección...            
+                descripcion
+
+             *# retorna el id de la sección y el id creado para identificar las preguntas...
+                seccion_cve
+                id_seccion_enc
+            */
+            $indicador_bd = $this->get_indicador($indicador['descripcion_indicador']);
+            if (isset($indicador_bd[0]['indicador_cve']) && $indicador_bd[0]['indicador_cve']>0) {
+                    //$seccion = $seccion_bd[0]['seccion_cve'];
+                    $row = array(
+                            'insert_id'=> $indicador_bd[0]['indicador_cve'],
+                            'id_indicador_enc'=> $indicador['id_indicador_enc']
+                        );
+            }else{
+                    $data['descripcion']=$indicador['descripcion_indicador'];
+                    $this->db->insert('encuestas.sse_indicador', $data);
+                    $insert_id = $this->db->insert_id();
+
+                    $row = array(
+                            'insert_id'=> $insert_id,
+                            'id_indicador_enc'=> $indicador['id_indicador_enc']
+                        );
+            }
+            //echo '<br>], sec: '.$row['insert_id'].' [';
+            return $row;
+            
+    }
+
+    public function get_indicadores()
+    {
+            
+            $query = $this->db->get('encuestas.sse_indicador');
+            $resultado = $query->result_array();
+
+            return $resultado;
+
+    }
+
+}
