@@ -1882,145 +1882,158 @@ where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18
 
     }
 
-    public function guarda_reactivos_evaluacion($params=null)
-    {        
-        $ob_si=0;
-        $ob_no=0;
-        $notob_si=0;
-        $notob_no=0;
-        $total_reactivos=0; 
+    public function guarda_reactivos_evaluacion($params = null) {
 
-        $encuesta_cve=$params['encuesta_cve'];
-        $course_cve=$params['curso_cve'];
-        $group_id =$params['grupo_cve'];
-        $evaluado_user_cve =$params['evaluado_user_cve'];
+        $ob_si = 0;
+        $ob_no = 0;
+        $notob_si = 0;
+        $notob_no = 0;
+
+
+//        pr($params);
+//        exit();
+        $encuesta_cve = $params['encuesta_cve'];
+        $course_cve = $params['curso_cve'];
+        $group_id = $params['grupo_cve'];
+        $evaluado_user_cve = $params['evaluado_user_cve'];
         $evaluador_user_cve = $params['evaluador_user_cve'];
+        $evaluado_rol_cve = $params['evaluado_rol_id'];
+        $evaluador_rol_cve = $params['evaluador_rol_id'];
+        $is_bono = $params['is_bono'];
 
+//        pr($params);
 
-        
         $this->db->trans_begin(); // inicio de transaccion
         //pr($params['reactivos']);
         foreach ($params['reactivos'] as $key => $value) {
-              # code...
-               $pregunta=$key;
-               $respuesta=$value; 
-               
-               $data = array(
-                    'encuesta_cve' => $encuesta_cve,
-                    'preguntas_cve' => $pregunta,
-                    'reactivos_cve' => $respuesta,
-                    'course_cve' => $course_cve,
-                    'group_id' => $group_id,
-                    'evaluado_user_cve' => $evaluado_user_cve,
-                    'evaluado_rol_id' => $params['evaluado_rol_id'],
-                    'evaluador_user_cve' => $evaluador_user_cve,
-                    'evaluador_rol_id' => $params['evaluador_rol_id'],
-                    'respuesta_abierta' => $params['respuesta_abierta'],
-                    'fecha' => $params['fecha']
-                    );
-                
-                
+            # code...
+            $pregunta = $key;
+            $respuesta = $value;
 
-                $this->db->where('encuesta_cve',$params['encuesta_cve']);
-                $this->db->where('evaluado_user_cve',$params['evaluado_user_cve']);
-                $this->db->where('evaluador_user_cve',$params['evaluador_user_cve']);
-                $this->db->where('course_cve',$params['curso_cve']);
-                $this->db->where('group_id',$params['grupo_cve']);
-                $this->db->where('preguntas_cve',$pregunta);
-                $this->db->where('reactivos_cve',$respuesta);
+            $data = array(
+                'encuesta_cve' => $encuesta_cve,
+                'preguntas_cve' => $pregunta,
+                'reactivos_cve' => $respuesta,
+                'course_cve' => $course_cve,
+                'group_id' => $group_id,
+                'evaluado_user_cve' => $evaluado_user_cve,
+                'evaluado_rol_id' => $evaluado_rol_cve,
+                'evaluador_user_cve' => $evaluador_user_cve,
+                'evaluador_rol_id' => $evaluador_rol_cve,
+                'respuesta_abierta' => $params['respuesta_abierta'],
+                'fecha' => $params['fecha']
+            );
 
-                $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
-                //pr($query);
-                if ($query->num_rows()== 0){
 
-                    $pregresp= $this->get_pregunta_respuesta($pregunta,$respuesta);
-                    
-                    if($pregresp[0]['obligada'] == 1)
-                    {
-                      if($pregresp[0]['ponderacion'] == 1)
-                      {
-                         $ob_si++;  
-                      }
-                      else
-                      {
-                         $ob_no++;    
-                      }  
-                    
+
+            $this->db->where('encuesta_cve', $params['encuesta_cve']);
+            $this->db->where('evaluado_user_cve', $params['evaluado_user_cve']);
+            $this->db->where('evaluador_user_cve', $params['evaluador_user_cve']);
+            $this->db->where('course_cve', $params['curso_cve']);
+            $this->db->where('group_id', $params['grupo_cve']);
+            $this->db->where('preguntas_cve', $pregunta);
+            $this->db->where('reactivos_cve', $respuesta);
+
+            $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
+            //pr($query);
+            if ($query->num_rows() == 0) {
+
+                $pregresp = $this->get_pregunta_respuesta($pregunta, $respuesta);
+
+                if ($pregresp[0]['obligada'] == 1) {
+                    if ($pregresp[0]['ponderacion'] == 1) {
+
+
+                        $ob_si++;
+                    } else {
+
+
+                        $ob_no++;
+
+
                     }
-                    else 
-                    {
-                       if($pregresp[0]['ponderacion'] == 1)
-                      {
-                         $notob_si++;  
-                      }
-                      else
-                      {
-                         $notob_no++;    
-                      }         # code...
-                    }    
-                    
+                } else {
+                    if ($pregresp[0]['ponderacion'] == 1) {
 
-                     $this->db->insert('encuestas.sse_evaluacion', $data);
+
+                        $notob_si++;
+                    } else {
+
+
+                        $notob_no++;
+                    }         # code...
                 }
 
-               
+
+                $this->db->insert('encuestas.sse_evaluacion', $data);
+            }
+
+
 
 
         }
 
-        /*pr($ob_si);
-        pr($ob_no);
-        pr($notob_si);
-        pr($notob_no);*/
-        $calif_emitida = 0;
-        $total_reactivos=$ob_si+$ob_no+$notob_si;
-        $total_si=$ob_si+$notob_si;
 
-        if ($total_si != 0) {
-            $calif_emitida=($total_si*100)/$total_reactivos;
 
-        }
+
+
+
+
+
+
+        //curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
+        $parametrosp = array(
+            'curso_cve' => $course_cve,
+            'grupo_cve' => $group_id,
+            'evaluado_user_cve' => $evaluado_user_cve,
+            'evaluado_rol_id' => $evaluado_rol_cve,
+            'encuesta_cve' => $encuesta_cve,
+            'is_bono' => $is_bono)
+        ;
+
+        $promedio = $this->get_promedio_encuesta_encuesta($parametrosp);
+//        pr($promedio);
         //GUARDAR EN RESUL_ENCUESTA
         $datares = array(
-                    'encuesta_cve' => $encuesta_cve,        
-                    'course_cve' => $course_cve,
-                    'group_id' => $group_id,
-                    'evaluado_user_cve' => $evaluado_user_cve,
-                    'evaluador_user_cve' => $evaluador_user_cve,
-                    'ob_si' =>$ob_si,
-                    'ob_no' =>$ob_no,
-                    'notob_si' => $notob_si,
-                    'notob_no' => $notob_no,
-                    'total_reactivos' => $total_reactivos,
-                    'total_si' => $total_si,
-                    'calif_emitida' => $calif_emitida
-                    );
+            'encuesta_cve' => $encuesta_cve,
+            'course_cve' => $course_cve,
+            'group_id' => $group_id,
+            'evaluado_user_cve' => $evaluado_user_cve,
+            'evaluador_user_cve' => $evaluador_user_cve,
+            'total_puntua_si' => $promedio[0]['puntua_reg'],
+            'total_nos' => $promedio[0]['total_no'],
+            'total_no_puntua_napv' => $promedio[0]['total_no_aplica_cuenta_promedio'],
+            'total_reactivos_bono' => $promedio[0]['total'],
+            'base' => $promedio[0]['base_reg'],
+            'calif_emitida' => $promedio[0]['porcentaje']
+
+        );
+        $this->db->insert('encuestas.sse_result_evaluacion_encuesta_curso', $datares);
 
 
 
-        $this->db->insert('encuestas.sse_result_evaluacion', $datares);
 
 
 
 
         $this->db->trans_complete();
-        if($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
-                $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+        if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+            $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
 
-                return false;
+            return false;
         } else {
 
-                $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
-                return true;
-            
-        } 
+            $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+            return true;
 
-            //$this->db->insert('encuestas.sse_evaluacion', $data);
-            //$insert_id = $this->db->insert_id();
+        }
 
-            //return $insert_id;
+        //$this->db->insert('encuestas.sse_evaluacion', $data);
+        //$insert_id = $this->db->insert_id();
 
-   }
+        //return $insert_id;
+
+    }
 
 
     public function get_pregunta_respuesta($pregunta=null, $respuesta=null)
@@ -2351,7 +2364,8 @@ order by ord_prioridad*/
                     'sse_encuestas.encuesta_cve',
                     'sse_encuestas.tipo_encuesta',
                     'sse_encuestas.eva_tipo',
-                    'sse_reglas_evaluacion.ord_prioridad'
+                    'sse_reglas_evaluacion.ord_prioridad',
+                    'sse_reglas_evaluacion.is_bono',
 
                     );
       
@@ -2579,6 +2593,201 @@ order by t.encuesta_cve,t.matevaluado,t.orden
 
             return $resultado;
 
+    }
+    
+    private function getReglaCursoPrioridad($parametros) {
+        if (is_null($parametros)) {
+            return array();
+        }
+        $select = array("reg.reglas_evaluacion_cve", "reg.rol_evaluado_cve", "reg.rol_evaluador_cve",
+            "reg.is_excepcion", "reg.tutorizado", "reg.is_bono", "reg.ord_prioridad",
+            "enc.encuesta_cve", "enc.eva_tipo",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        );
+
+
+
+
+        $this->db->select($select);
+        $this->db->where('reg.rol_evaluador_cve', $parametros['role_evaluador']);
+        $this->db->where('reg.tutorizado', $parametros['tutorizado']);
+        $this->db->where('encc.course_cve', $parametros['cur_id']);
+        $this->db->order_by('reg.ord_prioridad', 'asc'); //Importante obtrener el de mayor presedencia
+        $this->db->limit(1); //Importante obtrener el de mayor presedencia
+
+        $this->db->join('encuestas.sse_encuestas enc', 'enc.reglas_evaluacion_cve=reg.reglas_evaluacion_cve');
+        $this->db->join('encuestas.sse_encuesta_curso encc', 'encc.encuesta_cve=enc.encuesta_cve');
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
+
+
+        $resultado = $query->result_array();
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+//        pr($this->db->last_query());
+//        if (!empty($resultado)) {
+//            $resultado = $resultado[0];
+//        }
+
+        return $resultado;
+
+    }
+
+    
+    /**
+     * 
+     * @param type $parametros
+     * @return type
+     * $parametros = 'role_evaluador', 'tutorizado', 'cur_id'
+     */
+    public function getReglasEvaluacionCurso($parametros = null) {
+        $result_prioridad = $this->getReglaCursoPrioridad($parametros);
+        $regla_aplica = array();
+        if (!empty($result_prioridad)) {
+//            pr($result_prioridad);
+            $where = " WHERE reg.reglas_evaluacion_cve = " . $result_prioridad[0]['reglas_evaluacion_cve'];
+            $query_recursive = "WITH RECURSIVE busca_excepcion AS (
+            SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, 
+            reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad
+            FROM encuestas.sse_reglas_evaluacion reg "
+                    . $where .
+                    " UNION all 
+            select bex.is_excepcion, rer.rol_evaluado_cve, rer.rol_evaluador_cve, 
+            rer.is_excepcion, rer.tutorizado, rer.is_bono, rer.ord_prioridad 
+            from busca_excepcion bex
+            join encuestas.sse_reglas_evaluacion rer on rer.reglas_evaluacion_cve = bex.is_excepcion
+            )
+            select * FROM busca_excepcion OFFSET 0
+        "
+            ;
+//            $query_recursive = "WITH RECURSIVE busca_excepcion AS (
+//            SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, 
+//            reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad
+//            FROM encuestas.sse_reglas_evaluacion reg
+//            JOIN encuestas.sse_encuestas enc ON enc.reglas_evaluacion_cve=reg.reglas_evaluacion_cve
+//            JOIN encuestas.sse_encuesta_curso encc ON encc.encuesta_cve=enc.encuesta_cve "
+//                    . $where .
+//                    " UNION all 
+//            select bex.is_excepcion, rer.rol_evaluado_cve, rer.rol_evaluador_cve, 
+//            rer.is_excepcion, rer.tutorizado, rer.is_bono, rer.ord_prioridad 
+//            from busca_excepcion bex
+//            join encuestas.sse_reglas_evaluacion rer on rer.reglas_evaluacion_cve = bex.is_excepcion
+//            )
+//            select * FROM busca_excepcion OFFSET 0
+//        "
+//            ;
+            $query = $this->db->query($query_recursive);
+//            pr($this->db->last_query());
+            $result = $query->result_array();
+            if (!empty($result)) {
+                $regla_aplica = end($result);
+                $regla_aplica['encuesta_cve'] = $result_prioridad[0]['encuesta_cve'];
+                $regla_aplica['eva_tipo'] = $result_prioridad[0]['eva_tipo'];
+            }
+//            pr($regla_aplica);
+//            pr($result);
+        }
+        return $regla_aplica;
+    }
+    /**
+     * 
+     * @param type $params
+     * @return type
+     * @param curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
+
+
+
+     */
+    public function get_promedio_encuesta_encuesta($params = null) {
+        //Entidad de emp_actividad_docente 
+        $select_gral = 'select grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado, sum(netos) as total, '
+                . 'sum(no_puntua) as no_puntua_reg, sum(nos_) total_no, sum(no_aplica_promedio) as total_no_aplica_cuenta_promedio, '
+                . 'sum(puntua) as puntua_reg, (sum(netos) - sum(no_puntua)) as base_reg, '
+                . '(round(sum(puntua)::numeric * 100/(sum(netos) - sum(no_puntua))::numeric,3)) as porcentaje '
+                . ' from ( '
+        ;
+
+
+
+
+        $group_by_gral = ' ) as calculos_promedio '
+                . ' group by grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado ';
+
+
+
+
+
+
+        $joins = ' from encuestas.sse_evaluacion ev '
+                . ' join encuestas.sse_respuestas res on res.reactivos_cve = ev.reactivos_cve '
+                . ' join encuestas.sse_preguntas pre on pre.preguntas_cve = ev.preguntas_cve '
+                . ' join encuestas.sse_encuesta_curso encc on encc.encuesta_cve = res.encuesta_cve '
+        ;
+
+
+
+
+        $w_p = array(
+            'curso_cve' => ' encc.course_cve=' . $params['curso_cve'] . ' ',
+            'grupo_cve' => ' ev.group_id=' . $params['grupo_cve'] . ' ',
+            'evaluado_user_cve' => ' evaluado_user_cve=' . $params['evaluado_user_cve'] . ' ',
+            'evaluado_rol_id' => ' evaluado_rol_id=' . $params['evaluado_rol_id'] . ' ',
+            'is_bono' => ' pre.is_bono=' . $params['is_bono'] . ' ',
+        );
+
+        $where = array(
+            'total_si' => " where " . $w_p ['is_bono'] . " and res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['curso_cve'],
+            'total_is_bono' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'],
+            'total_no_aplica' => " where " . $w_p ['is_bono'] . " and pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'],
+            'total_nos' => " where " . $w_p ['is_bono'] . " and res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['curso_cve'],
+            'total_no_aplica_val_prom' => " where " . $w_p ['is_bono'] . " and pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'],
+        );
+        //Select especifico y repetido
+        $s_p = ' ev.evaluador_user_cve "evaluador", ev.evaluador_rol_id "rol_evaluador", ev.evaluado_user_cve "evaluado", ev.evaluado_rol_id "rol_evaluado" ';
+        $select = array(
+            'total_si' => ' select COUNT(res.texto) as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_is_bono' => ' select 0 as puntua, 0 as no_puntua, COUNT(res.texto) as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_no_aplica' => 'select 0 as puntua, COUNT(res.texto) as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_nos' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", COUNT(res.texto) as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_no_aplica_val_prom' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, COUNT(res.texto) as no_aplica_promedio, ' . $s_p,
+        );
+        $g_by = 'group by ev.group_id, ev.evaluador_user_cve, ev.evaluador_rol_id, ev.evaluado_user_cve, ev.evaluado_rol_id';
+
+
+
+        $string_query = $select_gral;
+        $union = '';
+        foreach ($select as $key => $value) {
+            $string_query .= $union . $value . $joins . $where[$key] . $g_by;
+            $union = ' union ';
+        }
+        $string_query .= $group_by_gral;
+//        pr($string_query);
+        $query = $this->db->query($string_query);
+        $result = $query->result_array();
+//        pr($this->db->last_query());
+//        pr($result);
+        return $result;
     }
 
 }

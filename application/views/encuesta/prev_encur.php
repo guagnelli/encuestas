@@ -139,6 +139,7 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
                 echo '<input type="hidden" id="iduevaluado" name="iduevaluado" value="'.$evaluado_user_cve.'">';
                 echo '<input type="hidden" id="iduevaluador" name="iduevaluador" value="'.$evaluador_user_cve.'">';
                 echo '<input type="hidden" id="idcurso" name="idcurso" value="'.$curso_cve.'">';
+                echo '<input type="hidden" id="is_bono" name="is_bono" value="'.$instrumento[0]['is_bono'] .'">';
                 echo '<input type="hidden" id="idgrupo" name="idgrupo" value="'.$grupo_cve.'">';
                 echo "<br>";
                 }

@@ -293,6 +293,7 @@ class Encuestausuario extends CI_Controller
                     $datos['evaluador_user_cve']=$this->input->post('iduevaluador');
                     $datos['curso_cve']=$this->input->post('idcurso');
                     $datos['grupo_cve']=$this->input->post('idgrupo');
+                    
 
                     $main_contet = $this->load->view('encuesta/prev_encur', $datos, true);
                     $this->template->setMainContent($main_contet);
@@ -307,12 +308,13 @@ class Encuestausuario extends CI_Controller
     public function guardar_encuesta_usuario()
     {
         $id_instrumento=$this->input->post('idencuesta');
-
+        //pr($this->input->post());
         $campos_evaluacion['encuesta_cve'] = $this->input->post('idencuesta'); 
         $campos_evaluacion['curso_cve'] = $this->input->post('idcurso');
         $campos_evaluacion['grupo_cve'] = $this->input->post('idgrupo');
         $campos_evaluacion['evaluado_user_cve'] = $this->input->post('iduevaluado');        
         $campos_evaluacion['evaluador_user_cve'] = $this->input->post('iduevaluador');
+        $campos_evaluacion['is_bono'] = $this->input->post('is_bono');
         //Buscar los roles con las reglas de evaluacion
         $reglas=$this->enc_mod->get_reglas_encuesta($this->input->post('idencuesta'));
         //pr($reglas);
@@ -463,8 +465,10 @@ class Encuestausuario extends CI_Controller
                   $reglasgral[]=array('reglas_evaluacion_cve' => $valuer['reglas_evaluacion_cve'],
                                       'rol_evaluado_cve' => $valuer['rol_evaluado_cve'],
                                       'encuesta_cve' => $valuer['encuesta_cve'],
-                                      'eva_tipo' => $valuer['eva_tipo']
+                                      'eva_tipo' => $valuer['eva_tipo'],
+                                      'is_bono' => $valuer['is_bono'],
                                       );
+                  //pr($reglasgral);
                  
                  }
                  else
@@ -472,12 +476,13 @@ class Encuestausuario extends CI_Controller
                   //
                    $reglas_validas=$this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                   'tutorizado'=> $datos_curso['data'][0]['tutorizado'],'cur_id'=> $idcurso,'ord_prioridad' => '2'));
-                   pr($reglas_validas);
+                   //pr($reglas_validas);
 
                     $reglasgral[]=array('reglas_evaluacion_cve' => $reglas_validas['reglas_evaluacion_cve'],
                                       'rol_evaluado_cve' => $reglas_validas['rol_evaluado_cve'],
                                       'encuesta_cve' => $reglas_validas['encuesta_cve'],
-                                      'eva_tipo' => $reglas_validas['eva_tipo']
+                                      'eva_tipo' => $reglas_validas['eva_tipo'],
+                                      'is_bono' => $reglas_validas['is_bono'],
                                       );
                   }
 
@@ -514,13 +519,14 @@ class Encuestausuario extends CI_Controller
 
                 //pr($valuerg['eva_tipo']);
 
-                if($valuerg['eva_tipo'] == 1)
+                if($valuerg['eva_tipo'] != 1)
                 {
                   //por persona
                   //echo "por persona";
                   $datos_user_aeva[]=$this->enc_mod->listado_eval(array('role_evaluado' => $valuerg['rol_evaluado_cve'],
                     'cur_id' => $idcurso,'encuesta_cve' => $valuerg['encuesta_cve'],
-                    'evaluador_user_cve' => $idusuario,'role_evaluador' => $value)
+                    'evaluador_user_cve' => $idusuario,'role_evaluador' => $value, 'is_bono'=>$valuerg['is_bono']
+                    )
                   );
                           
                     
@@ -550,6 +556,9 @@ class Encuestausuario extends CI_Controller
                     'evaluador_user_cve' => $idusuario,
                     'role_evaluador' => $role_evaluador)
                     );
+
+                   //$datos_user_aeva[]['is_bono']=$valuerg['is_bono'];
+
                    }
                    //pr($datos_user_aeva);
                   }
@@ -569,7 +578,7 @@ class Encuestausuario extends CI_Controller
               }
 
               
-
+              pr($datos_user_aeva);
              $datos['datos_user_aeva']=$datos_user_aeva;
 
 
