@@ -355,5 +355,16 @@ class Reporte_model extends CI_Model {
         $resultado= $query->result_array();
         return $resultado;
     }
+    
+    public function get_anios(){
+        $this->db->select('distinct(fecha)');
 
+        $this->db->order_by('fecha', 'desc');
+
+        $query = $this->db->get('encuestas.sse_evaluacion');
+
+        //pr($this->db->last_query());
+        return $query->result_array();
+    }
+    
 }

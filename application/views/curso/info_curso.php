@@ -122,6 +122,9 @@
                     <a href="<?php echo site_url('resultadocursoencuesta/curso_encuesta_resultado_detalle/'.$info_curso['cur_id'])?>" class="btn btn-success btn-block">Detalle de encuestas contestadas</a>
                 
                 </div>
+                <div class="col-xs-4 col-md-12 list-group-item">
+                    <a href="<?php echo site_url('resultadocursoindicador/index/'.$info_curso['cur_id'])?>" class="btn btn-success btn-block">Resultados de encuesta por indicador</a>
+                </div>
                 <br><br>
 
                 <div class="clearfix"></div>

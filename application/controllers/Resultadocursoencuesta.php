@@ -224,7 +224,7 @@ class Resultadocursoencuesta extends CI_Controller
         $data['datos_curso']=$datos_curso;
   
 
-        $datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
+        //$datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso']=$curso;
         
                
