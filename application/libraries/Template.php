@@ -18,7 +18,7 @@ class Template {
         $this->elements = array(
         	"title"=>null,
         	"menu"=>null,
-        	"main_title"=>null,
+        	"main_title"=>'Encuestas de satisfacción docente',
         	"main_content"=>null,
             "css_files"=>null,
             "js_files"=> null,
@@ -32,6 +32,7 @@ class Template {
     *@return: mixed[] Data arreglo de datos de plantilla con la siguiente estructura array("title"=>null,"nav"=>null,"main_title"=>null,"main_content"=>null);
     */
     function getElements(){
+        
     	return $this->elements;
     }
 

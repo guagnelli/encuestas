@@ -1882,7 +1882,7 @@ where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18
 
     }
 
-    public function guarda_reactivos_evaluacion($params = null) {
+     public function guarda_reactivos_evaluacion($params = null) {
 
         $ob_si = 0;
         $ob_no = 0;
@@ -1987,6 +1987,8 @@ where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18
             'grupo_cve' => $group_id,
             'evaluado_user_cve' => $evaluado_user_cve,
             'evaluado_rol_id' => $evaluado_rol_cve,
+            'evaluador_rol_id' => $evaluador_rol_cve,
+            'evaluador_user_cve' => $evaluador_user_cve,
             'encuesta_cve' => $encuesta_cve,
             'is_bono' => $is_bono)
         ;
@@ -2034,7 +2036,6 @@ where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18
         //return $insert_id;
 
     }
-
 
     public function get_pregunta_respuesta($pregunta=null, $respuesta=null)
     {
@@ -2284,7 +2285,7 @@ order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.ro
     INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
     INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
     WHERE mdl_course.id=".$params['cur_id']." and mdl_user.id=".$params['user_id'];
-        
+        $arrol = array();   
         $result = $this->db->query($sql);
         if($result->num_rows() > 0){
 
@@ -2709,6 +2710,7 @@ order by t.encuesta_cve,t.matevaluado,t.orden
         }
         return $regla_aplica;
     }
+    
     /**
      * 
      * @param type $params
@@ -2745,22 +2747,26 @@ order by t.encuesta_cve,t.matevaluado,t.orden
         ;
 
 
-
-
+        $grupo = '';
+        if (!empty($params['grupo_cve']) and is_numeric($params['grupo_cve']) and intval($params['grupo_cve']) > 0) {
+            $grupo = ' and ev.group_id=' . $params['grupo_cve'] . ' ';
+        }
         $w_p = array(
             'curso_cve' => ' encc.course_cve=' . $params['curso_cve'] . ' ',
-            'grupo_cve' => ' ev.group_id=' . $params['grupo_cve'] . ' ',
+            'grupo_cve' => $grupo,
             'evaluado_user_cve' => ' evaluado_user_cve=' . $params['evaluado_user_cve'] . ' ',
             'evaluado_rol_id' => ' evaluado_rol_id=' . $params['evaluado_rol_id'] . ' ',
+            'evaluador_user_cve' => ' evaluador_user_cve=' . $params['evaluador_user_cve'] . ' ',
+            'evaluador_rol_id' => ' evaluador_rol_id=' . $params['evaluador_rol_id'] . ' ',
             'is_bono' => ' pre.is_bono=' . $params['is_bono'] . ' ',
         );
 
         $where = array(
-            'total_si' => " where " . $w_p ['is_bono'] . " and res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['curso_cve'],
-            'total_is_bono' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'],
-            'total_no_aplica' => " where " . $w_p ['is_bono'] . " and pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'],
-            'total_nos' => " where " . $w_p ['is_bono'] . " and res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['curso_cve'],
-            'total_no_aplica_val_prom' => " where " . $w_p ['is_bono'] . " and pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'],
+            'total_si' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_is_bono' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_no_aplica' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_nos' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_no_aplica_val_prom' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
         );
         //Select especifico y repetido
         $s_p = ' ev.evaluador_user_cve "evaluador", ev.evaluador_rol_id "rol_evaluador", ev.evaluado_user_cve "evaluado", ev.evaluado_rol_id "rol_evaluado" ';
@@ -2785,7 +2791,7 @@ order by t.encuesta_cve,t.matevaluado,t.orden
 //        pr($string_query);
         $query = $this->db->query($string_query);
         $result = $query->result_array();
-//        pr($this->db->last_query());
+        pr($this->db->last_query());
 //        pr($result);
         return $result;
     }

@@ -54,21 +54,10 @@
      	<div class="row">
 		    <div class="large-12 columns">
 				<fieldset>
-			    	<legend align=''>Encuestas de satisfacción docente</legend>
-			    	<div id="contenedor" style=""  class= "large-12 columns" >
-			            <h1>
-			            	<small>
-				            <?php
-				            if(!is_null($main_title))
-				            { 
-				            	echo $main_title;
-
-				            }
-
-				            ?>
-				        	</small>
-			            </h1>
-			    	</div>
+				            <?phpif(!is_null($main_title)){ ?>
+                                                <legend align=''><?php echo $main_title;?></legend>
+				            <?php}?>
+			    	
 			    	<div class="clearfix"></div>
 			        <?php  
 

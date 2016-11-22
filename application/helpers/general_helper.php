@@ -455,6 +455,31 @@ if (!function_exists('crear_lista_asociativa_valores')) {
         return $array_lista_roles;
     }
 }
+if (!function_exists('valida_sesion_activa')) {
+
+    /**
+     * 
+     * @author LEAS
+     * @fecha 18112016
+     * @param type $user_id
+     * @return type
+     */
+    function valida_sesion_activa($user_id = null) {
+        $CI = & get_instance();
+        $valida_session = 0;
+        $id_user_actual = $CI->session->userdata('id');
+        $is_logeado = $CI->session->userdata('logueado');
+//            pr($this->session->userdata);
+        if (is_null($user_id)) {
+            return 0;
+        }
+        $user_valido = (intval($user_id) == intval($id_user_actual)) ? 1 : 0;
+        $valida_session = ($is_logeado == 1 and $user_valido); //Valida que el id del usuario que se logueo, sea igual al que desea consultar las encuestas
+        pr($valida_session);
+        return $valida_session;
+    }
+
+}
 
 
     /* End of file general_helper.php */

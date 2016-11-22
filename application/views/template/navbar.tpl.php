@@ -30,7 +30,7 @@ if (isset($logueado) && !empty($logueado)) {
 
                            <ul class="a_nav_sied">
                             <li>
-                                <a href="<?php echo site_url('registro/registrosagenda'); ?>" class="a_nav_sied">Reporte general por curso</a>
+                                <a href="<?php echo site_url('reporte_general'); ?>" class="a_nav_sied">Reporte general por curso</a>
                             </li>
                            
                         </ul>
