@@ -25,13 +25,6 @@
                     <th>Encuesta</th>
                     <th>Pregunta</th>
                     <th>Respuesta</th>
-
-
-                    
-
-
-
-
                 </tr>
             </thead>
             <tbody>

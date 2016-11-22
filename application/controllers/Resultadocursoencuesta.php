@@ -282,7 +282,7 @@ class Resultadocursoencuesta extends CI_Controller
     }
 
     private function listado_resultado_detalle($data, $form){
-        echo $data['error'].'<br>';
+        //echo $data['error'].'<br>';
         $data['encuestacve']=0;
    
         $pagination = $this->template->pagination_data_curso_encuesta_detalle($data); //Crear mensaje y links de paginación
