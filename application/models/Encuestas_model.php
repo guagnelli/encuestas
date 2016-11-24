@@ -2134,8 +2134,10 @@ order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.ro
                     'encuestas.sse_result_evaluacion_encuesta_curso.group_id as grupo_id',
                     'encuestas.sse_result_evaluacion_encuesta_curso.calif_emitida as calif_emitida',
                     '(select name from public.mdl_groups where id=encuestas.sse_result_evaluacion_encuesta_curso.group_id) as ngrupo',
-                    '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion_encuesta_curso.evaluador_user_cve) as nombreevaluador' 
-
+                    '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion_encuesta_curso.evaluador_user_cve) as nombreevaluador', 
+                    '(select * from departments.get_rama_completa((select cve_departamental from public.mdl_user where id=evaluado_user_cve), 7)) as ramaevaluado',
+                    '(select * from departments.get_rama_completa((select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve), 7)) as ramaevaluador',
+                    '(select username from public.mdl_user where id=evaluador_user_cve) as matricula_evaluador'
                     );
         
         $this->db->select($busqueda);
@@ -2838,19 +2840,20 @@ order by t.encuesta_cve,t.matevaluado,t.orden
         if(isset($params['evaluado_rol_id']) && !empty($params['evaluado_rol_id'])){
             $w_p['evaluado_rol_id'] = ' ev.group_id=' . $params['evaluado_rol_id'] . ' ';
         }*/
-        if(isset($params['is_bono']) && $params['is_bono']!=''){
+        /*if(isset($params['is_bono']) && $params['is_bono']!=''){
             $w_p['is_bono'] = ' and pre.is_bono=' . $params['is_bono'] . ' ';
-        }
+        }*/
         if(isset($params['tipo_indicador_cve']) && !empty($params['tipo_indicador_cve'][0])){
             $w_p['identificador'] = ' and pre.tipo_indicador_cve IN (' . implode(',', $params['tipo_indicador_cve']) . ') ';
         }
+        $conditions = (isset($params['conditions']) && !empty($params['conditions'])) ? $params['conditions'] : '';
         //pr($w_p['identificador']);
         $where = array(
-           'total_si' => " where res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
-           'total_is_bono' => " where " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
-           'total_no_aplica' => " where pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
-           'total_nos' => " where res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
-           'total_no_aplica_val_prom' => " where pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
+           'total_si' => " where ".$conditions." res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
+           'total_is_bono' => " where ".$conditions." " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
+           'total_no_aplica' => " where ".$conditions." pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
+           'total_nos' => " where ".$conditions." res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
+           'total_no_aplica_val_prom' => " where ".$conditions." pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['curso_cve'].$w_p['is_bono'].$w_p['identificador'],
         );
         //Select especifico y repetido
 
@@ -2924,7 +2927,7 @@ order by t.encuesta_cve,t.matevaluado,t.orden
         //pr($this->db->last_query());
         $result['total']=$num_rows[0]['total'];
         $result['columns']=$query->list_fields();
-        $result['indicadores']=$this->get_indicador_curso(array('conditions'=>array('eva.course_cve'=>$params['curso_cve']), 'fields'=>'distinct(ind.*)'));
+        $result['indicadores']=$this->get_indicador_curso(array('conditions'=>array('eva.course_cve'=>$params['curso_cve'], 'eva.evaluador_rol_id'=>$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']), 'fields'=>'distinct(ind.*)'));
         $result['data']=$query->result_array();
 
         $query->free_result(); //Libera la memoria
@@ -2951,7 +2954,7 @@ order by t.encuesta_cve,t.matevaluado,t.orden
         $this->db->join('encuestas.sse_evaluacion eva', 'eva.encuesta_cve=pre.encuesta_cve');
 
         $query = $this->db->get('encuestas.sse_indicador ind'); //Obtener conjunto de registros
-
+        //pr($this->db->last_query());
         $resultado=$query->result_array();
 
         $query->free_result(); //Libera la memoria

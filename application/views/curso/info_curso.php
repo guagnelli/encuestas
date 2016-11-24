@@ -31,8 +31,7 @@
 
         */
         $check_ok = '<span class="glyphicon glyphicon-ok" aria-hidden="true" style="color:green;"> </span>';
-        $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="color:red;"> </span>'; 
-
+        $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="color:red;"> </span>';
         if(isset($curso) && !empty($curso) && $curso['total']==1 ){
             $info_curso = $curso['data'][0];
     ?>
@@ -56,8 +55,7 @@
         <div class="row">            
             <div class="col-xs-12 col-sm-8 col-md-8">
                 <div class="col-xs-12 col-md-12">
-
-                        <h3>Información de la implementación</h3><br><br>
+                        <h3>Información de la implementación</h3>
                         <!--Id curso: <br>
                         Clave curso: <br>
                         Categoria: <br>
@@ -102,12 +100,15 @@
                 
                 <div class="clearfix"></div>
                 <div class="col-xs-4 col-md-12 list-group-item" >
-                    <a href="<?php echo site_url('cursoencuesta/curso_encuesta/'.$info_curso['cur_id'])?>" class="btn btn-success btn-block">Asignar encuestas   </a>
-                
+                    <a href="<?php echo site_url('cursoencuesta/curso_encuesta/'.$info_curso['cur_id'])?>" class="btn btn-info btn-block">Asignar encuestas</a>
                 </div>
-                
-               
-
+                <?php if($info_curso['tutorizado'] == 1) { ?>
+                    <div class="col-xs-4 col-md-12 list-group-item" >
+                        <a href="<?php echo site_url('curso/curso_bloque_grupos/'.$info_curso['cur_id'])?>" class="btn btn-info btn-block">Definir bloques</a>
+                    </div>
+                <?php } ?>
+                <div class="clearfix"></div>
+                <br><h3>Reportes</h3>
                 <div class="col-xs-4 col-md-12 list-group-item">                
                     <a href="<?php echo site_url('resultadocurenrealizada/curso_encuesta_general/'.$info_curso['cur_id'])?>" class="btn btn-success btn-block">Concentrado de encuestas (Estatus)</a>
                 
@@ -128,40 +129,37 @@
                 <br><br>
 
                 <div class="clearfix"></div>
-                <div class="col-xs-12 col-md-12">
-                    <h3>Roles de implementación</h3><br><br>
+                <div class="col-xs-12 col-md-12"><br>
+                    <h3>Roles de implementación</h3>
                     <div class="list-group">
                         <?php
                             $roles_mostrar = array(5,14,18,32,33,30);
                             foreach ($roles['data'] as $row) {
-
-                                if (in_array($row['rol_id'], $roles_mostrar)) {
-
-                                
+                                if (in_array($row['rol_id'], $roles_mostrar)) {                                
                                     ?>
                                     <div class="list-group-item" >
                                         <span  class="badge"><?php echo $row['usuarios_por_rol']; ?></span>
                                         <?php echo $row['nom_rol']; ?>
                                     </div>
                                     <?php
-
                                 }
-                            }
-                            
-                            ?>
-                            
+                            }                            
+                            ?>                            
                     </div>
                 </div>
 
             </div>
             
             <div class="col-xs-12 col-sm-4 col-md-4">
-                <h3>Grupos de implementación</h3><br><br>
+                <h3>Grupos de implementación</h3>
                 <div class="list-group">
+                    <div class="list-group-item left" style="width:30%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">Bloque</div>
+                    <div class="list-group-item right" style="width:70%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">Grupo</div>
                     <?php
                         foreach ($grupos['data'] as $row) {
                             ?>
-                            <div class="list-group-item" data-gorupId="<?php echo $row['grup_id']; ?>">
+                            <div class="list-group-item left" style="width:30%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;"><?php echo rand(1, 4); ?></div>
+                            <div class="list-group-item right" data-groupId="<?php echo $row['grup_id']; ?>" style="width:70%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">
                                 <?php echo $row['grup_nom']; ?>
                             </div>
                             <?php

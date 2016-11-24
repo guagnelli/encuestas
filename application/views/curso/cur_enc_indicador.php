@@ -19,16 +19,16 @@ echo form_open('cursoencuesta/curso_encuesta/'.$curso, array('id' => 'form_curso
                     <div class="col-lg-12">
                         <div class="col-lg-4 col-sm-4">
                             <div class="panel-body  input-group input-group-sm">
-                                <span class="input-group-addon">Bono:</span>
+                                <span class="input-group-addon">Bloques:</span>
                                 <label>
-                                <?php echo $this->form_complete->create_element(array('id' => 'is_bono', 'type' => 'dropdown', 'options' => $datos_bono, 'first' => array('' => 'Todos'), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Bono', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Bono', 'onchange' => "data_ajax(site_url+'/resultadocursoindicador/get_data_ajax/'+".$curso.", '#form_curso', '#listado_resultado')"))); ?>
+                                <?php echo $this->form_complete->create_element(array('id' => 'is_bono', 'type' => 'multiselect', 'options' => $datos_bono, 'first' => array('' => 'Todos los bloques'), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Bloques', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Bloques', 'onchange' => "data_ajax(site_url+'/resultadocursoindicador/get_data_ajax/'+".$curso.", '#form_curso', '#listado_resultado')"))); ?>
                                 </label>
                             </div>
                         </div>
                         <div class="col-lg-8 col-sm-8">
                             <div class="panel-body input-group input-group-sm">
-                                <span class="input-group-addon">Indicadores:</span>
-                                <?php echo $this->form_complete->create_element(array('id' => 'tipo_indicador_cve', 'type' => 'multiselect', 'options' => $datos_indicador, 'first' => array('' => 'Todos los indicadores'), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Indicador', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Indicador', 'onchange' => "data_ajax(site_url+'/resultadocursoindicador/get_data_ajax/'+".$curso.", '#form_curso', '#listado_resultado')"))); ?>
+                                <span class="input-group-addon">Grupos:</span>
+                                <?php echo $this->form_complete->create_element(array('id' => 'tipo_indicador_cve', 'type' => 'multiselect', 'options' => array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA'), 'first' => array('' => 'Todos los grupos'), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Indicador', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Indicador', 'onchange' => "data_ajax(site_url+'/resultadocursoindicador/get_data_ajax/'+".$curso.", '#form_curso', '#listado_resultado')"))); ?>
                             </div>
                         </div>
                         

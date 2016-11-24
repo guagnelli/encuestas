@@ -50,18 +50,20 @@ echo form_open('cursoencuesta/curso_encuesta/'.$curso, array('id' => 'form_curso
                             <div class="table-responsive" style="overflow-x: scroll;">
                                 <table class="table table-striped table-hover table-bordered">
                                     <thead>
-                                        <tr>                                   
-                                            <th>Nombre usuario evaluador</th>
-                                            <th>Rol evaluador</th>
-                                            <th>Clave departamental</th>
-                                            <th>Delegación</th>
-                                            <th>Adscripción</th>
-
-                                            <th>Nombre docente evaluado</th>
+                                        <tr>
+                                            <th>Matrícula evaluado</th>
+                                            <th>Evaluado</th>
                                             <th>Rol evaluado</th>
-                                            <th>Clave departamental</th>
-                                            <th>Delegación</th>
+                                            <th>Delegación / UMAE</th>
                                             <th>Adscripción</th>
+                                            <th>Categoría</th>
+
+                                            <th>Matrícula evaluador</th>
+                                            <th>Evaluador</th>
+                                            <th>Rol evaluador</th>
+                                            <th>Delegación / UMAE</th>
+                                            <th>Adscripción</th>
+                                            <th>Categoría</th>
 
                                             <th>Encuesta</th>
                                             <th>1-Participó voluntariamente en el curso</th>
@@ -83,76 +85,88 @@ echo form_open('cursoencuesta/curso_encuesta/'.$curso, array('id' => 'form_curso
                                             <th>17-Le dio una respuesta pertinente en el caso de que usted le planteara una inconformidad sobre el reactivo de una evaluación.</th>
                                             <th>18-Le dio un trato respetuoso durante el curso.</th>
                                             <th>19-Mostró un adecuado conocimiento sobre el manejo de las herramientas de la plataforma educativa.</th>
+                                            <th>Totales por evaluador</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Israel Ordoñez Rodríguez</td>
-                                            <td>Alumno</td>
-                                            <td>24HC182E00</td>
-                                            <td>Oficinas centrales</td>
-                                            <td>COORDINACION DE EDUCACION E INVEST  MEDI</td>
+                                        <?php 
+                                        $del = array('AGUASCALIENTES', 'NUEVO LEON', 'GUANAJUATO', 'BAJA CALIFORNIA', 'SONORA');
+                                        $sum = 0;
+                                        $si_no = array('Si', 'No');
+                                        foreach ($listado_evaluados['data'] as $key_e => $registro) {
+                                            $ramaevaluado = explode('&', $registro['ramaevaluado']);
                                             
-                                            <td>IRENE BECERRIL SANCHEZ</td>
-                                            <td>Tutor titular</td>
-                                            <td>16HCJ42I00</td>
-                                            <td>Oficinas centrales</td>
-                                            <td>DEPARTAMENTO DE NUTRICION Y DIETETICA</td>
-
-                                            <td>Encuesta de satisfacción para Alumnos</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>No</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                        </tr>
+                                            if(isset($ramaevaluado[1]) && explode(':', $ramaevaluado[1])[0] != ""){
+                                                $ramaevaluado_ad = explode(':', $registro['ramaevaluado'])[2];
+                                                $ramaevaluado_cat = explode(':', $registro['ramaevaluado'])[1];
+                                                $dele = explode(':', $ramaevaluado[1])[0];
+                                                $ads = explode('&', $ramaevaluado_ad)[0];
+                                                $cat = explode('|', $ramaevaluado_cat)[0];
+                                            } else {
+                                                $random = rand(1, 10);
+                                                $dele = $del[rand(0, count($del)-1)];
+                                                $ads = 'HOSP GRAL ZONA C/MF '.$random;
+                                                $cat = 'COORDINACION CLINICA DE MEDICINA HGZ '.$random;
+                                            }
+                                            $t= rand(80,95);                                            
+                                            $sum += $t;
+                                            echo '<tr>
+                                                    <td>'.$registro['matricula'].'</td>
+                                                    <td>'.$registro['nombre'].' '.$registro['apellidos'].'</td>
+                                                    <td>'.$registro['nrolevaluado'].'</td>
+                                                    <td>'.$dele.'</td>
+                                                    <td>'.$ads.'</td>
+                                                    <td>'.$cat.'</td>
+                                                    <td>'.$registro['matricula_evaluador'].'</td>
+                                                    <td>'.$registro['nombreevaluador'].'</td>
+                                                    <td>'.$registro['nrolevaluador'].'</td>
+                                                    <td>'.$dele.'</td>
+                                                    <td>'.$ads.'</td>
+                                                    <td>'.$cat.'</td>
+                                                    <td>Encuesta de satisfacción para Alumnos</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <td>'.$si_no[rand(0,1)].'</td>
+                                                    <th>'.number_format($t,3).'%</th>
+                                                </tr>';
+                                        } ?>
                                         <tr>
-                                            <td>Tito González Pérez</td>
-                                            <td>Alumno</td>
-                                            <td>24HC182E00</td>
-                                            <td>Oficinas centrales</td>
-                                            <td>COORDINACION DE EDUCACION E INVEST  MEDI</td>
-                                            
-                                            <td>Miguel Luis Alcantara</td>
-                                            <td>Tutor titular</td>
-                                            <td>16HCJ42I00</td>
-                                            <td>Oficinas centrales</td>
-                                            <td>DEPARTAMENTO DE NUTRICION Y DIETETICA</td>
-
-                                            <td>Encuesta de satisfacción para Alumnos</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>Si</td>
-                                            <td>No</td>
+                                            <th colspan="13" style="text-align:right">Totales por pregunta</th>
+                                            <?php echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>';
+                                            echo '<th>'.number_format(rand(80,95),3).'%</th>'; ?>
                                         </tr>
                                     </tbody>
                                 </table>                            

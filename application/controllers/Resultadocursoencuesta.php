@@ -208,8 +208,8 @@ class Resultadocursoencuesta extends CI_Controller {
 
         //$datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso'] = $curso;
-
-
+        $data['listado_evaluados'] = $this->encur_mod->listado_evaluados(array('curso'=>$curso));
+        //pr($listado_evaluados);
 
         $main_contet = $this->load->view('curso/cur_enc_resultado_detalle', $data, true);
         $this->template->setMainContent($main_contet);

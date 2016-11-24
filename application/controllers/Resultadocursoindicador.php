@@ -31,9 +31,9 @@ class Resultadocursoindicador extends CI_Controller
         $anios = $this->lista_anios();
         $data['datos_curso'] = $this->cur_mod->listado_cursos(array('cur_id'=>$curso));
         //$datos_grupos = $this->cur_mod->listar_grupos_curso(array('cur_id'=>$curso));
-        $datos_indicador = $this->encur_mod->get_indicador_curso(array('conditions'=>array('eva.course_cve'=>$curso), 'fields'=>'distinct(ind.*)'));
+        $datos_indicador = $this->encur_mod->get_indicador_curso(array('conditions'=>array('eva.course_cve'=>$curso, 'eva.evaluador_rol_id'=>$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']), 'fields'=>'distinct(ind.*)'));
         $data['datos_indicador'] = dropdown_options($datos_indicador, 'indicador_cve', 'descripcion');
-        $data['datos_bono'] = array('0'=>'Sin bono', '1'=>'Con bono');
+        $data['datos_bono'] = array('0'=>'Bloque 1', '1'=>'Bloque 2', '2'=>'Bloque 3', '3'=>'Bloque 4', '4'=>'Bloque 5');
         //pr($datos_curso);
         //pr($datos_indicador);
 
@@ -53,10 +53,10 @@ class Resultadocursoindicador extends CI_Controller
                 if ($this->input->post()) { //Se verifica que se haya recibido información por método post
                     //aqui va la nueva conexion a la base de datos del buscador
                     //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
-                    $filtros = $this->input->post(null, true);
-                    
+                    $filtros = $this->input->post(null, true);                    
                     $filtros['current_row'] = (isset($current_row) && !empty($current_row)) ? $current_row : 0;
                     $filtros['curso_cve'] = (isset($curso) && !empty($curso)) ? $curso : '';
+                    $filtros['conditions'] = ' ev.evaluador_rol_id='.$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO'].' AND ';
                     $data=$filtros;
                     $data['current_row'] = $filtros['current_row'];
                     $data['per_page'] = $this->input->post('per_page');

@@ -7,10 +7,10 @@
         <table class="table table-striped table-hover table-bordered">
             <thead>
                 <tr>
-                    <th rowspan="2">Nombre docente evaluado</th>
-                    <th rowspan="2">Rol evaluado</th>
                     <th rowspan="2">Nombre usuario evaluador</th>
                     <th rowspan="2">Rol evaluador</th>
+                    <th rowspan="2">Bloque</th>
+                    <th rowspan="2">Grupo</th>
                     <?php $html_head = '';
                     foreach ($indicadores as $key_ind => $indicador) {
                         $html_head .= '<th>'.$indicador['descripcion'].'</th>';
@@ -28,16 +28,18 @@
                     $registro_temp[$val['usu_evaluador']][$val['rol_nombre_evaluador']][$val['usu_evaluado']][$val['rol_nombre_evaluado']][$val['tipo_indicador_cve']] = $val['porcentaje'];
                 }
                 //pr($registro_temp);
+                $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
                 foreach ($registro_temp as $key_eva => $evaluador) {
                     foreach ($evaluador as $key_rol => $rol_evaluador) {
                         foreach ($rol_evaluador as $key_eval => $evaluado) {
                             foreach ($evaluado as $key_rol_e => $rol_evaluado) {
                                 //if($)
+                                //<td>'.$key_eval.'</td><td>'.$key_rol_e.'</td>
                                 echo '<tr>
-                                <td >'.$key_eval.'</td>
-                                <td >'.$key_rol_e.'</td >
-                                <td >'.$key_eva.'</td>
-                                <td >'.$key_rol.'</td >';
+                                <td>'.$key_eva.'</td>
+                                <td>'.$key_rol.'</td>
+                                <td>Bloque '.rand(1,5).'</td>
+                                <td>'.$temp_grupo[rand(0, count($temp_grupo)-1)].'</td>';
                                 //pr($rol_evaluado);
                                 foreach ($indicadores as $key_ind => $indicador) {
                                     if(isset($rol_evaluado[$indicador['indicador_cve']])){

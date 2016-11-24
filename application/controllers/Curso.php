@@ -79,7 +79,16 @@ class Curso extends CI_Controller
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
 
-    }    
+    }
+
+    public function curso_bloque_grupos($curso=null){
+        $data['datos_curso'] = $this->cur_mod->listado_cursos(array('cur_id'=>$curso));
+        $data['grupos'] = $this->cur_mod->listar_grupos_curso(array('cur_id'=>$curso));
+
+        $main_contet = $this->load->view('curso/curso_bloque_grupos', $data, true);
+        $this->template->setMainContent($main_contet);
+        $this->template->getTemplate();
+    }
 
     public function get_data_ajax($current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
