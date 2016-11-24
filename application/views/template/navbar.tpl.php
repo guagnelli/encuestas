@@ -23,7 +23,7 @@ if (isset($logueado) && !empty($logueado)) {
                             <i class="glyphicon glyphicon-chevron-down"></i></a>
                         <ul class="a_nav_sied">
                             <li>
-                                <a href="<?php echo site_url('reporte'); ?>" class="a_nav_sied">Reporte resumen de bonos</a>
+                                <a href="<?php echo site_url('reporte_bonos'); ?>" class="a_nav_sied">Reporte resumen de bonos</a>
                             </li>
                            
                         </ul>

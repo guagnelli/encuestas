@@ -108,7 +108,7 @@ class Curso_model extends CI_Model {
         //$this->db->order_by("title", "desc");
         $this->db->order_by('mdl_course.fullname','ASC');
         $query = $this->db->get('mdl_course'); //Obtener conjunto de registros
-        //pr($this->db1->last_query());                                  
+//        pr($this->db->last_query());                                  
         $resultado['total']=$num_rows[0]->total;
         $resultado['columns']=$query->list_fields();
         $resultado['data']=$query->result_array();

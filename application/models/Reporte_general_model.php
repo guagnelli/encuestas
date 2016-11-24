@@ -16,6 +16,9 @@ class Reporte_general_model extends CI_Model {
         $parametros;
         if ($parametros['tipo_curso'] == 1) {//Is tutorizado
             $result_reporte = array(
+                array(
+                    
+                )
                 
             );
         } else {//No tutorizado

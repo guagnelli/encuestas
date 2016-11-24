@@ -12,6 +12,7 @@
                     <th>Nombre docente evaluado</th>
                     <th>Rol evaluado</th>
                     <th>Grupo</th>
+                    <th>Bloque</th>
                     <th>Calificaci&oacute;n de encuesta</th>
                                     
 
@@ -21,13 +22,13 @@
                 <?php
                 
                 foreach ($empleados as $key => $val) {
-
                     echo '<tr>
                     <td >' .htmlentities($val['nombreevaluador']) . '</td>
                     <td >' . $val['nrolevaluador'].'</td >
                     <td >' .htmlentities($val['nombre']) . ' '. htmlentities($val['apellidos']). '</td>
                     <td > ' . $val['nrolevaluado'] . '</td >
                     <td > ' . $val['ngrupo'] . '</td >
+                    <td > ' . rand (1, 10) . '</td >
                     <td > ' . $val['calif_emitida'] . '</td >'; 
                     
 

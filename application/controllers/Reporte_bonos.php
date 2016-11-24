@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @version 	: 1.0.0
  * @autor 		: Pablo José
  */
-class Reporte_general extends CI_Controller {
+class Reporte_bonos extends CI_Controller {
 
     /**
      * * Carga de clases para el acceso a base de datos y para la creación de elementos del formulario
@@ -52,8 +52,8 @@ class Reporte_general extends CI_Controller {
 
          */
 
-        $main_contet = $this->load->view('reporte/general/general_cursos', $data, true);
-        $this->template->setMainTitle('Reporte general de cursos');
+        $main_contet = $this->load->view('reporte/bonos/bonos', $data, true);
+        $this->template->setMainTitle('Reporte de bonos');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
     }
@@ -77,7 +77,7 @@ class Reporte_general extends CI_Controller {
 //                $data['per_page'] = $this->input->post('per_page');
 //                //pr($data);
 //                $this->listado_resultado($data, array('form_recurso' => '#form_empleado', 'elemento_resultado' => '#listado_resultado_empleado')); //Generar listado en caso de obtener datos
-                echo $this->load->view('reporte/general/tb_result_rg', $data, TRUE);
+                echo $this->load->view('reporte/bonos/tb_result_bnos', $data, TRUE);
             }
         } else {
 
@@ -89,7 +89,7 @@ class Reporte_general extends CI_Controller {
         $pagination = $this->template->pagination_data_empleado($data, 'get_data_ajax2'); //Crear mensaje y links de paginación
         $links = "<div class='col-sm-5 dataTables_info' style='line-height: 50px;'>" . $pagination['total'] . "</div>
                 <div class='col-sm-7 text-right'>" . $pagination['links'] . "</div>";
-        echo $links . $this->load->view('reporte/general/tb_result_rg', $data, TRUE) . $links . '
+        echo $links . $this->load->view('reporte/bonos/tb_result_bnos', $data, TRUE) . $links . '
             <script>
             $("ul.pagination li a").click(function(event){
                 data_ajax(this, "' . $form['form_recurso'] . '", "' . $form['elemento_resultado'] . '");

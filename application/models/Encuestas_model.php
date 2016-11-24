@@ -2089,7 +2089,7 @@ where  re.rol_evaluador_cve=14 and re.tutorizado=1 and re.rol_evaluado_cve in(18
        c.shortname as clave_curso,c.fullname as desc_curso,
        re.rol_evaluado_cve as role,(select name from public.mdl_role where id=re.rol_evaluado_cve) as nrol,re.rol_evaluador_cve as idrol,count(*) as evaluaciones
 
-from encuestas.sse_result_evaluacion ee
+from encuestas.sse_result_evaluacion_encuesta_curso ee
 left join public.mdl_user u on u.id=ee.evaluado_user_cve
 left join public.mdl_course c on c.id=ee.course_cve
 inner join encuestas.sse_encuestas en on en.encuesta_cve=ee.encuesta_cve 
@@ -2103,20 +2103,20 @@ order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.ro
         $resultado = array();
         ///////////////////// Iniciar almacenado de parámetros en cache /////////////////////////
         $this->db->start_cache();
-        $this->db->select('encuestas.sse_result_evaluacion.evaluacion_resul_cve');
-        $this->db->where('encuestas.sse_result_evaluacion.course_cve', $params['curso']);
+        $this->db->select('encuestas.sse_result_evaluacion_encuesta_curso.evaluacion_resul_cve');
+        $this->db->where('encuestas.sse_result_evaluacion_encuesta_curso.course_cve', $params['curso']);
 
         
-        $this->db->join('public.mdl_user', 'public.mdl_user.id=encuestas.sse_result_evaluacion.evaluado_user_cve','left');
-        $this->db->join('public.mdl_course', 'public.mdl_course.id=encuestas.sse_result_evaluacion.course_cve','left');
-        $this->db->join('encuestas.sse_encuestas', 'encuestas.sse_encuestas.encuesta_cve=encuestas.sse_result_evaluacion.encuesta_cve');
+        $this->db->join('public.mdl_user', 'public.mdl_user.id=encuestas.sse_result_evaluacion_encuesta_curso.evaluado_user_cve','left');
+        $this->db->join('public.mdl_course', 'public.mdl_course.id=encuestas.sse_result_evaluacion_encuesta_curso.course_cve','left');
+        $this->db->join('encuestas.sse_encuestas', 'encuestas.sse_encuestas.encuesta_cve=encuestas.sse_result_evaluacion_encuesta_curso.encuesta_cve');
         $this->db->join('encuestas.sse_reglas_evaluacion', 'encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve');
 
         $this->db->stop_cache();
         /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
 
         ///////////////////////////// Obtener número de registros ///////////////////////////////
-        $nr = $this->db->get_compiled_select('encuestas.sse_result_evaluacion'); //Obtener el total de registros
+        $nr = $this->db->get_compiled_select('encuestas.sse_result_evaluacion_encuesta_curso'); //Obtener el total de registros
         $num_rows = $this->db->query("SELECT count(*) AS total FROM (".$nr.") AS temp")->result();
         //pr($this->db1->last_query());
         /////////////////////////////// FIN número de registros /////////////////////////////////
@@ -2131,10 +2131,10 @@ order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.ro
                     'sse_reglas_evaluacion.rol_evaluador_cve as evaluador',
                     '(select name from public.mdl_role where id=sse_reglas_evaluacion.rol_evaluador_cve) as nrolevaluador', 
                     'count(*) as evaluaciones',
-                    'encuestas.sse_result_evaluacion.group_id as grupo_id',
-                    'encuestas.sse_result_evaluacion.calif_emitida as calif_emitida',
-                    '(select name from public.mdl_groups where id=encuestas.sse_result_evaluacion.group_id) as ngrupo',
-                    '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion.evaluador_user_cve) as nombreevaluador' 
+                    'encuestas.sse_result_evaluacion_encuesta_curso.group_id as grupo_id',
+                    'encuestas.sse_result_evaluacion_encuesta_curso.calif_emitida as calif_emitida',
+                    '(select name from public.mdl_groups where id=encuestas.sse_result_evaluacion_encuesta_curso.group_id) as ngrupo',
+                    '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion_encuesta_curso.evaluador_user_cve) as nombreevaluador' 
 
                     );
         
@@ -2147,12 +2147,12 @@ order by u.firstname,u.lastname,c.shortname,c.fullname,re.rol_evaluado_cve,re.ro
             $this->db->limit($params['per_page'], $params['current_row']);
         }
 
-        $this->db->group_by('sse_result_evaluacion.evaluacion_resul_cve,mdl_user.username, mdl_user.firstname,mdl_user.lastname,mdl_course.shortname,mdl_course.fullname,
+        $this->db->group_by('sse_result_evaluacion_encuesta_curso.evaluacion_resul_cve,mdl_user.username, mdl_user.firstname,mdl_user.lastname,mdl_course.shortname,mdl_course.fullname,
             sse_reglas_evaluacion.rol_evaluado_cve,sse_reglas_evaluacion.rol_evaluador_cve');
 
-        $query = $this->db->get('encuestas.sse_result_evaluacion'); //Obtener conjunto de registros
+        $query = $this->db->get('encuestas.sse_result_evaluacion_encuesta_curso'); //Obtener conjunto de registros
         
-        //pr($this->db1->last_query());                                  
+//        pr($this->db->last_query());                                  
         $resultado['total']=$num_rows[0]->total;
         $resultado['columns']=$query->list_fields();
         $resultado['data']=$query->result_array();

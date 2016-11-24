@@ -1,19 +1,22 @@
-<?php       if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
 
 
 $config['salt'] = "B0no5"; ///SALT
 
 $config['rol_docente'] = array(
-                        array('rol_id' =>14,'rol_nom'=>'Coordinador de curso'),
-                        array('rol_id' =>18,'rol_nom'=>'Coordinador de tutores'),
-                        array('rol_id' =>32,'rol_nom'=>'Tutor titular'),
-                        array('rol_id' =>33,'rol_nom'=>'Tutor adjunto'),
-                        array('rol_id' =>30,'rol_nom'=>'Coordinador normativo') 
-                );
+    array('rol_id' => 14, 'rol_nom' => 'Coordinador de curso'),
+    array('rol_id' => 18, 'rol_nom' => 'Coordinador de tutores'),
+    array('rol_id' => 32, 'rol_nom' => 'Tutor titular'),
+    array('rol_id' => 33, 'rol_nom' => 'Tutor adjunto'),
+    array('rol_id' => 30, 'rol_nom' => 'Coordinador normativo')
+);
 
-$config['menu_super_admin'] = array('resultadocursoencuesta'=>array('*'),'encuestas' => array('*'), 'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 'encuestausuario'=>array('*'),'resultadocurenrealizada'=>array('*'), 'pagina_no_encontrada' => array('*'));
+$config['menu_super_admin'] = array('resultadocursoencuesta' => array('*'), 'encuestas' => array('*'), 'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 'encuestausuario' => array('*'), 'resultadocurenrealizada' => array('*'), 'pagina_no_encontrada' => array('*'));
 $config['menu_validador'] = array('login' => array('cerrar_session', 'cerrar_session_ajax'), 'dashboard' => array('*'), 'tarjeton' => array('*'), 'pagina_no_encontrada' => array('index'), 'bonos_titular' => array('*'), 'bono_perfil_empleado' => array('*'));
-$config['menu_no_logueado'] = array('login'=>array('*'));
+$config['menu_no_logueado'] = array('login' => array('*'));
 
 /////Ruta de solicitudes
 $config['ruta_documentacion'] = $_SERVER["DOCUMENT_ROOT"] . "/sipimss_bonos/assets/files/archivos_bono/";
@@ -92,191 +95,191 @@ $config['buscador_listado'] = array(6, 5, 4, 14, 15);
 //$config['buscador_listado'] = array(                     'vista'=>array(array('vista'=>1,10,13,14,15,16,17,18,19)));
 
 $config['alert_msg'] = array(
-                'SUCCESS' => array('id_msg' => 1 , 'class' => 'success') ,
-                'DANGER' => array('id_msg' => 2 , 'class' => 'danger'),
-                'WARNING' => array('id_msg' => 3 , 'class' => 'warning'),
-                'INFO' => array('id_msg' => 4 , 'class' => 'info')
-              );
+    'SUCCESS' => array('id_msg' => 1, 'class' => 'success'),
+    'DANGER' => array('id_msg' => 2, 'class' => 'danger'),
+    'WARNING' => array('id_msg' => 3, 'class' => 'warning'),
+    'INFO' => array('id_msg' => 4, 'class' => 'info')
+);
 
 $config['parametros_bitacora'] = array('USUARIO_CVE' => 'NULL', 'BIT_VALORES' => 'NULL',
     'BIT_IP' => 'NULL', 'BIT_RUTA' => 'NULL', 'MODULO_CVE' => 'NULL');
-$config['parametros_log'] = array('USUARIO_CVE' => 'NULL', 'LOG_INI_SES_IP' => 'NULL', 
-    'INICIO_SATISFACTORIO'=>'NULL');
+$config['parametros_log'] = array('USUARIO_CVE' => 'NULL', 'LOG_INI_SES_IP' => 'NULL',
+    'INICIO_SATISFACTORIO' => 'NULL');
 
 
 
 $config['ENCUESTAS_RESPUESTA'] = array(
-                                        'CERRADA' => array('SI'=>1,'NO'=>0),
-                                        'ABIERTA'=>array('SI'=>7,'NO'=>0),
-                                        'NO_ENVIO_MENSAJE'=>array('SI'=>7,'NO'=>0) 
-                                        );
+    'CERRADA' => array('SI' => 1, 'NO' => 0),
+    'ABIERTA' => array('SI' => 7, 'NO' => 0),
+    'NO_ENVIO_MENSAJE' => array('SI' => 7, 'NO' => 0)
+);
 
 $config['ENCUESTAS_TIPO_PREGUNTA'] = array(
-                                            1=> array(//RESPUESTA_INDEFINIDA
-                                                'tipo_pregunta_cve'=>7
-                                                ), 
-                                            2=> array( //SI_NO
-                                                'tipo_pregunta_cve'=>1, 
-                                                'reactivos'=>array(
-                                                    array('texto'=>'Si','ponderacion'=>1),
-                                                    array('texto'=>'No','ponderacion'=>0)
-                                                    )
-                                                ), 
-                                            3=> array(//NULO_SI_NO
-                                                'tipo_pregunta_cve'=>2, 
-                                                'reactivos'=>array(
-                                                    array('texto'=>'No aplica','ponderacion'=>0),
-                                                    array('texto'=>'Si','ponderacion'=>1),
-                                                    array('texto'=>'No','ponderacion'=>0)
-                                                    )
-                                                ), 
-                                            5=> array(//SIEMPRE_NUNCA
-                                                'tipo_pregunta_cve'=>3, 
-                                                'reactivos'=>array(
-                                                    array('texto'=>'Siempre','ponderacion'=>1),
-                                                    array('texto'=>'Casi siempre','ponderacion'=>1),
-                                                    array('texto'=>'Algunas veces','ponderacion'=>0),
-                                                    array('texto'=>'Casi nunca','ponderacion'=>0),
-                                                    array('texto'=>'Nunca','ponderacion'=>0)
-                                                    )
-                                                ),
-                                            6=>array(//NULO_SIEMPRE_NUNCA
-                                                'tipo_pregunta_cve'=>4, 
-                                                'reactivos'=>array(
-                                                    array('texto'=>'No aplica','ponderacion'=>0),
-                                                    array('texto'=>'Siempre','ponderacion'=>1),
-                                                    array('texto'=>'Casi siempre','ponderacion'=>1),
-                                                    array('texto'=>'Algunas veces','ponderacion'=>0),
-                                                    array('texto'=>'Casi nunca','ponderacion'=>0),
-                                                    array('texto'=>'Nunca','ponderacion'=>0)
-                                                    )
-                                                ), 
-                                            7=>array(//RESPUESTA_ABIERTA
-                                                'tipo_pregunta_cve'=>5
-                                                ), 
-                                            8=>array(//NULO_RESPUESTA_ABIERTA
-                                                'tipo_pregunta_cve'=>6, 
-                                                'reactivos'=>array(
-                                                    array('texto'=>'No aplica','ponderacion'=>0))
-                                                ),
-                                            9=>array(//NULO_RESPUESTA_ABIERTA
-                                               'tipo_pregunta_cve'=>8, 
-                                               'reactivos'=>array(
-                                                    array('texto'=>'No envió mensaje','ponderacion'=>0),
-                                                    array('texto'=>'Si','ponderacion'=>1),
-                                                    array('texto'=>'No','ponderacion'=>0)
-                                                    )
-                                                )       
-                                            );
+    1 => array(//RESPUESTA_INDEFINIDA
+        'tipo_pregunta_cve' => 7
+    ),
+    2 => array(//SI_NO
+        'tipo_pregunta_cve' => 1,
+        'reactivos' => array(
+            array('texto' => 'Si', 'ponderacion' => 1),
+            array('texto' => 'No', 'ponderacion' => 0)
+        )
+    ),
+    3 => array(//NULO_SI_NO
+        'tipo_pregunta_cve' => 2,
+        'reactivos' => array(
+            array('texto' => 'No aplica', 'ponderacion' => 0),
+            array('texto' => 'Si', 'ponderacion' => 1),
+            array('texto' => 'No', 'ponderacion' => 0)
+        )
+    ),
+    5 => array(//SIEMPRE_NUNCA
+        'tipo_pregunta_cve' => 3,
+        'reactivos' => array(
+            array('texto' => 'Siempre', 'ponderacion' => 1),
+            array('texto' => 'Casi siempre', 'ponderacion' => 1),
+            array('texto' => 'Algunas veces', 'ponderacion' => 0),
+            array('texto' => 'Casi nunca', 'ponderacion' => 0),
+            array('texto' => 'Nunca', 'ponderacion' => 0)
+        )
+    ),
+    6 => array(//NULO_SIEMPRE_NUNCA
+        'tipo_pregunta_cve' => 4,
+        'reactivos' => array(
+            array('texto' => 'No aplica', 'ponderacion' => 0),
+            array('texto' => 'Siempre', 'ponderacion' => 1),
+            array('texto' => 'Casi siempre', 'ponderacion' => 1),
+            array('texto' => 'Algunas veces', 'ponderacion' => 0),
+            array('texto' => 'Casi nunca', 'ponderacion' => 0),
+            array('texto' => 'Nunca', 'ponderacion' => 0)
+        )
+    ),
+    7 => array(//RESPUESTA_ABIERTA
+        'tipo_pregunta_cve' => 5
+    ),
+    8 => array(//NULO_RESPUESTA_ABIERTA
+        'tipo_pregunta_cve' => 6,
+        'reactivos' => array(
+            array('texto' => 'No aplica', 'ponderacion' => 0))
+    ),
+    9 => array(//NULO_RESPUESTA_ABIERTA
+        'tipo_pregunta_cve' => 8,
+        'reactivos' => array(
+            array('texto' => 'No envió mensaje', 'ponderacion' => 0),
+            array('texto' => 'Si', 'ponderacion' => 1),
+            array('texto' => 'No', 'ponderacion' => 0)
+        )
+    )
+);
 $config['ENCUESTAS_RESPUESTA_ESPERADA'] = array(
-                                            'NO_APLICA'=>'No aplica',
-                                            'SI'=>'Si',
-                                            'NO'=>'No',
-                                            'SIEMPRE'=>'Siempre',
-                                            'CASI_SIEMPRE'=>'Casi siempre',
-                                            'ALGUNAS_VECES'=>'Algunas veces',
-                                            'CASI_NUNCA'=>'Casi nunca',
-                                            'NUNCA'=>'Nunca',
-                                            'RESPUESTA_ABIERTA'=>'Respuesta abierta',
-                                            'NO_ENVIO_MENSAJE'=>'No envío mensaje'
-                                            );
+    'NO_APLICA' => 'No aplica',
+    'SI' => 'Si',
+    'NO' => 'No',
+    'SIEMPRE' => 'Siempre',
+    'CASI_SIEMPRE' => 'Casi siempre',
+    'ALGUNAS_VECES' => 'Algunas veces',
+    'CASI_NUNCA' => 'Casi nunca',
+    'NUNCA' => 'Nunca',
+    'RESPUESTA_ABIERTA' => 'Respuesta abierta',
+    'NO_ENVIO_MENSAJE' => 'No envío mensaje'
+);
 $config['ENCUESTAS_ROL_EVALUA'] = array(
-                                    'COORDINADOR_NORMATIVO'=>30,
-                                    'COORDINADOR_CURSO'=>14,
-                                    'COORDINADOR_TUTORES'=>18,
-                                    'TUTOR_TITULAR'=>32,
-                                    'TUTOR_ADJUNTO'=>33
-                                    );
+    'COORDINADOR_NORMATIVO' => 30,
+    'COORDINADOR_CURSO' => 14,
+    'COORDINADOR_TUTORES' => 18,
+    'TUTOR_TITULAR' => 32,
+    'TUTOR_ADJUNTO' => 33
+);
 $config['ENCUESTAS_ROL_EVALUADOR'] = array(
-                                    'COORDINADOR_CURSO'=>14,
-                                    'COORDINADOR_TUTORES'=>18,
-                                    'TUTOR_TITULAR'=>32,
-                                    'ALUMNO'=>5,
-                                    'COORDINADOR_NORMATIVO'=>30,
-                                    'TUTOR_ADJUNTO'=>33
-                                    );
+    'COORDINADOR_CURSO' => 14,
+    'COORDINADOR_TUTORES' => 18,
+    'TUTOR_TITULAR' => 32,
+    'ALUMNO' => 5,
+    'COORDINADOR_NORMATIVO' => 30,
+    'TUTOR_ADJUNTO' => 33
+);
 
-$config['puntos_rol'] = array(  14=>3,//'Coordinador de curso'
-                                18=>4,//Coordinador de tutores
-                                32=>6,//Tutor titular
-                                33=>4,//Tutor adjunto
-                                30=>0// coordinador normativo
-                );
+$config['puntos_rol'] = array(14 => 3, //'Coordinador de curso'
+    18 => 4, //Coordinador de tutores
+    32 => 6, //Tutor titular
+    33 => 4, //Tutor adjunto
+    30 => 0// coordinador normativo
+);
 
-$config['puntos_tipo_curso']=array('CURSO'=>1, 'DIPLOMADO'=>3, 'CURSO BASADO EN GPC' => 1);
-$config['puntos_horas']=array(                            
-                            '=0'   =>array('PUN'=>0,'DESC'=>'Default'),
-                            '<40'   =>array('PUN'=>1,'DESC'=>'Menor que 40 y mayor a 1'),
-                            '>40'   =>array('PUN'=>2,'DESC'=>'Mayor o igual a 40 y menor a 80'),
-                            '>80'   =>array('PUN'=>3,'DESC'=>'Mayor o igual a 80 y menor a 10'),
-                            '>120'  =>array('PUN'=>6,'DESC'=>'Mayor o igual a 120')
-                        );
+$config['puntos_tipo_curso'] = array('CURSO' => 1, 'DIPLOMADO' => 3, 'CURSO BASADO EN GPC' => 1);
+$config['puntos_horas'] = array(
+    '=0' => array('PUN' => 0, 'DESC' => 'Default'),
+    '<40' => array('PUN' => 1, 'DESC' => 'Menor que 40 y mayor a 1'),
+    '>40' => array('PUN' => 2, 'DESC' => 'Mayor o igual a 40 y menor a 80'),
+    '>80' => array('PUN' => 3, 'DESC' => 'Mayor o igual a 80 y menor a 10'),
+    '>120' => array('PUN' => 6, 'DESC' => 'Mayor o igual a 120')
+);
 
-/*ES_NULO
-                            SI
-                            NO
-                            SIEMPRE
-                            CASI_SIEMPRE
-                            ALGUNAS_VECES
-                            CASI_NUNCA
-                            NUNCA
-                            RESPUESTA_ABIERTA
-            No aplica
-            Si
-            No
-            Siempre
-            Casi siempre
-            Algunas veces
-            Casi nunca
-            Nunca
-            Respuesta abierta
+/* ES_NULO
+  SI
+  NO
+  SIEMPRE
+  CASI_SIEMPRE
+  ALGUNAS_VECES
+  CASI_NUNCA
+  NUNCA
+  RESPUESTA_ABIERTA
+  No aplica
+  Si
+  No
+  Siempre
+  Casi siempre
+  Algunas veces
+  Casi nunca
+  Nunca
+  Respuesta abierta
 
-        *//*    # ROLES
+ *//*    # ROLES
 
-            - COORDINADOR_CURSO
-            - COORDINADOR_TUTORES
-            - TUTOR_TITULAR
-            - TUTOR_ADJUNTO
+  - COORDINADOR_CURSO
+  - COORDINADOR_TUTORES
+  - TUTOR_TITULAR
+  - TUTOR_ADJUNTO
 
-        */
+ */
 
 $config['rol_orden'] = array(1 => 'A', 2 => 'TT', 3 => 'TA', 4 => 'CT', 5 => 'CC', 6 => 'CN');
 $config['ENCUESTAS_RESPUESTAS_PREGUNTA'] = array(
-                                                1 => array(//SI_NO
-                                                        array('texto'=>'Si','ponderacion'=>1),
-                                                        array('texto'=>'No','ponderacion'=>0)
-                                                    ),
-                                                2 =>array(//NULO_SI_NO
-                                                    array('texto'=>'No aplica','ponderacion'=>0),
-                                                    array('texto'=>'Si','ponderacion'=>1),
-                                                    array('texto'=>'No','ponderacion'=>0)
-                                                ),
-                                                3 =>array(//SIEMPRE_NUNCA
-                                                    array('texto'=>'Siempre','ponderacion'=>1),
-                                                    array('texto'=>'Casi siempre','ponderacion'=>1),
-                                                    array('texto'=>'Algunas veces','ponderacion'=>1),
-                                                    array('texto'=>'Casi nunca','ponderacion'=>0),
-                                                    array('texto'=>'Nunca','ponderacion'=>0)
-                                                ),
-                                                4 =>array(//NULO_SIEMPRE_NUNCA
-                                                    array('texto'=>'No aplica','ponderacion'=>0),
-                                                    array('texto'=>'Siempre','ponderacion'=>1),
-                                                    array('texto'=>'Casi siempre','ponderacion'=>1),
-                                                    array('texto'=>'Algunas veces','ponderacion'=>1),
-                                                    array('texto'=>'Casi nunca','ponderacion'=>0),
-                                                    array('texto'=>'Nunca','ponderacion'=>0)
-                                                ),                                             
-                                                5 =>array(),//RESPUESTA_ABIERTA                                            
-                                                6 =>array(//NULO_RESPUESTA_ABIERTA
-                                                    array('texto'=>'No aplica','ponderacion'=>0)
-                                                    ),
-                                                7 =>array(),//RESPUESTA_INDEFINIDA
-                                                8 =>array(//NOENVIOMSG_SI_NO
-                                                    array('texto'=>'No envió mensaje','ponderacion'=>0),
-                                                    array('texto'=>'Si','ponderacion'=>1),
-                                                    array('texto'=>'No','ponderacion'=>0)
-                                                    ),
-                                            );
+    1 => array(//SI_NO
+        array('texto' => 'Si', 'ponderacion' => 1),
+        array('texto' => 'No', 'ponderacion' => 0)
+    ),
+    2 => array(//NULO_SI_NO
+        array('texto' => 'No aplica', 'ponderacion' => 0),
+        array('texto' => 'Si', 'ponderacion' => 1),
+        array('texto' => 'No', 'ponderacion' => 0)
+    ),
+    3 => array(//SIEMPRE_NUNCA
+        array('texto' => 'Siempre', 'ponderacion' => 1),
+        array('texto' => 'Casi siempre', 'ponderacion' => 1),
+        array('texto' => 'Algunas veces', 'ponderacion' => 1),
+        array('texto' => 'Casi nunca', 'ponderacion' => 0),
+        array('texto' => 'Nunca', 'ponderacion' => 0)
+    ),
+    4 => array(//NULO_SIEMPRE_NUNCA
+        array('texto' => 'No aplica', 'ponderacion' => 0),
+        array('texto' => 'Siempre', 'ponderacion' => 1),
+        array('texto' => 'Casi siempre', 'ponderacion' => 1),
+        array('texto' => 'Algunas veces', 'ponderacion' => 1),
+        array('texto' => 'Casi nunca', 'ponderacion' => 0),
+        array('texto' => 'Nunca', 'ponderacion' => 0)
+    ),
+    5 => array(), //RESPUESTA_ABIERTA                                            
+    6 => array(//NULO_RESPUESTA_ABIERTA
+        array('texto' => 'No aplica', 'ponderacion' => 0)
+    ),
+    7 => array(), //RESPUESTA_INDEFINIDA
+    8 => array(//NOENVIOMSG_SI_NO
+        array('texto' => 'No envió mensaje', 'ponderacion' => 0),
+        array('texto' => 'Si', 'ponderacion' => 1),
+        array('texto' => 'No', 'ponderacion' => 0)
+    ),
+);
 
 // Checar esta posible configuración.
 // if($_SERVER['CI_ENV']  === "development"){
@@ -287,27 +290,52 @@ $config['ENCUESTAS_RESPUESTAS_PREGUNTA'] = array(
 //      $config['url_sied_logout'] = 'http://11.32.41.92/kio/sied/app/login/logout.php';    
 // }
 
-$config['url_sied'] ='http://11.32.41.92/kio/sied';
+$config['url_sied'] = 'http://11.32.41.92/kio/sied';
 $config['url_sied_logout'] = 'http://11.32.41.92/kio/sied/app/login/logout.php';
 
 //$config['url_sied'] ='http://localhost/encuestas/';
 //$config['url_sied_logout'] = 'http://localhost/encuestas/app/login/logout.php';
 
 $config['TIPO_INSTRUMENTO'] = array(
-                                    'DESEMPENIO'=>1,
-                                    'SATISFACCION'=>2
-                                    );
+    'DESEMPENIO' => 1,
+    'SATISFACCION' => 2
+);
 
 $config['TIPO_INSTRUMENTOV'] = array(
-                                    1=>'Desempeño',
-                                    2=>'Satisfacción'
-                                    );
+    1 => 'Desempeño',
+    2 => 'Satisfacción'
+);
 
 
 $config['EVA_TIPO'] = array(
-                             'POR_GRUPO' => array('valor' => 1, 'text' => 'Por grupo'),
-                             'POR_USUARIO' => array('valor' => 2, 'text' => 'Por usuario'),
-                                    
-                             );
+    'POR_GRUPO' => array('valor' => 1, 'text' => 'Por grupo'),
+    'POR_USUARIO' => array('valor' => 2, 'text' => 'Por usuario'),
+);
 
 
+$config['prop_roles'] = array(
+    En_roles::ALUMNO => array(//5
+        'rol_nom' => 'Alumno', 
+        'ab'=>'A'
+    ),
+    En_roles::COORDINADOR_DE_CURSO => array(//14
+        'rol_nom' => 'Coordinador de Curso', 
+        'ab'=>'CC'
+    ),
+    En_roles::COORDINADOR_DE_TUTORES => array(//18
+        'rol_nom' => 'Coordinador de Tutores', 
+        'ab'=>'CT'
+    ),
+    En_roles::COORDINADOR_NORMATIVO => array(//30
+        'rol_nom' => 'Coordinador Normativo', 
+        'ab'=>'CN'
+    ),
+    En_roles::TUTOR_TITULAR => array(//32
+        'rol_nom' => 'Tutor Titular', 
+        'ab'=>'TT'
+    ),
+    En_roles::TUTOR_ADJUNTO => array(//33
+        'rol_nom' => 'Tutor Adjunto', 
+        'ab'=>'TA'
+    )
+);

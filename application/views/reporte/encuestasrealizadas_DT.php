@@ -26,7 +26,8 @@
 </div>
 <div class="row"></div>
 <script type="text/javascript">
-    $(document).ready(function() {
+//    $(document).ready(function() {
+    $(window).load(function() {
         var curso=$("#curso").val();
         var recurso = {
             per_page:5
