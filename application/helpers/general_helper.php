@@ -457,7 +457,8 @@ if (!function_exists('crear_lista_asociativa_valores')) {
 }
 if (!function_exists('valida_sesion_activa')) {
 
-    /**
+    
+/**
      * 
      * @author LEAS
      * @fecha 18112016
@@ -478,7 +479,6 @@ if (!function_exists('valida_sesion_activa')) {
         pr($valida_session);
         return $valida_session;
     }
-
 }
 
 

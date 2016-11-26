@@ -22,6 +22,7 @@
 		<?php //echo css("bonos.css"); ?>
 		<?php echo css("custom.css"); ?>
 		<?php echo css("font-awesome.css"); ?>
+		<?php echo css("encuestas.css"); ?>
 		<?php echo js("jquery.min.js"); ?>
 		<?php //echo js("jquery.selectric.js"); ?>
 		<?php echo js("general.js"); ?>

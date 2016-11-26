@@ -352,12 +352,14 @@ class Reporte_model extends CI_Model {
     public function get_filtros_generales_reportes() {
         $rol = $this->config->item('rol_docente');
         $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
-        $temp_grupo[rand(0, count($temp_grupo) - 1)];
+        $del_umae = $this->get_general_catalogos(array('from'=>'departments.ssd_cat_delegacion', 'select'=>array('nom_delegacion','cve_delegacion')));
         $result = array(
             'tipo_implementacion' => array(1 => 'Tutorizado', 0 => 'No tutorizado'),
             'tipo_encuesta' => array(1 => 'Satisfacción', 0 => 'Desempeño'),
             'anios' => $this->get_listado_anios(2009),
             'rol' => dropdown_options($rol, 'rol_id', 'rol_nom'),
+            'rol_evaluado' => dropdown_options($rol, 'rol_id', 'rol_nom'),
+            'rol_evaluado' => dropdown_options($rol, 'rol_id', 'rol_nom'),
             'ordenar_por' => array(
                 'emp_matricula' => 'Matrícula', 'emp_nombre' => 'Nombre del evaluado',
                 'cur_clave' => 'Clave curso', 'cur_nom_completo' => 'Nombre curso',
@@ -365,11 +367,15 @@ class Reporte_model extends CI_Model {
                 'rol_nom_edor' => 'Rol evaluador'),
             'order_by' => array('ASC' => 'Ascendente', 'DESC' => 'Descendente'),
             'order_columns' => array('emp_matricula' => 'Matrícula', 'cve_depto_adscripcion' => 'Adscripción', 'cat_nombre' => 'Categoría', 'grup_nom' => 'BD'),
-            'delg_umae' => array('d' => 'Delegación', 'u' => 'UMAE'),
+            'delg_umae' => dropdown_options($del_umae, 'cve_delegacion', 'nom_delegacion'),
             'instrumento' => $this->get_lista_roles_regla_evaluacion(),
             'buscar_por' => array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento'),
+            'buscar_categoria' => array('categoria' => 'Categoría'),
+            'buscar_adscripcion' => array('claveadscripcion' => 'Clave departamental', 'nameadscripcion' => 'Nombre departamento'),
+            'buscar_instrumento' => array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento'),
+            'buscar_docente_evaluado' => array('matriculado' => 'Matricula', 'namedocentedo' => 'Nombre docente'),
             'is_bono_p' => array(1 => 'Es bono', 'No es para bono' => 'No es bono'),
-            'grupos_p' => array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA'),
+            'grupos_p' => $temp_grupo,
             'bloques_p' => array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5'),
         );
         return $result;
@@ -411,6 +417,17 @@ class Reporte_model extends CI_Model {
         $this->db->order_by('rol_evaluador_cve', 'asc');
         $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
 
+        return $query->result_array();
+    }
+
+    public function get_general_catalogos($parametros) {
+        if (isset($parametros['select'])) {
+            $this->db->select($parametros['select']);
+        }
+        if (isset($parametros['where'])) {
+            $this->db->where($parametros['where']);
+        }
+        $query = $this->db->get($parametros['from']);
         return $query->result_array();
     }
 

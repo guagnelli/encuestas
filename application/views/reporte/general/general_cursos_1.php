@@ -20,7 +20,7 @@ echo form_open('reporte/index', array('id' => 'form_empleado'));
                         <div class="panel-body  input-group input-group-sm">
                             <!--<span class="input-group-addon">Sesiones:</span>-->
                             <label for="tipo_curso">Tipo de encuesta</label>
-                            <?php echo $this->form_complete->create_element(array('id' => 'tipo_encuesta', 'type' => 'dropdown', 'options' => $tipo_encuesta, 'first' => array('' => 'Seleccione tipo de encuesta'), 'attributes' => array('name' => 'tipo_curso', 'class' => 'form-control', 'placeholder' => 'Encuesta de satisfacción o desempeño', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Encuesta de satisfacción o desempeño', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
+                            <?php echo $this->form_complete->create_element(array('id' => 'tipo_encuesta', 'type' => 'dropdown', 'options' => $tipo_encuesta, 'first' => array('' => 'Seleccione tipo de curso'), 'attributes' => array('name' => 'tipo_curso', 'class' => 'form-control', 'placeholder' => 'Encuesta de satisfacción o desempeño', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Encuesta de satisfacción o desempeño', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-4">
@@ -32,30 +32,44 @@ echo form_open('reporte/index', array('id' => 'form_empleado'));
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 col-sm-6">
+                    <div class="col-lg-4 col-sm-4">
                         <div class="panel-body input-group input-group-sm">
                             <!--<span class="input-group-addon">Delegación:</span>-->
                             <label for="grupo">Grupos</label>
                             <?php echo $this->form_complete->create_element(array('id' => 'grupo', 'type' => 'multiselect', 'options' => $grupos_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'grupo', 'class' => 'form-control', 'placeholder' => 'Grupo', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Grupos', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-sm-6">
+                    <div class="col-lg-4 col-sm-4">
                         <div class="panel-body input-group input-group-sm">
                             <!--<span class="input-group-addon">Delegación:</span>-->
                             <label for="grupo">Bloques</label>
                             <?php echo $this->form_complete->create_element(array('id' => 'bloque', 'type' => 'multiselect', 'options' => $bloques_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'bloque', 'class' => 'form-control', 'placeholder' => 'Bloque', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Bloques', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
                         </div>
                     </div>
+                    <div class="col-lg-4 col-sm-4">
+                        <div class="panel-body input-group input-group-sm">
+                            <!--<span class="input-group-addon">Delegación:</span>-->
+                            <label for="anio_curso">Bono</label>
+                            <?php echo $this->form_complete->create_element(array('id' => 'is_bono', 'type' => 'dropdown', 'options' => $is_bono_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'is_bono', 'class' => 'form-control', 'placeholder' => 'Año que impartio curso', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'C/SN Bono', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">                    
-                    <div class="col-lg-6 col-sm-6">
+                    <div class="col-lg-4 col-sm-4">
+                        <div class="panel-body  input-group input-group-sm">
+                            <!--<span class="input-group-addon">Sesiones:</span>-->
+                            <label for="evaluado">Rol del evaluado</label>
+                            <?php echo $this->form_complete->create_element(array('id' => 'rol_evaluado', 'type' => 'dropdown', 'options' => $rol, 'first' => array('' => 'Seleccione un rol'), 'attributes' => array('name' => 'rol_evaluado', 'class' => 'form-control', 'placeholder' => 'Rol evaluado', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Rol que desempeño como docente', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-4">
                         <div class="panel-body  input-group input-group-sm">
                             <!--<span class="input-group-addon">Sesiones:</span>-->
                             <label for="evaluado">Instrumento</label>
                             <?php echo $this->form_complete->create_element(array('id' => 'instrumento', 'type' => 'dropdown', 'options' => $instrumento, 'first' => array('' => 'Seleccione un instrumento'), 'attributes' => array('name' => 'instrumento', 'class' => 'form-control', 'placeholder' => 'Instrumento', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Instrumento', 'onchange' => "data_ajax(site_url+'/reporte_general/get_buscar_cursos_encuestas', '#form_empleado', '#listado_resultado_empleado')"))); ?>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-sm-6">
+                    <div class="col-lg-4 col-sm-4">
                         <div class="panel-body  input-group input-group-sm">
                             <!--<span class="input-group-addon">Sesiones:</span>-->
                             <label for="evaluado">Delegación - UMAE</label>

@@ -10,77 +10,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Clave curso</th>
                 <th>Tipo de curso</th>
                 <th>Curso</th>
-                <th>Fecha de inicio</th>
                 <th>Grupo</th>
                 <th>Bloque</th>
-                <th>Matricula</th>
-                <th>Nombre evaluado</th>    
-                <th>Rol evaluado</th>
                 <th>A-TT</th>
                 <th>TT-CT</th>
                 <th>CT-CC</th>
                 <th>CT-TT</th>
                 <th>CC-CT</th>
-                <th></th>
                 <!--<th>Opciones</th>-->
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-03-17 00:00:00-06</td>
-                <td>QUINTANA ROO</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>9344829</td>
-                <td>Rosa María Yáñez González</td>
-                <td>Tutor Titular</td>
-                <td>100%</td>
-                <td>98.134</td>
-                <td>--</td>
-                <td>86.364%</td>
-                <td>--</td>
-            </tr>
-             <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>MORELOS</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99350573</td>
-                <td>Aurea Atanacia Barreto González</td>
-                <td>Tutor Titular</td>
-                <td>89.474%</td>
-                <td>--</td>
-                <td>--</td>
-                <td>67.897</td>
-                <td>--</td>
-            </tr>
-             <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>MICHOACAN</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99324079</td>
-                <td>Sergio Humberto Martínez López</td>
-                <td>Tutor Titular</td>
-                <td>91.071%</td>
-                <td>--</td>
-                <td>78.965%</td>
-                <td>--</td>
-                <td>87.350%</td>
-            </tr>
-        </tbody>
         <tfoot>
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -93,6 +34,44 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td>suma:87.350% <br> promedio:29.11%</td>
             </tr>
         </tfoot>
+        <tbody>
+            <tr>
+                <td>CES-DD-I2-15</td>
+                <td>Curso</td>
+                <td>Formación de Directivos en Salud</td>
+                <td>QUINTANA ROO</td>
+                <td>Bloque 2</td>
+                <td>100%</td>
+                <td>98.134</td>
+                <td>--</td>
+                <td>86.364%</td>
+                <td>--</td>
+            </tr>
+            <tr>
+                <td>CES-DD-I2-15</td>
+                <td>Curso</td>
+                <td>Formación de Directivos en Salud</td>
+                <td>MICHOACAN</td>
+                <td>Bloque 3</td>
+                <td>91.071%</td>
+                <td>--</td>
+                <td>78.965%</td>
+                <td>--</td>
+                <td>87.350%</td>
+            </tr>
+            <tr>
+                <td>CES-DPDESBL-I2-15</td>
+                <td>Curso</td>
+                <td>Profesionalización Docente para la Educación en Salud</td>
+                <td>GUANAJUATO 1</td>
+                <td>Bloque 4</td>
+                <td>85.43%</td>
+                <td>67.349%</td>
+                <td>78.965%</td>
+                <td>65.98%</td>
+                <td>84.1%</td>
+            </tr>
+        </tbody>
     </table>
 </div>
 

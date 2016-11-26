@@ -37,7 +37,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td>Rosa María Yáñez González</td>
                 <td>Tutor Titular</td>
                 <td>100%</td>
-                <td>--</td>
+                <td>98.134</td>
                 <td>--</td>
                 <td>86.364%</td>
                 <td>--</td>
@@ -51,11 +51,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td>Bloque <?php echo rand (1, 5);?></td>
                 <td>99350573</td>
                 <td>Aurea Atanacia Barreto González</td>
-                <td>Coordinador de curso</td>
+                <td>Tutor Titular</td>
+                <td>89.474%</td>
                 <td>--</td>
                 <td>--</td>
                 <td>67.897</td>
-                <td>--</td>
                 <td>--</td>
             </tr>
              <tr>
@@ -63,32 +63,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td>Curso</td>
                 <td>Formación de Directivos en Salud</td>
                 <td>2015-05-18 00:00:00-06</td>
-                <td>NUEVO LEON 2</td>
+                <td>MICHOACAN</td>
                 <td>Bloque <?php echo rand (1, 5);?></td>
                 <td>99324079</td>
                 <td>Sergio Humberto Martínez López</td>
-                <td>Coordinador de tutores</td>
-                <td>--</td>
+                <td>Tutor Titular</td>
                 <td>91.071%</td>
                 <td>--</td>
+                <td>78.965%</td>
                 <td>--</td>
                 <td>87.350%</td>
-            </tr>
-            <tr>
-                <td>CES-DPDESBL-I2-15</td>
-                <td>Curso</td>
-                <td>Profesionalización Docente para la Educación en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>GUANAJUATO 1</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99110715</td>
-                <td>Raúl Hernández Ordoñez</td>
-                <td>Tutor Titular</td>
-                <td>73.684%</td>
-                <td>--</td>
-                <td>--</td>
-                <td>78.54%</td>
-                <td>--</td>
             </tr>
         </tbody>
         <tfoot>
@@ -102,11 +86,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td></td>
                 <td></td>
                 <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>suma:280.545% <br> promedio:93.515%</td>
+                <td>suma:98.134% <br> promedio:32.71%</td>
+                <td>suma:78.965% <br> promedio:26.32%</td>
+                <td>suma:154.410% <br> promedio:51.42%</td>
+                <td>suma:87.350% <br> promedio:29.11%</td>
             </tr>
         </tfoot>
     </table>

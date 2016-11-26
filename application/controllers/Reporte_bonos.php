@@ -28,7 +28,11 @@ class Reporte_bonos extends CI_Controller {
     public function index() {
         //Obtiene los filtros para reporte
         $data = $this->rep_mod->get_filtros_generales_reportes();
-        
+        //Quitar lo que no se utiliza
+        $unset = array('buscar_por', 'buscar_categoria');
+        foreach ($unset as $k_value) {
+            unset($data[$k_value]);
+        }
         /*
           [2] => emp_matricula
           [3] => emp_nombre

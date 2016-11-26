@@ -53,7 +53,7 @@ class Resultadocurenrealizada extends CI_Controller
     public function get_data_ajax( $curso = null, $current_row=null)
     {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
-            if (isset($curso) && !empty($curso)) {            
+            if (is_null($curso) && !empty($curso)) {            
             
                 if ($this->input->post()) { //Se verifica que se haya recibido información por método post
                     //aqui va la nueva conexion a la base de datos del buscador
@@ -70,7 +70,7 @@ class Resultadocurenrealizada extends CI_Controller
                     $error = "";
                     $data['error']=$error;
                     
-                    $datos_curso=$this->cur_mod->listado_cursos(array('cur_id'=>$curso));
+//                    $datos_curso=$this->cur_mod->listado_cursos(array('cur_id'=>$curso));
                                          
                     $resultado = $this->resultadorealizado($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
                    
@@ -91,7 +91,7 @@ class Resultadocurenrealizada extends CI_Controller
         echo $data['error'].'<br>';
         $data['encuestacve']=0;
    
-        if(!self::DATA_TABLES_RESULTADO_REALIZADO){
+        if(self::DATA_TABLES_RESULTADO_REALIZADO){
             $pagination = $this->template->pagination_data_reporte($data); //Crear mensaje y links de paginación
             $links = "<div class='col-sm-5 dataTables_info' style='line-height: 50px;'>".$pagination['total']."</div>
                     <div class='col-sm-7 text-right'>".$pagination['links']."</div>";
@@ -146,10 +146,10 @@ class Resultadocurenrealizada extends CI_Controller
                 
         //$data['anios']=dropdown_options($anios, 'anio_id','anio_desc');
 
-        $datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
+//        $datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso']=$curso;
                
-        if(!self::DATA_TABLES_RESULTADO_REALIZADO){
+        if(self::DATA_TABLES_RESULTADO_REALIZADO){
             $main_contet = $this->load->view('reporte/encuestasrealizadas', $data, true);
         }else{
             $main_contet = $this->load->view('reporte/encuestasrealizadas_DT', $data, true);
@@ -194,9 +194,12 @@ class Resultadocurenrealizada extends CI_Controller
             $current_row = "0";
         }
         $idcurso=$filtros['curso'];
-        $datos_curso=$this->cur_mod->listado_cursos(array('cur_id'=> $filtros['curso']));
-        $usuarioscurso=$this->rep_mod->listado_usuariosenc($filtros['curso']);
+        $datos_curso=$this->cur_mod->listado_cursos(array('cur_id'=> $idcurso));
+        $usuarioscurso=$this->rep_mod->listado_usuariosenc($idcurso);
+        pr($datos_curso);
+        pr($usuarioscurso);
         //pr($usuarioscurso);
+        exit();
         foreach ($usuarioscurso as $keyuc => $valueuc) 
         {
             $rolescusercurso=$this->encur_mod->get_roles_usercurso(array('user_id' => $valueuc['cve_usuario'],'cur_id'=>$idcurso));
