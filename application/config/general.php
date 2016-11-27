@@ -206,6 +206,7 @@ $config['puntos_rol'] = array(14 => 3, //'Coordinador de curso'
     30 => 0// coordinador normativo
 );
 
+$config['tipo_curso_DCG'] = array(1 => 'Diplomado', 2 => 'Curso', 3 => 'Curso basado en GPC');
 $config['puntos_tipo_curso'] = array('CURSO' => 1, 'DIPLOMADO' => 3, 'CURSO BASADO EN GPC' => 1);
 $config['puntos_horas'] = array(
     '=0' => array('PUN' => 0, 'DESC' => 'Default'),

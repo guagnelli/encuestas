@@ -351,15 +351,15 @@ class Reporte_model extends CI_Model {
 
     public function get_filtros_generales_reportes() {
         $rol = $this->config->item('rol_docente');
+        $tipo_course = $this->config->item('tipo_curso_DCG');
         $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
         $del_umae = $this->get_general_catalogos(array('from'=>'departments.ssd_cat_delegacion', 'select'=>array('nom_delegacion','cve_delegacion')));
         $result = array(
-            'tipo_implementacion' => array(1 => 'Tutorizado', 0 => 'No tutorizado'),
             'tipo_encuesta' => array(1 => 'Satisfacción', 0 => 'Desempeño'),
             'anios' => $this->get_listado_anios(2009),
             'rol' => dropdown_options($rol, 'rol_id', 'rol_nom'),
             'rol_evaluado' => dropdown_options($rol, 'rol_id', 'rol_nom'),
-            'rol_evaluado' => dropdown_options($rol, 'rol_id', 'rol_nom'),
+            'rol_evaluador' => dropdown_options($rol, 'rol_id', 'rol_nom'),
             'ordenar_por' => array(
                 'emp_matricula' => 'Matrícula', 'emp_nombre' => 'Nombre del evaluado',
                 'cur_clave' => 'Clave curso', 'cur_nom_completo' => 'Nombre curso',
@@ -374,9 +374,11 @@ class Reporte_model extends CI_Model {
             'buscar_adscripcion' => array('claveadscripcion' => 'Clave departamental', 'nameadscripcion' => 'Nombre departamento'),
             'buscar_instrumento' => array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento'),
             'buscar_docente_evaluado' => array('matriculado' => 'Matricula', 'namedocentedo' => 'Nombre docente'),
-            'is_bono_p' => array(1 => 'Es bono', 'No es para bono' => 'No es bono'),
             'grupos_p' => $temp_grupo,
             'bloques_p' => array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5'),
+            'is_bono_p' => array(1 => 'Para bono', 0 => 'No es para bono'),
+            'tipo_implementacion' => array(1 => 'Tutorizado', 0 => 'No tutorizado'),
+            '$tipo_course' => $tipo_course,
         );
         return $result;
     }
@@ -444,16 +446,16 @@ class Reporte_model extends CI_Model {
             $anio_fin = intval(date("Y"));
         }
         if ($ascendente == 1) {
-            $anios[] = $anio_inicio;
+            $anios[$anio_inicio] = $anio_inicio;
             while ($anio_inicio != $anio_fin) {
                 $anio_inicio ++;
-                $anios[] = $anio_inicio;
+                $anios[$anio_inicio] = $anio_inicio;
             }
         } else {
-            $anios[] = $anio_fin;
+            $anios[$anio_fin] = $anio_fin;
             while ($anio_inicio != $anio_fin) {
                 $anio_fin --;
-                $anios[] = $anio_fin;
+                $anios[$anio_fin] = $anio_fin;
             }
         }
 //        pr($anios);

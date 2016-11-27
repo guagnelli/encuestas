@@ -65,6 +65,8 @@ class Reporte_bonos extends CI_Controller {
     public function get_buscar_cursos_encuestas($current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
+                $data_post = $this->input->post();
+                pr($data_post);
                 //aqui va la nueva conexion a la base de datos del buscador
                 //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
 //                $filtros = $this->input->post();
