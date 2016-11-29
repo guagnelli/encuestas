@@ -39,7 +39,17 @@
 a.a_nav_sied:hover, a.a_nav_sied:focus {
     text-decoration: none !important;
 }
-
+legend.scheduler-border {
+    width:inherit; /* Or auto */
+    padding:0 10px; /* To give a bit of padding on the left and right */
+    border-bottom:none;
+}
+fieldset.well {
+    padding: 19px 0;
+}
+fieldset .panel-body{
+    padding: 10px 0;
+}
 /*
 .navbar-top-links li {
     display: inline-block;

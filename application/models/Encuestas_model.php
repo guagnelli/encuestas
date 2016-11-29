@@ -1580,7 +1580,7 @@ WHERE mdl_course.id=761 and mdl_user.id=7848*/
 
 
             $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
-
+            pr($this->db->last_query());
         }
         else
         {
@@ -1625,6 +1625,7 @@ WHERE mdl_course.id=761 and mdl_user.id=7848*/
 
             $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
 
+            pr($this->db->last_query());
 
 
         }    
