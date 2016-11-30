@@ -456,7 +456,7 @@ class Reporte_model extends CI_Model {
     private function getDatosPorGrupo() {
         $array = array(
             Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'buscar_adscripcion', 'region','ordenar_por', 'order_by'),
-            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'buscar_adscripcion', 'region','ordenar_por', 'anios', 'order_by'),
+            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado','ordenar_por', 'anios', 'order_by'),
             Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'region', 'ordenar_por', 'order_by'),
             Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
             Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),

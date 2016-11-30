@@ -64,7 +64,7 @@ class Reporte_bonos extends CI_Controller {
 //         $this->filtrosreportes_tpl->getVista(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
 
         $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
-        $this->template->setMainTitle('Reporte de bonos');
+        $this->template->setMainTitle('Reporte de implementación');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
     }

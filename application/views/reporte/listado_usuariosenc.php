@@ -20,7 +20,7 @@
                     <th>Curso</th>
                     <th>Fecha inicio</th>
                     <th>Tutorizado</th>
-                    <th>Rol docente</th>
+                    <th>Rol evaluado</th>
                     <th>Puntos rol</th>
                     <th>Tipo curso</th>
                     <th>Puntos tipo curso</th>

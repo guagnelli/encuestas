@@ -61,6 +61,7 @@ class Reporte extends CI_Controller {
          */
         $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RB_RESUMEN_PUNTOS);
 //        $main_contet = $this->load->view('reporte/resumen_bonos/docentes', $data, true);
+        $this->template->setMainTitle('Resumen de bonos');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
     }
