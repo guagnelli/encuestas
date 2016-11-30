@@ -58,11 +58,11 @@ $autoload['packages'] = array();
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('template','session', 'En_roles');
+$autoload['libraries'] = array('template','session', 'En_roles', 'filtrosreportes_tpl');
 
 /*
 | -------------------------------------------------------------------
-|  Auto-load Drivers
+|  Auto-load Drivers    
 | -------------------------------------------------------------------
 | These classes are located in system/libraries/ or in your
 | application/libraries/ directory, but are also placed inside their

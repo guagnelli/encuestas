@@ -29,6 +29,7 @@ class Reporte_general extends CI_Controller {
         //Obtiene los filtros para reporte
         $data = $this->rep_mod->get_filtros_generales_reportes();
         
+//        pr('holas');
         /*
           [2] => emp_matricula
           [3] => emp_nombre
@@ -52,10 +53,11 @@ class Reporte_general extends CI_Controller {
 
          */
 
-        $main_contet = $this->load->view('reporte/general/general_cursos', $data, true);
-        $this->template->setMainTitle('Reporte general de cursos');
-        $this->template->setMainContent($main_contet);
-        $this->template->getTemplate();
+//        $main_contet = $this->load->view('reporte/general/general_cursos', $data, true);
+//        $this->filtrosreportes_tpl->setMainTitle('Reporte general de cursos');
+//        $this->filtrosreportes_tpl->setMainContent($main_contet);
+//        $this->filtrosreportes_tpl->getTemplate();
+        $this->filtrosreportes_tpl->getVista(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
     }
 
     public function get_buscar_cursos_encuestas($current_row = null) {

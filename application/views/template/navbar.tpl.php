@@ -18,7 +18,7 @@ if (isset($logueado) && !empty($logueado)) {
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Reportes
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="<?php echo site_url('reporte_general'); ?>" class="a_menu">Reporte general</a></li>
+                        <!--<li><a href="<?php // echo site_url('reporte_general'); ?>" class="a_menu">Reporte general</a></li>-->
                         <li><a href="<?php echo site_url('reporte'); ?>" class="a_menu">Reporte resumen de bonos</a></li>
                         <li><a href="<?php echo site_url('reporte_bonos'); ?>" class="a_menu">Reporte de implementación</a></li>
                         <li><a href="<?php echo site_url('reporte_detallado'); ?>" class="a_menu">Reporte detalle de encuestas</a></li>

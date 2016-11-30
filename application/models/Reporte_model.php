@@ -4,6 +4,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Reporte_model extends CI_Model {
 
+    const
+            GF_EVALUADO = 'evaluado',
+            GF_EVALUADO_P = 'evaluado_p',
+            GF_EVALUADOR = 'evaluador',
+            GF_ENCUESTA = 'encuesta',
+            GF_CURSO = 'curso',
+            GF_GENERAL = 'general'
+
+    ;
+
     public function __construct() {
         // Call the CI_Model constructor
         parent::__construct();
@@ -353,7 +363,7 @@ class Reporte_model extends CI_Model {
         $rol = $this->config->item('rol_docente');
         $tipo_course = $this->config->item('tipo_curso_DCG');
         $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
-        $del_umae = $this->get_general_catalogos(array('from'=>'departments.ssd_cat_delegacion', 'select'=>array('nom_delegacion','cve_delegacion')));
+        $del_umae = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_delegacion', 'select' => array('nom_delegacion', 'cve_delegacion')));
         $result = array(
             'tipo_encuesta' => array(1 => 'Satisfacción', 0 => 'Desempeño'),
             'anios' => $this->get_listado_anios(2009),
@@ -371,16 +381,88 @@ class Reporte_model extends CI_Model {
             'instrumento' => $this->get_lista_roles_regla_evaluacion(),
             'buscar_por' => array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento'),
             'buscar_categoria' => array('categoria' => 'Categoría'),
-            'buscar_adscripcion' => array('claveadscripcion' => 'Clave departamental', 'nameadscripcion' => 'Nombre departamento'),
+            'buscar_adscripcion' => array('claveadscripcion' => 'Clave departamental'/* , 'nameadscripcion' => 'Nombre departamento' */),
             'buscar_instrumento' => array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento'),
             'buscar_docente_evaluado' => array('matriculado' => 'Matricula', 'namedocentedo' => 'Nombre docente'),
             'grupos_p' => $temp_grupo,
             'bloques_p' => array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5'),
             'is_bono_p' => array(1 => 'Para bono', 0 => 'No es para bono'),
             'tipo_implementacion' => array(1 => 'Tutorizado', 0 => 'No tutorizado'),
-            '$tipo_course' => $tipo_course,
+            'tipo_course' => $tipo_course,
+            'region' => array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste'),
         );
         return $result;
+    }
+
+    public function get_filtros_grupo($array_grupos) {
+        $grupos_info = $this->getDatosPorGrupo();
+        $key_datos = array();
+        foreach ($array_grupos as $value) {
+            $key_datos = array_merge($key_datos, $grupos_info[$value]); //Junta array
+        }
+        $key_datos = array_unique($key_datos); //Quita valores duplicados
+        $result = array();
+        foreach ($key_datos as $value) {
+            $result[$value] = $this->getCatalogoInfoReportes($value); //Obtiene el valor de los datos
+        }
+        return $result;
+    }
+
+    private function getCatalogoInfoReportes($key_dato) {
+        switch ($key_dato) {
+            case'tipo_encuesta':return array(1 => 'Satisfacción', 0 => 'Desempeño');
+            case 'anios': return $this->get_listado_anios(2009);
+            case 'rol':
+                $rol = $this->config->item('rol_docente');
+                return dropdown_options($rol, 'rol_id', 'rol_nom');
+            case 'rol_evaluado':
+                $rol = $this->config->item('rol_docente');
+                return dropdown_options($rol, 'rol_id', 'rol_nom');
+            case 'rol_evaluador':
+                $rol = $this->config->item('rol_docente');
+                return dropdown_options($rol, 'rol_id', 'rol_nom');
+            case 'ordenar_por': return array(
+                    'nombre' => 'Nombre',
+                    'nrolevaluador' => 'Rol evaluador', 
+                    'nrolevaluado' => 'Rol evaluado', 
+                    'ngrupo' => 'Grupo');
+            case 'order_by': return array('ASC' => 'Ascendente', 'DESC' => 'Descendente');
+            case 'order_columns': return array('emp_matricula' => 'Matrícula', 'cve_depto_adscripcion' => 'Adscripción', 'cat_nombre' => 'Categoría', 'grup_nom' => 'BD');
+            case 'delg_umae':
+                $del_umae = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_delegacion', 'select' => array('nom_delegacion', 'cve_delegacion')));
+                return dropdown_options($del_umae, 'cve_delegacion', 'nom_delegacion');
+            case 'instrumento': return $this->get_lista_roles_regla_evaluacion();
+            case 'buscar_por': return array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento');
+            case 'buscar_categoria': return array('categoria' => 'Categoría');
+            case 'buscar_adscripcion': return array('claveadscripcion' => 'Clave departamental'/* , 'nameadscripcion' => 'Nombre departamento' */);
+            case 'buscar_instrumento': return array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento');
+            case 'buscar_docente_evaluado': return array('matriculado' => 'Matricula', 'namedocentedo' => 'Nombre docente');
+            case 'grupos_p':
+                $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
+                return $temp_grupo;
+            case 'bloques_p': return array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5');
+            case 'is_bono_p': return array(1 => 'Si', 0 => 'No');
+            case 'tipo_implementacion': return array(1 => 'Tutorizado', 0 => 'No tutorizado');
+            case 'tipo_course':
+                $tipo_course = $this->config->item('tipo_curso_DCG');
+                return $tipo_course;
+            case 'region':
+                return array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste');
+            default:
+                return array();
+        }
+    }
+
+    private function getDatosPorGrupo() {
+        $array = array(
+            Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'buscar_adscripcion', 'region','ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'buscar_adscripcion', 'region','ordenar_por', 'anios', 'order_by'),
+            Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'region', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_GENERAL => array(),
+        );
+        return $array;
     }
 
     /**

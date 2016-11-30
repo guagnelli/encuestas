@@ -27,12 +27,13 @@ class Reporte_bonos extends CI_Controller {
 
     public function index() {
         //Obtiene los filtros para reporte
-        $data = $this->rep_mod->get_filtros_generales_reportes();
-        //Quitar lo que no se utiliza
-        $unset = array('buscar_por', 'buscar_categoria');
-        foreach ($unset as $k_value) {
-            unset($data[$k_value]);
-        }
+//        $data = $this->rep_mod->get_filtros_generales_reportes();
+//        pr($data);
+////Quitar lo que no se utiliza
+//        $unset = array('buscar_por', 'buscar_categoria', 'grupos_p', 'bloques_p');
+//        foreach ($unset as $k_value) {
+//            unset($data[$k_value]);
+//        }
         /*
           [2] => emp_matricula
           [3] => emp_nombre
@@ -56,7 +57,13 @@ class Reporte_bonos extends CI_Controller {
 
          */
 
-        $main_contet = $this->load->view('reporte/bonos/bonos', $data, true);
+//        $main_contet = $this->load->view('reporte/bonos/bonos', $data, true);
+//        $this->template->setMainTitle('Reporte de bonos');
+//        $this->template->setMainContent($main_contet);
+//        $this->template->getTemplate();
+//         $this->filtrosreportes_tpl->getVista(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
+
+        $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
         $this->template->setMainTitle('Reporte de bonos');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
@@ -66,7 +73,7 @@ class Reporte_bonos extends CI_Controller {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
                 $data_post = $this->input->post();
-                pr($data_post);
+//                pr($data_post);
                 //aqui va la nueva conexion a la base de datos del buscador
                 //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
 //                $filtros = $this->input->post();

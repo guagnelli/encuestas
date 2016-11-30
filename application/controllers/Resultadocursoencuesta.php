@@ -45,7 +45,8 @@ class Resultadocursoencuesta extends CI_Controller {
     public function get_data_ajax($curso = null, $current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (isset($curso) && !empty($curso)) {
-
+//                pr($this->input->post());
+//exit();
                 if ($this->input->post()) { //Se verifica que se haya recibido información por método post
                     //aqui va la nueva conexion a la base de datos del buscador
                     //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
@@ -132,17 +133,23 @@ class Resultadocursoencuesta extends CI_Controller {
 
 
         //$data['anios']=dropdown_options($anios, 'anio_id','anio_desc');
-        
+
         $this->load->model('Reporte_model', 'rep_mod'); // modelo de cursos
         $data += $this->rep_mod->get_filtros_generales_reportes();
+        
 //        pr($datos);
 //        $datos['order_columns'] += array('nombre' => 'Nombre', 'nrolevaluador' => 'Rol evaluador', 'nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso'] = $curso;
 
-
-
-        $main_contet = $this->load->view('curso/cur_enc_resultado', $data, true);
+        $data_extra['curso_url'] = "site_url+'/resultadocursoencuesta/get_data_ajax/'+" . $curso . ", '#form_curso', '#listado_resultado'";
+        $data_extra['texto_titulo'] = $datos_curso['data'][0]['cur_clave'] . '-' . $datos_curso['data'][0]['cur_nom_completo'];
+        $data_extra['curso'] = $curso;
+//data_ajax(site_url+'/resultadocursoencuesta/get_data_ajax/'+838, '#form_curso', '#listado_resultado')
+//data_ajax(site_url+'/resultadocursoencuesta/get_data_ajax/'+838, '#form_curso', '#listado_resultado')
+//          $main_contet = $this->load->view('curso/cur_enc_resultado', $data, true);
+        $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RE_CONTESTADAS_NO_CONTESTADAS_PROMEDIO, $data_extra);
         $this->template->setMainContent($main_contet);
+        $this->template->setMainTitle('Encuestas contestadas');
         $this->template->getTemplate();
     }
 
@@ -208,7 +215,7 @@ class Resultadocursoencuesta extends CI_Controller {
 
         //$datos['order_columns'] = array('nombre'=>'Nombre','nrolevaluador'=>'Rol evaluador','nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso'] = $curso;
-        $data['listado_evaluados'] = $this->encur_mod->listado_evaluados(array('curso'=>$curso));
+        $data['listado_evaluados'] = $this->encur_mod->listado_evaluados(array('curso' => $curso));
         //pr($listado_evaluados);
 
         $main_contet = $this->load->view('curso/cur_enc_resultado_detalle', $data, true);
