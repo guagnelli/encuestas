@@ -145,14 +145,14 @@
                                     <a href="<?php echo site_url('resultadocursoencuesta/curso_encuesta_resultado/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Encuestas contestadas </a>
                                 </td>
                             </tr>
-                            <tr>                
+                            <!-- <tr>                
                                 <td>
                                     <a href="<?php echo site_url('resultadocursoencuesta/curso_encuesta_resultado_detalle/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Detalle de encuestas contestadas</a>
                                 </td>
-                            </tr>
+                            </tr> -->
                             <tr>                
                                 <td>
-                                    <a href="<?php echo site_url('resultadocursoindicador/index/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Resultados de encuesta por indicador</a>
+                                    <a href="<?php echo site_url('resultadocursoindicador/index/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Reporte de encuestas por indicador</a>
                                 </td>
                             </tr>
                         </table>

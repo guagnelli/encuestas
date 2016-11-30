@@ -9,8 +9,8 @@
                 <tr>
                     <th rowspan="2">Bloque</th>
                     <th rowspan="2">Grupo</th>
-                    <th rowspan="2">Nombre usuario evaluador</th>
-                    <th rowspan="2">Delegación</th>
+                    <th rowspan="2">Nombre del evaluador</th>
+                    <th rowspan="2">Delegación / UMAE</th>
                     <th rowspan="2">Departamento</th>
                     <th rowspan="2">Categoría</th>
                     <?php $html_head = '';
@@ -49,7 +49,7 @@
                                 <td>'.$temp_delegacion[$random].'</td>
                                 <td>'.$temp_depto[$random].'</td>
                                 <td>'.$temp_cat[rand(0, count($temp_cat)-1)].'</td>';
-                                //pr($rol_evaluado);
+                                //pr($rol_evaluado)
                                 foreach ($indicadores as $key_ind => $indicador) {
                                     if(isset($rol_evaluado[$indicador['indicador_cve']])){
                                         echo '<td >'.$rol_evaluado[$indicador['indicador_cve']].'</td >';

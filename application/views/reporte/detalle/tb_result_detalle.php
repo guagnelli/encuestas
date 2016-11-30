@@ -9,8 +9,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <tr class="bg-info">
                 <th>Encuesta</th>
                 <th>Tipo encuesta</th>
-                <th>Bonos</th>
-                <th>Tutorizado</th>
+                <th>Aplica para bono</th>
+                <th>Es tutorizado</th>
                 <th>Curso</th>
                 <th>Tipo de curso</th>                
                 <th>Año</th>
@@ -27,9 +27,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Matrícula evaluador</th>
                 <th>Nombre evaluador</th>
                 <th>Rol evaluador</th>
-                <th>Delegación evaluador</th>
+                <!-- <th>Delegación evaluador</th>
                 <th>Adscripción evaluador</th>
-                <th>Categoría evaluador</th>
+                <th>Categoría evaluador</th> -->
                 <?php //pr($preguntas); 
                 foreach ($preguntas as $key_p => $pregunta) {
                     echo '<th>'.$pregunta['pregunta'].'</th>';
@@ -41,8 +41,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php //pr($datos); 
             //pr($respuestas);
             foreach ($datos as $key_d => $dato) {
-                $depto_evaluado = ((!empty($dato['depto_tut_nombre'])) ? $dato['depto_tut_nombre'] : $dato['depto_user_nombre']);
-                $depto_rama_evaluado = ((!empty($dato['depto_tut_nombre'])) ? $dato['depto_tut_nombre'] : $dato['depto_user_nombre']);
+                //$depto_evaluado = ((!empty($dato['depto_tut_nombre'])) ? $dato['depto_tut_nombre'] : $dato['depto_user_nombre']);
+                $depto_rama_evaluado = ((!empty($dato['rama_tut_evaluador'])) ? $dato['rama_tut_evaluador'] : $dato['rama_uder_evaluador']);
+                $a_depto_rama_evaluado = explode(":", $depto_rama_evaluado);
+                $rama_evaluador = explode("&", $a_depto_rama_evaluado[2]);
                 echo '<tr>
                         <td>'.$dato['descripcion_encuestas'].'</td>
                         <td>'.($this->config->item('TIPO_INSTRUMENTOV')[$dato['tipo_encuesta']]).'</td>
@@ -59,12 +61,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <td>'.$dato['evaluado_nombre'].' '.$dato['evaluado_apellido'].'</td>
                         <td>'.$dato['evaluado_rol_nombre'].'</td>
                         <td>'.((!empty($dato['depto_tut_nom_del'])) ? $dato['depto_tut_nom_del'] : $dato['depto_user_nom_del']).'</td>
-                        <td>'.$depto_evaluado.'</td>
+                        <td>'.$rama_evaluador[0].'</td>
                         <td>'.((!empty($dato['evaluado_cat_tut_nom'])) ? $dato['evaluado_cat_tut_nom'] : $dato['evaluado_cat_user_nom']).'</td>
                         <td>'.$dato['evaluador_matricula'].'</td>
                         <td>'.$dato['evaluador_nombre'].' '.$dato['evaluador_apellido'].'</td>
                         <td>'.$dato['evaluador_rol_nombre'].'</td>';
-                if($dato['evaluador_rol_id']==$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']){
+                /*if($dato['evaluador_rol_id']==$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']){
                     echo '<td>'.((!empty($dato['depto_e_pre_nom_del'])) ? $dato['depto_e_pre_nom_del'] : $dato['depto_e_user_nom_del']).'</td>
                             <td>'.((!empty($dato['depto_e_pre_nombre'])) ? $dato['depto_e_pre_nombre'] : $dato['depto_e_user_nombre']).'</td>
                             <td>'.((!empty($dato['evaluador_cat_pre_nom'])) ? $dato['evaluador_cat_pre_nom'] : $dato['evaluador_cat_user_nom']).'</td>
@@ -74,7 +76,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <td>'.((!empty($dato['depto_e_tut_nombre'])) ? $dato['depto_e_tut_nombre'] : $dato['depto_e_user_nombre']).'</td>
                             <td>'.((!empty($dato['evaluador_cat_tut_nom'])) ? $dato['evaluador_cat_tut_nom'] : $dato['evaluador_cat_user_nom']).'</td>
                         ';
-                }
+                }*/
                 foreach ($preguntas as $key_p => $pregunta) {
                     //echo '<td>'.$respuestas[$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']]['texto'].'</td>';
                     echo '<td>'.$respuestas[$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']]['texto'].'</td>';

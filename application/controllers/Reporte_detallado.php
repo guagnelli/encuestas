@@ -50,7 +50,7 @@ class Reporte_detallado extends CI_Controller {
           [28] => tipocur
          */
         $main_contet = $this->load->view('reporte/detalle/detalle', $data, true);
-        $this->template->setMainTitle('Reporte detallado');
+        $this->template->setMainTitle('Reporte detalle de encuestas');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();
     }

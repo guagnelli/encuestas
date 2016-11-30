@@ -53,6 +53,7 @@ class Resultadocursoindicador extends CI_Controller
         }
         $data['curso']=$curso;
         $main_contet = $this->load->view('curso/cur_enc_indicador', $data, true);
+        $this->template->setMainTitle('Reporte de encuestas por indicador');
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();        
     }  
