@@ -57,7 +57,7 @@ class FiltrosReportes_Tpl extends Template {
                 FiltrosReportes_Tpl::C_CONTROL_RESULT => 'reporte/get_data_ajax2',
                 FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(Reporte_model::GF_EVALUADO_P),
                 FiltrosReportes_Tpl::C_TITULO => 'Resumen de bonos',
-                FiltrosReportes_Tpl::C_SUBTITULO => 'Listado de encuestas',
+                FiltrosReportes_Tpl::C_SUBTITULO => '',//'Listado de encuestas',
                 FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/reporte/get_data_ajax2', '#form_curso', '#listado_resultado_empleado'",
             ),
             FiltrosReportes_Tpl::RB_IMPLEMENTACION => array(
@@ -67,7 +67,7 @@ class FiltrosReportes_Tpl extends Template {
                 FiltrosReportes_Tpl::C_CONTROL_RESULT => '',
                 FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(Reporte_model::GF_CURSO, Reporte_model::GF_ENCUESTA, Reporte_model::GF_EVALUADO, Reporte_model::GF_GENERAL),
                 FiltrosReportes_Tpl::C_TITULO => 'Reporte de implementación',
-                FiltrosReportes_Tpl::C_SUBTITULO => 'Listado de cursos-encuestas',
+                FiltrosReportes_Tpl::C_SUBTITULO => '', //'Listado de cursos-encuestas',
                 FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/reporte_bonos/get_buscar_cursos_encuestas', '#form_curso', '#listado_resultado_empleado'",
             ),
             FiltrosReportes_Tpl::RB_ENCUESTAS_DETALLE => array(

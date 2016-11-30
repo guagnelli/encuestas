@@ -141,7 +141,8 @@ class Reporte_model extends CI_Model {
             "mdl_user.curp AS emp_curp",
             "mdl_course.shortname AS cur_clave",
             "mdl_course.fullname AS cur_nom_completo",
-            "TO_TIMESTAMP(mdl_course.startdate) AS fecha_inicio",
+            "TO_CHAR(TO_TIMESTAMP(mdl_course.startdate),'YYYY-mm-dd') AS fecha_inicio",
+//            "TO_TIMESTAMP(mdl_course.startdate) AS fecha_inicio",
             "mdl_course_config.horascur",
             "mdl_course_config.lastdate AS fecha_fin",
             "mdl_role.id AS rol_id",
@@ -170,7 +171,7 @@ class Reporte_model extends CI_Model {
             $this->db->limit($params['per_page'], $params['current_row']);
         }
         $query = $this->db->get('mdl_user'); //Obtener conjunto de registros
-        //pr($this->db->last_query());                                  
+//        pr($this->db->last_query());                                  
         $resultado['total'] = $num_rows[0]->total;
         $resultado['columns'] = $query->list_fields();
         $resultado['data'] = $query->result_array();
@@ -389,7 +390,7 @@ class Reporte_model extends CI_Model {
             'is_bono_p' => array(1 => 'Para bono', 0 => 'No es para bono'),
             'tipo_implementacion' => array(1 => 'Tutorizado', 0 => 'No tutorizado'),
             'tipo_course' => $tipo_course,
-            'region' => array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste'),
+//            'region' => array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste'),
         );
         return $result;
     }
@@ -446,8 +447,8 @@ class Reporte_model extends CI_Model {
             case 'tipo_course':
                 $tipo_course = $this->config->item('tipo_curso_DCG');
                 return $tipo_course;
-            case 'region':
-                return array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste');
+//            case 'region':
+//                return array(1 => 'Noroccidente', 2 => 'Noreste', 3 => 'Centro', 4 => 'Centro sureste');
             default:
                 return array();
         }
@@ -455,9 +456,9 @@ class Reporte_model extends CI_Model {
 
     private function getDatosPorGrupo() {
         $array = array(
-            Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'buscar_adscripcion', 'region','ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado','ordenar_por', 'order_by'),
             Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado','ordenar_por', 'anios', 'order_by'),
-            Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'region', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'ordenar_por', 'order_by'),
             Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
             Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),
             Reporte_model::GF_GENERAL => array(),
