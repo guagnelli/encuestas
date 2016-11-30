@@ -7,13 +7,15 @@
         <table class="table table-striped table-hover table-bordered">
             <thead>
                 <tr>
-                    <th rowspan="2">Nombre usuario evaluador</th>
-                    <th rowspan="2">Rol evaluador</th>
                     <th rowspan="2">Bloque</th>
                     <th rowspan="2">Grupo</th>
+                    <th rowspan="2">Nombre usuario evaluador</th>
+                    <th rowspan="2">Delegación</th>
+                    <th rowspan="2">Departamento</th>
+                    <th rowspan="2">Categoría</th>
                     <?php $html_head = '';
                     foreach ($indicadores as $key_ind => $indicador) {
-                        $html_head .= '<th>'.$indicador['descripcion'].'</th>';
+                        $html_head .= '<th style="text-align:center;">'.$indicador['descripcion'].'</th>';
                     } 
                     echo '<th colspan="'.(isset($key_ind) ? ($key_ind+1) : 1).'">Indicadores</th>';
                     ?>
@@ -28,25 +30,32 @@
                     $registro_temp[$val['usu_evaluador']][$val['rol_nombre_evaluador']][$val['usu_evaluado']][$val['rol_nombre_evaluado']][$val['tipo_indicador_cve']] = $val['porcentaje'];
                 }
                 //pr($registro_temp);
-                $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA');
+                //pr($registros);
+                $temp_grupo = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON 1', 'NUEVO LEON 2', 'PUEBLA', 'QUINTANA ROO');
+                $temp_delegacion = array('GUANAJUATO', 'AGUASCALIENTES', 'MICHOACAN', 'MORELOS', 'NUEVO LEON', 'NUEVO LEON', 'PUEBLA', 'QUINTANA ROO');
+                $temp_depto = array('HOSP GRAL ZONA C/MF 7','UNIDAD MEDICINA FAM 16 AGUASCALIENTES', 'UNIDAD MEDICINA FAM 75 (MORELIA)', 'HOSP GRAL ZONA C/MF 17 MORELOS', 'HOSP GRAL ZONA NL 1', 'HOSP GRAL ZONA NL 1', 'HOSP GRAL ZONA PUEBLA', 'HOSP GRAL ZONA CANCUN');
+                $temp_cat = array('N51 JEFE SERVICIOS UMF', 'MEDICO FAMILIAR', 'MEDICO NO FAMILIAR');
                 foreach ($registro_temp as $key_eva => $evaluador) {
                     foreach ($evaluador as $key_rol => $rol_evaluador) {
                         foreach ($rol_evaluador as $key_eval => $evaluado) {
                             foreach ($evaluado as $key_rol_e => $rol_evaluado) {
                                 //if($)
                                 //<td>'.$key_eval.'</td><td>'.$key_rol_e.'</td>
+                                $random = rand(0, count($temp_grupo)-1);
                                 echo '<tr>
-                                <td>'.$key_eva.'</td>
-                                <td>'.$key_rol.'</td>
                                 <td>Bloque '.rand(1,5).'</td>
-                                <td>'.$temp_grupo[rand(0, count($temp_grupo)-1)].'</td>';
+                                <td>'.$temp_grupo[$random].'</td>
+                                <td>'.$key_eva.'</td>
+                                <td>'.$temp_delegacion[$random].'</td>
+                                <td>'.$temp_depto[$random].'</td>
+                                <td>'.$temp_cat[rand(0, count($temp_cat)-1)].'</td>';
                                 //pr($rol_evaluado);
                                 foreach ($indicadores as $key_ind => $indicador) {
                                     if(isset($rol_evaluado[$indicador['indicador_cve']])){
                                         echo '<td >'.$rol_evaluado[$indicador['indicador_cve']].'</td >';
                                     } else {
                                         echo '<td ></td >';
-                                    }                                    
+                                    }
                                 }
                                 echo '</tr>';
                             }
@@ -56,18 +65,13 @@
                 ?>
             </tbody>
         </table>
-            
     </div>
 <?php } else { ?>
     <br><br>
     <div class="row">
         <div class="jumbotron"><div class="container"> <p class="text_center">No se encontraron datos registrados con esta busqueda</p> </div></div>
     </div>
-
-<?php } 
-
- 
-?>
+<?php } ?>
 
 <script type="text/javascript">
 $(document).ready(function(){

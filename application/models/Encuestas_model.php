@@ -2815,7 +2815,7 @@ order by t.encuesta_cve,t.matevaluado,t.orden
             left join mdl_role rol_eva on rol_eva.id=calculos_promedio.rol_evaluador
             left join mdl_user us_eval on us_eval.id=calculos_promedio.evaluado
             left join mdl_role rol_eval on rol_eval.id=calculos_promedio.rol_evaluado
-            group by tipo_indicador_cve, ind.descripcion, evaluador, us_eva.firstname, us_eva.lastname, rol_evaluador, rol_eva.name, evaluado, us_eval.firstname, us_eval.lastname, rol_evaluado, rol_eval.name';
+            group by tipo_indicador_cve, ind.descripcion, evaluador, us_eva.username, us_eva.firstname, us_eva.lastname, rol_evaluador, rol_eva.name, evaluado, us_eval.username, us_eval.firstname, us_eval.lastname, rol_evaluado, rol_eval.name';
 
         $joins = ' from encuestas.sse_evaluacion ev '
                . ' join encuestas.sse_respuestas res on res.reactivos_cve = ev.reactivos_cve '
@@ -2897,8 +2897,8 @@ order by t.encuesta_cve,t.matevaluado,t.orden
                . 'sum(puntua) as puntua_reg, (sum(netos) - sum(no_puntua)) as base_reg, '
                . '(round(sum(puntua)::numeric * 100/(sum(netos) - sum(no_puntua))::numeric,3)) as porcentaje '
                . ' from ( ';*/
-        $sq = "select tipo_indicador_cve, ind.descripcion as indicador, evaluador,CONCAT(us_eva.firstname,' ',us_eva.lastname) as usu_evaluador, 
-                rol_evaluador, rol_eva.name as rol_nombre_evaluador, evaluado, CONCAT(us_eval.firstname,' ',us_eval.lastname) as usu_evaluado, 
+        $sq = "select tipo_indicador_cve, ind.descripcion as indicador, evaluador, us_eva.username as eva_username, CONCAT(us_eva.firstname,' ',us_eva.lastname) as usu_evaluador, 
+                rol_evaluador, rol_eva.name as rol_nombre_evaluador, evaluado, us_eval.username as eval_username, CONCAT(us_eval.firstname,' ',us_eval.lastname) as usu_evaluado, 
                 rol_evaluado, rol_eval.name as rol_nombre_evaluado, sum(netos) as total, "
                . 'sum(no_puntua) as no_puntua_reg, sum(nos_) total_no, sum(no_aplica_promedio) as total_no_aplica_cuenta_promedio, '
                . 'sum(puntua) as puntua_reg, (sum(netos) - sum(no_puntua)) as base_reg, '

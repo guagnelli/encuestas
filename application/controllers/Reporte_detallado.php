@@ -60,7 +60,7 @@ class Reporte_detallado extends CI_Controller {
             if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
                 $this->load->model('Reporte_detallado_model', 'rep_det_mod'); // modelo de reporte
                 $data_post = $this->input->post();
-                pr($data_post);
+                //pr($data_post);
                 //aqui va la nueva conexion a la base de datos del buscador
                 //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
                 $filtros = $this->input->post(null, true);
@@ -69,10 +69,12 @@ class Reporte_detallado extends CI_Controller {
 //                $result = $this->rep_mod->get_filtros_generales_reportes();
 //                pr($result);
                 //pr($filtros);
-                $resultado = $this->rep_det_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+                $resultado = $this->rep_det_mod->reporte_detalle_encuesta($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
                 $data = $filtros;
-                $data['total_empleados'] = $resultado['total'];
+                //$data['total_empleados'] = $resultado['total'];
                 $data['datos'] = $resultado['data'];
+                $data['preguntas'] = $resultado['preguntas']['data'];
+                $data['respuestas'] = $resultado['respuestas']['data'];
                 $data['current_row'] = $filtros['current_row'];
                 $data['per_page'] = $this->input->post('per_page');
                 //pr($data);

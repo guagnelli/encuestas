@@ -28,8 +28,9 @@ class Resultadocursoindicador extends CI_Controller
     public function index($curso=null)
     {
         //redirect(site_url()); //Redirigir al inicio del sistema si se desea acceder al método mediante una petición normal, no ajax
-        $anios = $this->lista_anios();
-        $data['datos_curso'] = $this->cur_mod->listado_cursos(array('cur_id'=>$curso));
+        
+        /*$anios = $this->lista_anios();
+        
         //$datos_grupos = $this->cur_mod->listar_grupos_curso(array('cur_id'=>$curso));
         $datos_indicador = $this->encur_mod->get_indicador_curso(array('conditions'=>array('eva.course_cve'=>$curso, 'eva.evaluador_rol_id'=>$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']), 'fields'=>'distinct(ind.*)'));
         $data['datos_indicador'] = dropdown_options($datos_indicador, 'indicador_cve', 'descripcion');
@@ -38,8 +39,19 @@ class Resultadocursoindicador extends CI_Controller
         //pr($datos_indicador);
 
         $data['order_columns'] = array('tipo_indicador_cve' => 'Indicador', 'is_bono' => 'Bono');
-        $data['curso']=$curso;
+        
 
+        $main_contet = $this->load->view('curso/cur_enc_indicador', $data, true);*/
+        $this->load->model('Reporte_model', 'rep_mod'); // modelo de reporte
+        //Obtiene los filtros para reporte
+        $data = $this->rep_mod->get_filtros_generales_reportes();
+        $data['datos_curso'] = $this->cur_mod->listado_cursos(array('cur_id'=>$curso));
+        //Quitar lo que no se utiliza
+        $unset = array('buscar_por');
+        foreach ($unset as $k_value) {
+            unset($data[$k_value]);
+        }
+        $data['curso']=$curso;
         $main_contet = $this->load->view('curso/cur_enc_indicador', $data, true);
         $this->template->setMainContent($main_contet);
         $this->template->getTemplate();        
