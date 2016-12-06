@@ -30,7 +30,7 @@
                                 'data-tipo' => 'tc',
                                 'class' => 'form-control dropdown-toggle',
                                 'required data-toggle' => 'dropdown',
-                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
+//                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
                                 'title' => 'Buscar',
                             //                                        'readonly'=>'readonly',
                             )
@@ -104,9 +104,7 @@
 //                              alert(resp.curso);
                                 $("#resultado_bus_curso").empty();
                                 $("#resultado_bus_curso").append(resp.html);
-                                if (resp.curso != 0) {//Si es mayor que cero, carga bloque
-                                    funcion_cargar_bloque(resp.curso);//Carga curso
-                                }
+                                funcion_cargar_bloque(resp.curso);
                             } catch (e) {
 
                             }

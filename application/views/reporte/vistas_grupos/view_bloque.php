@@ -7,8 +7,9 @@ echo $this->form_complete->create_element(array('id' => 'bloque', 'type' => 'dro
         'class' => 'form-control',
         'placeholder' => 'Bloque',
         'data-toggle' => 'tooltip',
-        'data-tipo' => 'b',
+        'data-cursoid' => (isset($cursoid)) ? $cursoid : 0,
         'data-placement' => 'top',
         'title' => 'Bloques',
+        'onchange' => "funcion_cargar_grupo(this)"
 )));
 ?>

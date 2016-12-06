@@ -560,14 +560,14 @@ class Reporte_model extends CI_Model {
     }
 
     public function get_busca_bloques_grupos($cursoid = null, $bloqueid = null) {
-        if ($cursoid != null) {
+        if ($bloqueid == null) {
             $this->db->select('bloque');
             $this->db->where('course_cve', $cursoid);
             $this->db->group_by('bloque');
             $this->db->order_by('bloque', 'asc');
-        }
-        if ($bloqueid != null) {
+        } else {
             $this->db->select('mdl_groups_cve');
+            $this->db->where('course_cve', $cursoid);
             $this->db->where('bloque', $bloqueid);
             $this->db->group_by('mdl_groups_cve');
             $this->db->order_by('mdl_groups_cve', 'asc');

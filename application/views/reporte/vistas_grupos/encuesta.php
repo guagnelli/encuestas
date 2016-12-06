@@ -24,10 +24,7 @@
     <?php } ?>
     <?php if (isset($grupos_p)) { ?>
         <div id="div_grupos" class="col-lg-12 col-sm-12">
-            <div id="div_grupos" class="panel-body input-group input-group-sm" style = "visibility: hidden;">
-                <!--<span class="input-group-addon">Delegación:</span>-->
-                <label for="grupo">Grupos</label>
-                <?php echo $this->form_complete->create_element(array('id' => 'grupo', 'type' => 'dropdown', 'options' => $grupos_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'grupo', 'class' => 'form-control', 'placeholder' => 'Grupo', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Grupos', 'onchange' => "data_ajax($url_control)"))); ?>
+            <div id="div_prima_grupos" class="panel-body input-group input-group-sm">
             </div>
         </div>
     <?php } ?>

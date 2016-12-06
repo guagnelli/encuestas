@@ -95,7 +95,9 @@
 	        	</div>
 	      	</div>
 	    </footer>
-	    <script>$(function(){$('select').selectric();});</script>
+	    <script>
+//                $(function(){$('select').selectric();});
+            </script>
 	    <!-- #####carga de archivos js -->
 	    <?php echo js("moment.js"); ?>
 		<?php echo js("collapse.js"); ?>

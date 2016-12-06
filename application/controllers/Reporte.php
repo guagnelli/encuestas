@@ -289,13 +289,24 @@ class Reporte extends CI_Controller {
                         $bs['empty'] = 0;
                         if (!empty($result)) {
                             $data['bloques_p'] = dropdown_options($result, 'bloque', 'bloque');
+                            $data['cursoid'] = $data_post['curso'];//Agrega curso
                             $bs['html'] = $this->load->view('reporte/vistas_grupos/view_bloque', $data, TRUE);
                             $bs['empty'] = 1;
                         }
                         echo json_encode($bs);
                         exit();
                     case "b":
-                        break;
+                        $result = $this->rep_mod->get_busca_bloques_grupos($data_post['curso'], $data_post['bloque']);
+                        $gs['empty'] = 0;
+                        if (!empty($result)) {
+                            $data['grupos_p'] = dropdown_options($result, 'mdl_groups_cve', 'mdl_groups_cve');
+                            $data['cursoid'] = $data_post['curso'];//Agrega curso
+                            $data['bloqueid'] = $data_post['bloque'];//Agrega curso
+                            $gs['html'] = $this->load->view('reporte/vistas_grupos/view_grupo', $data, TRUE);
+                            $gs['empty'] = 1;
+                        }
+                        echo json_encode($gs);
+                        exit();
                 }
             }
         }
