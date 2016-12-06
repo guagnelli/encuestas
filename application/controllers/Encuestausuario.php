@@ -348,6 +348,11 @@ class Encuestausuario extends CI_Controller {
                 $datos = array();
 
                 $datos_curso = $this->cur_mod->listado_cursos(array('cur_id' => $idcurso));
+//                pr($datos_curso);
+                $tutorizado = null;
+                if (!empty($datos_curso['data'])) {
+                    $tutorizado = $datos_curso['data'][0]['tutorizado'];
+                }
                 //pr($datos_curso);
                 //var_dump($datos_curso['data'][0]['tutorizado']);
                 //$datos_roles_curso=$this->cur_mod->listar_roles_curso(array('cur_id'=>$idcurso));
@@ -355,8 +360,13 @@ class Encuestausuario extends CI_Controller {
                 //pr(array_values($datos_roles_curso['data
                 //roles por curso por usuario
                 $rolescusercurso = $this->enc_mod->get_roles_usercurso(array('user_id' => $idusuario, 'cur_id' => $idcurso));
-//                pr($rolescusercurso);
+                
+//                $rolescusercurso = array(14, 18, 32, 5);
+                $parametros = array('role_evaluador' => $rolescusercurso, 'tutorizado' => $tutorizado, 'cur_id' => $idcurso);
+                $reglas_validas = $this->enc_mod->getReglasEvaluacionCurso($parametros);
+                pr($reglas_validas);
 
+                exit();
 
                 foreach ($rolescusercurso as $key => $value) {
 
@@ -366,7 +376,7 @@ class Encuestausuario extends CI_Controller {
                     $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                         'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '1'));
 
-//                    pr($reglas_validas);
+                    pr($reglas_validas);
                     foreach ($reglas_validas as $keyr => $valuer) {
                         //pr($value['is_excepcion']);
                         if ($valuer['is_excepcion'] == 0) {
@@ -391,32 +401,6 @@ class Encuestausuario extends CI_Controller {
                                 'is_bono' => $reglas_validas['is_bono'],
                             );
                         }
-
-                        //pr($reglasgral);
-                        /* if($valuer['eva_tipo'] == 1)
-                          {
-                          //por persona
-                          echo "por persona";
-                          $datos_user_aeva[]=$this->enc_mod->listado_eval(array('role_evaluado' => $reglasgral['rol_evaluado_cve'],
-                          'cur_id' => $idcurso,'encuesta_cve' => $reglasgral['encuesta_cve'],
-                          'evaluador_user_cve' => $idusuario,
-                          'role_evaluador' => $value)
-                          );
-
-
-                          }
-                          else
-                          { */
-                        //por grupo
-                        //echo "por grupo";
-                        /* $datos_user_aeva[]=$this->enc_mod->listado_eval(array('gpo_evaluador' => $gpo_evaluador,'role_evaluado' => $reglasgral['rol_evaluado_cve'],
-                          'cur_id' => $idcurso,'encuesta_cve' => $reglasgral['encuesta_cve'],
-                          'evaluador_user_cve' => $idusuario,
-                          'role_evaluador' => $value)
-                          ); */
-
-                        //}  
-                        //die();
                     }
                     if (isset($reglasgral)) {
                         foreach ($reglasgral as $keyrg => $valuerg) {

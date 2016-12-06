@@ -16,21 +16,18 @@
             </div>
         </div>
     <?php } ?>
-    <?php if (isset($grupos_p)) { ?>
-        <div class="col-lg-12 col-sm-12">
-            <div class="panel-body input-group input-group-sm">
-                <!--<span class="input-group-addon">Delegación:</span>-->
-                <label for="grupo">Grupos</label>
-                <?php echo $this->form_complete->create_element(array('id' => 'grupo', 'type' => 'dropdown', 'options' => $grupos_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'grupo', 'class' => 'form-control', 'placeholder' => 'Grupo', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Grupos', 'onchange' => "data_ajax($url_control)"))); ?>
+    <?php if (isset($bloques_p)) { ?>
+        <div id="div_bloques" class="col-lg-12 col-sm-12">
+            <div id="div_prima_bloques" class="panel-body input-group input-group-sm" >
             </div>
         </div>
     <?php } ?>
-    <?php if (isset($bloques_p)) { ?>
-        <div class="col-lg-12 col-sm-12">
-            <div class="panel-body input-group input-group-sm">
+    <?php if (isset($grupos_p)) { ?>
+        <div id="div_grupos" class="col-lg-12 col-sm-12">
+            <div id="div_grupos" class="panel-body input-group input-group-sm" style = "visibility: hidden;">
                 <!--<span class="input-group-addon">Delegación:</span>-->
-                <label for="grupo">Bloques</label>
-                <?php echo $this->form_complete->create_element(array('id' => 'bloque', 'type' => 'dropdown', 'options' => $bloques_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'bloque', 'class' => 'form-control', 'placeholder' => 'Bloque', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Bloques', 'onchange' => "data_ajax($url_control)"))); ?>
+                <label for="grupo">Grupos</label>
+                <?php echo $this->form_complete->create_element(array('id' => 'grupo', 'type' => 'dropdown', 'options' => $grupos_p, 'first' => array('' => 'Seleccione'), 'attributes' => array('name' => 'grupo', 'class' => 'form-control', 'placeholder' => 'Grupo', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Grupos', 'onchange' => "data_ajax($url_control)"))); ?>
             </div>
         </div>
     <?php } ?>

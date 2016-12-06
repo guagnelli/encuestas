@@ -31,8 +31,8 @@ class Reporte extends CI_Controller {
         $adscripcion;
         $categoria;
 
-        //$data['categoria']=dropdown_options($categoria, 'cve_categoria','nom_nombre');
-        //$data['adscripcion']=dropdown_options($adscripcion, '','');
+//$data['categoria']=dropdown_options($categoria, 'cve_categoria','nom_nombre');
+//$data['adscripcion']=dropdown_options($adscripcion, '','');
         $data['anios'] = dropdown_options($anios, 'anio_id', 'anio_desc');
         $data['rol'] = dropdown_options($rol, 'rol_id', 'rol_nom');
         $datos['order_columns'] = array('emp_matricula' => 'Matrícula', 'cve_depto_adscripcion' => 'Adscripción', 'cat_nombre' => 'Categoría', 'grup_nom' => 'BD');
@@ -97,49 +97,49 @@ class Reporte extends CI_Controller {
     public function get_data_ajax($current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
-                //aqui va la nueva conexion a la base de datos del buscador
-                //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
+//aqui va la nueva conexion a la base de datos del buscador
+//Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
                 $filtros = $this->input->post();
                 $filtros['current_row'] = (isset($current_row) && !empty($current_row)) ? $current_row : 0;
 
-                //pr($filtros);
-                //$resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+//pr($filtros);
+//$resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
                 $idcurso = $this->input->post('curso');
                 $datos_curso = $this->cur_mod->listado_cursos(array('cur_id' => $idcurso));
-                //pr($datos_curso);
+//pr($datos_curso);
                 /**/
-                //usuarios enrolados en el curso
+//usuarios enrolados en el curso
                 $usuarioscurso = $this->rep_mod->listado_usuariosenc($filtros);
-                //pr($usuarioscurso);
+//pr($usuarioscurso);
 
                 foreach ($usuarioscurso as $keyuc => $valueuc) {
 
                     $rolescusercurso = $this->enc_mod->get_roles_usercurso(array('user_id' => $valueuc['cve_usuario'], 'cur_id' => $idcurso));
-                    //pr($rolescusercurso);
+//pr($rolescusercurso);
 
 
                     foreach ($rolescusercurso as $key => $value) {
 
-                        //checar reglas validas con encuestas asignadas al curso
-                        //pr($value);
+//checar reglas validas con encuestas asignadas al curso
+//pr($value);
 
                         $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                             'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '1'));
-                        //pr($reglas_validas);
+//pr($reglas_validas);
                         if (isset($reglas_validas) && !empty($reglas_validas)) {
                             echo "entra";
-                            //pr($reglas_validas);
+//pr($reglas_validas);
                             foreach ($reglas_validas as $keyr => $valuer) {
-                                //pr($value['is_excepcion']);
+//pr($value['is_excepcion']);
                                 if ($valuer['is_excepcion'] == 0) {
-                                    //no hay excepciones armar el arreglo para buscar usuarios
+//no hay excepciones armar el arreglo para buscar usuarios
                                     $reglasgral[] = array('reglas_evaluacion_cve' => $valuer['reglas_evaluacion_cve'],
                                         'rol_evaluado_cve' => $valuer['rol_evaluado_cve'],
                                         'encuesta_cve' => $valuer['encuesta_cve'],
                                         'eva_tipo' => $valuer['eva_tipo']
                                     );
                                 } else {
-                                    //
+//
                                     $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                                         'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '2'));
 
@@ -152,27 +152,27 @@ class Reporte extends CI_Controller {
                             }
 
                             foreach ($reglasgral as $keyrg => $valuerg) {
-                                //pr($valuerg['eva_tipo']);
+//pr($valuerg['eva_tipo']);
 
                                 if ($valuerg['eva_tipo'] == 1) {
-                                    //por persona
-                                    //echo "por persona";
+//por persona
+//echo "por persona";
                                     $datos_user_aeva[] = $this->rep_mod->listado_eval_reporte(array('role_evaluado' => $valuerg['rol_evaluado_cve'],
                                         'cur_id' => $idcurso, 'encuesta_cve' => $valuerg['encuesta_cve'],
                                         'evaluador_user_cve' => $idusuario, 'role_evaluador' => $value)
                                     );
                                 } else {
-                                    //por grupo
-                                    //echo "por grupo";
+//por grupo
+//echo "por grupo";
                                     $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario, 'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuerg['rol_evaluado_cve']));
-                                    //pr($datos_usuario);
+//pr($datos_usuario);
                                     if (isset($datos_usuario) || isset($datos_curso) || !empty($datos_usuario) || !empty($datos_curso)) {
                                         foreach ($datos_usuario as $key => $value) {
 
-                                            //role evaluador
+//role evaluador
                                             $role_evaluador = $value['cve_rol'];
-                                            //pr($role_evaluador);
-                                            //grupo del evaluador
+//pr($role_evaluador);
+//grupo del evaluador
                                             $gpo_evaluador = $value['cve_grupo']; # code...
 
 
@@ -185,7 +185,7 @@ class Reporte extends CI_Controller {
                                                 'role_evaluador' => $role_evaluador)
                                             );
                                         }
-                                        //pr($datos_user_aeva);
+//pr($datos_user_aeva);
                                     }
                                 }
                             }
@@ -193,7 +193,7 @@ class Reporte extends CI_Controller {
                             echo "entra2";
                         }
 
-                        //fin de reglas validas 
+//fin de reglas validas 
                     }
                 }
 
@@ -221,19 +221,19 @@ class Reporte extends CI_Controller {
     public function get_data_ajax2($current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
-                //aqui va la nueva conexion a la base de datos del buscador
-                //Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
+//aqui va la nueva conexion a la base de datos del buscador
+//Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
                 $filtros = $this->input->post();
                 $filtros['current_row'] = (isset($current_row) && !empty($current_row)) ? $current_row : 0;
 
-                //pr($filtros);
+//pr($filtros);
                 $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
                 $data = $filtros;
                 $data['total_empleados'] = $resultado['total'];
                 $data['empleados'] = $resultado['data'];
                 $data['current_row'] = $filtros['current_row'];
                 $data['per_page'] = $this->input->post('per_page');
-                //pr($data);
+//pr($data);
                 $this->listado_resultado($data, array('form_recurso' => '#form_empleado', 'elemento_resultado' => '#listado_resultado_empleado')); //Generar listado en caso de obtener datos
             }
         } else {
@@ -261,6 +261,44 @@ class Reporte extends CI_Controller {
             $anios[] = array('anio_id' => $anio, 'anio_desc' => $anio);
         }
         return $anios;
+    }
+
+    function buscar_curso() {
+        if ($this->input->is_ajax_request()) {
+            if ($this->input->post()) {
+                $data_post = $this->input->post(null, true);
+                $row['res_busqueda'] = $this->rep_mod->get_busca_cursos_nombre($data_post['b']);
+                $data['html'] = $this->load->view('pruebas/lista_res', $row, true);
+                $data['curso'] = 0;
+                if (count($row['res_busqueda']) == 1) {
+                    $data['curso'] = $row['res_busqueda'][0]["idcurso"];
+                }
+                echo json_encode($data);
+            }
+        }
+    }
+
+    function buscar_bloques_grupos() {
+        if ($this->input->is_ajax_request()) {
+            if ($this->input->post()) {
+                $data_post = $this->input->post(null, true);
+//                pr($data_post);
+                switch ($data_post['tipo']) {
+                    case "c":
+                        $result = $this->rep_mod->get_busca_bloques_grupos($data_post['curso'], null);
+                        $bs['empty'] = 0;
+                        if (!empty($result)) {
+                            $data['bloques_p'] = dropdown_options($result, 'bloque', 'bloque');
+                            $bs['html'] = $this->load->view('reporte/vistas_grupos/view_bloque', $data, TRUE);
+                            $bs['empty'] = 1;
+                        }
+                        echo json_encode($bs);
+                        exit();
+                    case "b":
+                        break;
+                }
+            }
+        }
     }
 
 }

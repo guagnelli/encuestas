@@ -8,7 +8,6 @@
 ?>
 
 <?php
-echo js("busquedas/busqueda.js");
 echo form_open($controlador, array('id' => 'form_curso'));
 ?>
 <div class="row">
@@ -120,6 +119,11 @@ echo form_open($controlador, array('id' => 'form_curso'));
         </div>
     </div>
 </div>
+
+<?php
+echo js("busquedas/busqueda.js");
+?>
+
 <script type="text/javascript">
     $(document).ready(function () {
     });

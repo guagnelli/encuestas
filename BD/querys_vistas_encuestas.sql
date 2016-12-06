@@ -120,7 +120,23 @@ select *, mrdo."name" , mrdor."name"
  left join mdl_role mrdo on mrdo.id = re.rol_evaluado_cve 
  where cce.course_cve  = 838;
 
- 
+
+ --obtiene las reglas que podrian aplicar a la encuesta 
+		WITH RECURSIVE busca_excepcion AS (
+		SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, 
+		reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad
+		FROM encuestas.sse_reglas_evaluacion reg
+		JOIN encuestas.sse_encuestas enc ON enc.reglas_evaluacion_cve=reg.reglas_evaluacion_cve
+		JOIN encuestas.sse_encuesta_curso encc ON encc.encuesta_cve=enc.encuesta_cve 
+				WHERE reg.reglas_evaluacion_cve = 10
+				 UNION all 
+		select bex.is_excepcion, rer.rol_evaluado_cve, rer.rol_evaluador_cve, 
+		rer.is_excepcion, rer.tutorizado, rer.is_bono, rer.ord_prioridad 
+		from busca_excepcion bex
+		join encuestas.sse_reglas_evaluacion rer on rer.reglas_evaluacion_cve = bex.is_excepcion
+		)
+		select * FROM busca_excepcion OFFSET 0 
+			
  --obtiene las reglas que podrian aplicar a la encuesta 
  WITH RECURSIVE busca_excepcion AS (
 SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad

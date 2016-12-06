@@ -18,7 +18,7 @@ class Reporte_model extends CI_Model {
         // Call the CI_Model constructor
         parent::__construct();
         $this->config->load('general');
-        //$this->load->database();
+        $this->load->database();
     }
 
     /**
@@ -424,8 +424,8 @@ class Reporte_model extends CI_Model {
                 return dropdown_options($rol, 'rol_id', 'rol_nom');
             case 'ordenar_por': return array(
                     'nombre' => 'Nombre',
-                    'nrolevaluador' => 'Rol evaluador', 
-                    'nrolevaluado' => 'Rol evaluado', 
+                    'nrolevaluador' => 'Rol evaluador',
+                    'nrolevaluado' => 'Rol evaluado',
                     'ngrupo' => 'Grupo');
             case 'order_by': return array('ASC' => 'Ascendente', 'DESC' => 'Descendente');
             case 'order_columns': return array('emp_matricula' => 'Matrícula', 'cve_depto_adscripcion' => 'Adscripción', 'cat_nombre' => 'Categoría', 'grup_nom' => 'BD');
@@ -456,8 +456,8 @@ class Reporte_model extends CI_Model {
 
     private function getDatosPorGrupo() {
         $array = array(
-            Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado','ordenar_por', 'order_by'),
-            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado','ordenar_por', 'anios', 'order_by'),
+            Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by'),
             Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'ordenar_por', 'order_by'),
             Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
             Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),
@@ -543,6 +543,38 @@ class Reporte_model extends CI_Model {
         }
 //        pr($anios);
         return $anios;
+    }
+
+    public function get_busca_cursos_nombre($text = '') {
+        $select = array('shortname as "curso"', 'id as "idcurso"');
+        $this->db->select($select);
+        $this->db->like('upper(shortname)', strtoupper($text));
+//        $this->db->where('lower(shortname) ~* to_ascii(' . $text . ')');
+        $this->db->order_by('shortname', 'asc');
+        $this->db->limit(20);
+//
+        $query = $this->db->get('mdl_course');
+//
+//        pr($this->db->last_query());
+        return $query->result_array();
+    }
+
+    public function get_busca_bloques_grupos($cursoid = null, $bloqueid = null) {
+        if ($cursoid != null) {
+            $this->db->select('bloque');
+            $this->db->where('course_cve', $cursoid);
+            $this->db->group_by('bloque');
+            $this->db->order_by('bloque', 'asc');
+        }
+        if ($bloqueid != null) {
+            $this->db->select('mdl_groups_cve');
+            $this->db->where('bloque', $bloqueid);
+            $this->db->group_by('mdl_groups_cve');
+            $this->db->order_by('mdl_groups_cve', 'asc');
+        }
+        $query = $this->db->get('encuestas.sse_curso_bloque_grupo');
+//        pr($this->db->last_query());
+        return $query->result_array();
     }
 
 }

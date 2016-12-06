@@ -199,3 +199,50 @@ function dropdown(id,tag,act){
 		remove_loader();
 	});
 }
+
+/**
+ * 
+ * @param {type} path
+ * @param {type} form_recurso - Formulario que se va a enviar
+ * @param {type} elemento_resultado Div o elemento donde se mostrará el resultado
+ * param {type objete} Despúes del elemento resuiltado, se enviarán todos los elementos 
+ * por post simple que se requieran enviar ejem. {key : value, key_2 : value_2,...,key_n : value_n}
+ * 
+ * @returns {JSON} Si el return del response del servidor es un, regresa JSON, si no, regresa vacio 
+ */
+function data_ajax_post(path, form_recurso, elemento_resultado) {
+//    var result = 0;
+    var formData = '';
+    if (form_recurso !== null) {//Prepara los datos del formulario
+        formData = $(form_recurso).serialize();
+    }
+    if (arguments.length === 4) {//Prepara los datos extra que se enviarán por post
+        var obj_data_extra = arguments[3];
+        for (var key_extras in arguments[3]) {
+            formData += '&' + key_extras + '=' + obj_data_extra[key_extras];
+        }
+    }
+
+    $.ajax({
+        url: path,
+        data: formData,
+        method: 'POST',
+        beforeSend: function (xhr) {
+            $(elemento_resultado).html(create_loader());
+        }
+    })
+            .done(function (response) {
+//                     result = 1;
+                try {
+                    var json = $.parseJSON(response);
+                } catch (e) {
+                    $(elemento_resultado).html(response);
+                }
+            })
+            .fail(function (jqXHR, textStatus) {
+                $(elemento_resultado).html("Ocurrió un error durante el proceso, inténtelo más tarde.");
+            })
+            .always(function () {
+                remove_loader();
+            });
+}
