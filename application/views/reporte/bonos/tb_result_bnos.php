@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-//pr($lista_unidades);
+//pr($reglas_evaluacion);
+//pr($result);
+//pr($result_promedio);
 ?>
 <div id="div_tabla_reporte_general_encuestas" style="overflow-x: auto; width: 1200px;">
     <!--Mostrará la tabla de actividad docente --> 
@@ -8,90 +10,64 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <thead>
             <tr class="bg-info">
                 <th>Clave curso</th>
-                <th>Tipo de curso</th>
                 <th>Curso</th>
-                <th>Fecha de inicio</th>
-                <th>Grupo</th>
+                <th>Tipo implementación</th>
+                <th>Tipo</th>
                 <th>Bloque</th>
+                <th>Grupo</th>
                 <th>Matricula</th>
                 <th>Nombre evaluado</th>    
                 <th>Rol evaluado</th>
-                <th>A-TT</th>
-                <th>TT-CT</th>
-                <th>CT-CC</th>
-                <th>CT-TT</th>
-                <th>CC-CT</th>
-                <!--<th>Opciones</th>-->
+                <th>Región</th>
+                <th>Delegación</th>
+                <th>Clave de Adscripción</th>
+                <?php foreach ($reglas_evaluacion as $val) { ?>
+                    <th><?php echo $val; ?></th>
+                <?php } ?>
+<!--<th>Opciones</th>-->
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-03-17 00:00:00-06</td>
-                <td>QUINTANA ROO</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>9344829</td>
-                <td>Rosa María Yáñez González</td>
-                <td>Tutor Titular</td>
-                <td>100%</td>
-                <td>--</td>
-                <td>--</td>
-                <td>86.364%</td>
-                <td>--</td>
-            </tr>
-             <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>MORELOS</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99350573</td>
-                <td>Aurea Atanacia Barreto González</td>
-                <td>Coordinador de curso</td>
-                <td>--</td>
-                <td>--</td>
-                <td>67.897</td>
-                <td>--</td>
-                <td>--</td>
-            </tr>
-             <tr>
-                <td>CES-DD-I2-15</td>
-                <td>Curso</td>
-                <td>Formación de Directivos en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>NUEVO LEON 2</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99324079</td>
-                <td>Sergio Humberto Martínez López</td>
-                <td>Coordinador de tutores</td>
-                <td>--</td>
-                <td>91.071%</td>
-                <td>--</td>
-                <td>--</td>
-                <td>87.350%</td>
-            </tr>
-            <tr>
-                <td>CES-DPDESBL-I2-15</td>
-                <td>Curso</td>
-                <td>Profesionalización Docente para la Educación en Salud</td>
-                <td>2015-05-18 00:00:00-06</td>
-                <td>GUANAJUATO 1</td>
-                <td>Bloque <?php echo rand (1, 5);?></td>
-                <td>99110715</td>
-                <td>Raúl Hernández Ordoñez</td>
-                <td>Tutor Titular</td>
-                <td>73.684%</td>
-                <td>--</td>
-                <td>--</td>
-                <td>78.54%</td>
-                <td>--</td>
-            </tr>
+            <?php foreach ($result as $key => $val) { ?>
+
+                <?php
+                $evaluado = (isset($val['name_rol_evaluado'])) ? $val['name_rol_evaluado'] : '--';
+                $bloque = (isset($val['bloque'])) ? $val['bloque'] : '--';
+                $grupo = (isset($val['mdl_groups_cve'])) ? $val['mdl_groups_cve'] : '--';
+                echo "<tr id='id_row_" . $key . "' data-keyrow=" . $key . ">";
+                echo "<td>" . $val['clave'] . "</td>";
+                echo "<td>" . $val['namec'] . "</td>";
+                echo "<td>" . $val['tipo_curso'] . "</td>";
+                echo "<td>" . $val['tex_tutorizado'] . "</td>";
+                echo "<td>" . $bloque . "</td>";
+                echo "<td>" . $grupo . "</td>";
+                echo "<td>" . $val['username'] . "</td>";
+                echo "<td>" . $val['name_evaluado'] . "</td>";
+                echo "<td>" . $evaluado . "</td>";
+                echo "<td>" . $val['name_region'] . "</td>";
+                echo "<td>" . $val['cve_depto_adscripcion'] . "</td>";
+                echo "<td>" . $val['nom_delegacion'] . "</td>";
+                foreach ($reglas_evaluacion as $key_rol => $vp) {
+                    if (isset($result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol])) {
+                        echo "<td>" . $result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol]['promedio'] . " %</td>";
+                    } else {
+//                        echo "<td>".$val['course_cve']. ', '. $val['evaluado_user_cve'] . ', ' . $val['tutorizado'] . ', ' .$key_rol ."</td>";
+                        echo "<td> </td>";
+                    }
+                }
+                echo "<tr>";
+                ?>
+            <?php } ?>
         </tbody>
         <tfoot>
             <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

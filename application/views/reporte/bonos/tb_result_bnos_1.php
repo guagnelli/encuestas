@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 //pr($lista_unidades);
 ?>
-<div id="div_tabla_reporte_general_encuestas">
+<div id="div_tabla_reporte_general_encuestas" style="overflow-x: auto; width: 1200px;">
     <!--Mostrará la tabla de actividad docente --> 
     <table class="table table-striped table-hover table-bordered " id="tabla_reporte_gral_encuestas">
         <thead>
@@ -10,9 +10,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Clave curso</th>
                 <th>Tipo de curso</th>
                 <th>Curso</th>
-                <th>Fecha de inicio</th>
-                <th>Grupo</th>
-                <th>Bloque</th>
                 <th>Matricula</th>
                 <th>Nombre evaluado</th>    
                 <th>Rol evaluado</th>
@@ -21,7 +18,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>CT-CC</th>
                 <th>CT-TT</th>
                 <th>CC-CT</th>
-                <th></th>
                 <!--<th>Opciones</th>-->
             </tr>
         </thead>

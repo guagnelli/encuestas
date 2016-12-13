@@ -471,17 +471,28 @@ class Reporte_model extends CI_Model {
      * @return string Listado de reglas de evaluación por roles
      * 
      */
-    public function get_lista_roles_regla_evaluacion() {
+    public function get_lista_roles_regla_evaluacion($tipo = 'normal') {
 
         $roles_prop = $this->config->item('prop_roles');
 //        pr($roles_prop);
         $reglas_db = $this->get_regla_evaluacion_nombre();
         $result = array();
-        foreach ($reglas_db as $value) {
-//        pr($value);
-            $rol_evaluado = $roles_prop[$value['rol_evaluado_cve']]['ab'];
-            $rol_evaluador = $roles_prop[$value['rol_evaluador_cve']]['ab'];
-            $result[$value['reglas_evaluacion_cve']] = $rol_evaluador . ' a ' . $rol_evaluado . ' -' . $value['text_tutorizado'];
+        switch ($tipo) {
+            case 'normal':
+                foreach ($reglas_db as $value) {
+//                    pr($value);
+                    $rol_evaluado = $roles_prop[$value['rol_evaluado_cve']]['ab'];
+                    $rol_evaluador = $roles_prop[$value['rol_evaluador_cve']]['ab'];
+                    $result[$value['reglas_evaluacion_cve']] = $rol_evaluador . ' a ' . $rol_evaluado . ' -' . $value['text_tutorizado'];
+                }
+                break;
+            case 'roles':
+                foreach ($reglas_db as $value) {
+                    $rol_evaluado = $roles_prop[$value['rol_evaluado_cve']]['ab'];
+                    $rol_evaluador = $roles_prop[$value['rol_evaluador_cve']]['ab'];
+                    $result[$value['rol_evaluado_cve'] . '-' . $value['rol_evaluador_cve']] = $rol_evaluador . ' a ' . $rol_evaluado . ' -' . $value['text_tutorizado'];
+                }
+                break;
         }
         return $result;
     }
@@ -554,9 +565,11 @@ class Reporte_model extends CI_Model {
         $this->db->limit(20);
 //
         $query = $this->db->get('mdl_course');
+        $result = $query->result_array();
+        $query->free_result();
 //
 //        pr($this->db->last_query());
-        return $query->result_array();
+        return $result;
     }
 
     public function get_busca_bloques_grupos($cursoid = null, $bloqueid = null) {
@@ -564,7 +577,7 @@ class Reporte_model extends CI_Model {
             $this->db->select('bloque');
             $this->db->where('course_cve', $cursoid);
             $this->db->group_by('bloque');
-            $this->db->order_by('bloque', 'asc');
+//            $this->db->order_by('bloque', 'asc');
         } else {
             $this->db->select('mdl_groups_cve');
             $this->db->where('course_cve', $cursoid);
@@ -573,8 +586,12 @@ class Reporte_model extends CI_Model {
             $this->db->order_by('mdl_groups_cve', 'asc');
         }
         $query = $this->db->get('encuestas.sse_curso_bloque_grupo');
+        $result = $query->result_array();
+        $query->free_result();
 //        pr($this->db->last_query());
-        return $query->result_array();
+//        pr($result);
+
+        return $result;
     }
 
 }

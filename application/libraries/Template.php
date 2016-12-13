@@ -109,6 +109,42 @@ class Template {
             'total' => "Mostrando " . ($pagination_data['current_row'] + 1) . " a " . ((($pagination_data['current_row'] + $config['per_page']) > $pagination_data['total']) ? $pagination_data['total'] : $pagination_data['current_row'] + $config['per_page']) . " de " . $pagination_data['total']
         );
     }
+    
+    /**
+     * Método que crea links de paginación y mensaje sobre registros mostrados
+     * @autor 		: Jesús Díaz P.
+     * @modified 	: 
+     * @access 		: public
+     * @param 		: mixed[] $pagination_data Parámetros usados para generar las ligas
+     * @return 		: midex[] links -> Ligas para la paginación
+     * 						total -> Mensaje sobre registros mostrados
+     */
+    function pagination_data_general($pagination_data) {
+        $this->CI->load->library(array('pagination', 'table'));
+        $config['base_url'] = (array_key_exists('controller', $pagination_data) && array_key_exists('action', $pagination_data)) ? site_url(array($pagination_data['controller'], $pagination_data['action'])) : site_url(array('buscador', 'get_data_ajax')); //Path que se utilizará en la generación de los links
+        $config['total_rows'] = $pagination_data['total']; //Número total de registros
+        $config['per_page'] = $pagination_data['per_page']; //Sobreescribir número de registros a mostrar
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="disabled"><span><strong>';
+        $config['cur_tag_close'] = '</strong></span></li>';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_tag_open'] = '<li>';
+        $config['prev_tag_close'] = '</li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+
+        $this->CI->pagination->initialize($config);
+
+        return array('links' => "<div class='dataTables_paginate paging_simple_numbers  pull-right'>" . $this->CI->pagination->create_links() . "</div>",
+            'total' => "Mostrando " . ($pagination_data['current_row'] + 1) . " a " . ((($pagination_data['current_row'] + $config['per_page']) > $pagination_data['total']) ? $pagination_data['total'] : $pagination_data['current_row'] + $config['per_page']) . " de " . $pagination_data['total']
+        );
+    }
 
     /*
      * Asigna valores a la propiedad Titulo de la plantilla

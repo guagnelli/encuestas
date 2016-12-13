@@ -36,7 +36,7 @@ psql (9.5.3)
 postgres=# \i
 \i: falta argumento requerido
 postgres=# create database sied30_2016;   ---Crea una base de datos
-CREATE DATABASE
+CREATE DATABASE ENCODING 'UTF8';
 
 postgres=# \c sied30_2016; --Entrar a la instancia de la base de datos creada  
 Contraseña para usuario postgres:  --carga password de usuario
@@ -51,4 +51,14 @@ sied30_2016=#     ---Ya esta dentro de la instancia o base de datos
 --Posisionado en la ruta del archivo sql, carga "ddl y datos de la base " en sql ejem C:\Users\Elizabeth\name_file.sql
 sied30_2016=#\i name_file.sql  
 
+--importar un "schema" de postgresql
+pg_dump -d nombredebasededatos -n nombredeesquema > archivodeexportacion.sql;
+ejemplo=# pg_dump -h11.32.41.92 -Uinnovaedu -W -d kio_prod2016 -n encuestas > schema_kio_encuestas.sql
+pg_dump -h11.32.41.92 -Uinnovaedu -W -d kio_prod2016 -n departments > schema_kio_departments.sql
+--exportar un "schema" de postgresql
+psql -d nombredebasededatos -f archivodeexportacion.sql
+ejemplo=# psql -Upostgres -W -d sied_2016 -f schema_kio_encuestas.sql
+psql -Upostgres -W -d sied_2016 -f schema_kio_departments.sql
 
+---Eliminar un esquema
+DROP SCHEMA name_schema CASCADE;

@@ -196,10 +196,10 @@ class Resultadocurenrealizada extends CI_Controller
         $idcurso=$filtros['curso'];
         $datos_curso=$this->cur_mod->listado_cursos(array('cur_id'=> $idcurso));
         $usuarioscurso=$this->rep_mod->listado_usuariosenc($idcurso);
-        pr($datos_curso);
-        pr($usuarioscurso);
+//        pr($datos_curso);
+//        pr($usuarioscurso);
         //pr($usuarioscurso);
-        exit();
+//        exit();
         foreach ($usuarioscurso as $keyuc => $valueuc) 
         {
             $rolescusercurso=$this->encur_mod->get_roles_usercurso(array('user_id' => $valueuc['cve_usuario'],'cur_id'=>$idcurso));

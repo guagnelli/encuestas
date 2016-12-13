@@ -26,7 +26,7 @@
                                 'data-toggle' => 'tooltip',
                                 'data-placement' => 'bottom',
                                 'class' => 'form-control',
-                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
+//                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
                                 'title' => 'Buscar',
                             //                                        'readonly'=>'readonly',
                             )
@@ -89,7 +89,7 @@
                                 'data-toggle' => 'tooltip',
                                 'data-placement' => 'bottom',
                                 'class' => 'form-control',
-                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
+//                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
                                 'title' => 'Buscar en evaluado',
                             //                                        'readonly'=>'readonly',
                             )
@@ -125,7 +125,7 @@
                                 'data-toggle' => 'tooltip',
                                 'data-placement' => 'bottom',
                                 'class' => 'form-control',
-                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
+//                                'onkeypress' => 'return runScript(event);', //control key del enter para buscar
                                 'title' => 'Buscar en evaluado',
                             //                                        'readonly'=>'readonly',
                             )

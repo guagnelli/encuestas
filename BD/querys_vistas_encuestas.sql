@@ -428,3 +428,15 @@ group by enc.encuesta_cve, enc.descripcion_encuestas, enc.is_bono, enc.reglas_ev
 	evaluado.username, evaluado.firstname, evaluado.lastname, evaluador.username, evaluador.firstname, evaluador.lastname,
 	enc.reglas_evaluacion_cve;
  
+ 
+ ----Bonos Reporte de implementación
+ SELECT eeec.course_cve, eeec.evaluado_user_cve, vdc.clave, vdc.namec, vdc.tex_tutorizado, vdc.tipo_curso, concat(evaluado.firstname, ' ', evaluado.lastname) as name_evaluador, evaluado.username, revaluado.name as name_rol_evaluado, revaluado.id id_rol_evaluado
+FROM encuestas.sse_result_evaluacion_encuesta_curso eeec
+JOIN encuestas.view_datos_curso vdc ON vdc.idc = eeec.course_cve
+LEFT JOIN public.mdl_user evaluado ON evaluado.id = eeec.evaluado_user_cve
+JOIN encuestas.sse_encuestas enc ON enc.encuesta_cve = eeec.encuesta_cve
+JOIN encuestas.sse_reglas_evaluacion reg ON reg.reglas_evaluacion_cve = enc.reglas_evaluacion_cve
+LEFT JOIN public.mdl_role revaluado ON revaluado.id=reg.rol_evaluado_cve
+WHERE revaluado.id = '32'
+GROUP BY eeec.course_cve, vdc.clave, vdc.namec, evaluado_user_cve, vdc.tex_tutorizado, vdc.tipo_curso, evaluado.firstname, evaluado.lastname, evaluado.username, revaluado.name, revaluado.id
+ LIMIT 5

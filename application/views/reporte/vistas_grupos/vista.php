@@ -5,6 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+// pr($formulario);
 ?>
 
 <?php
@@ -78,56 +79,67 @@ echo form_open($controlador, array('id' => 'form_curso'));
                             <button type="button" id="btn_buscar_b" aria-expanded="false" class="btn btn-primary browse" title="Buscar" data-toggle="tooltip" onclick="data_ajax(<?php echo $url_control; ?>)" >
                                 Buscar <span aria-hidden="true" class="glyphicon glyphicon-search"></span>
                             </button>
-                            <button type="button" id="btn_export" aria-expanded="false" class="btn btn-primary browse" title="Exportar" data-toggle="tooltip" onclick="data_ajax(<?php echo $url_control; ?>)" style="margin-left:10px;">
-                                Exportar <span aria-hidden="true" class="glyphicon glyphicon-export"></span>
-                            </button>
+                            <?php if (!empty($exportar)) { ?>
+                                <button type="button" id="btn_export" aria-expanded="false" class="btn btn-primary browse" title="Exportar" data-toggle="tooltip" style="margin-left:10px;">
+                                    Exportar<span aria-hidden="true" class="glyphicon glyphicon-export"></span>
+                                </button>
+                                <?php } ?>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-4">
-                        <div class="panel-body input-group input-group-sm">
-                            <span class="input-group-addon">Número de registros a mostrar:</span>
-                            <?php // echo $this->form_complete->create_element(array('id'=>'per_page', 'type'=>'dropdown', 'options'=>array(2=>2,3=>3,4=>4,10=>10, 20=>20, 50=>50, 100=>100), 'attributes'=>array('class'=>'form-control', 'placeholder'=>'Número de registros a mostrar', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Número de registros a mostrar', 'onchange'=>"data_ajax(site_url+'/bonos_titular/get_buscar_cursos_encuestas', '#form_buscador', '#listado_resultado_empleado')")));     ?>
-                            <?php echo $this->form_complete->create_element(array('id' => 'per_page', 'type' => 'dropdown', 'options' => array(5 => 5, 10 => 10, 20 => 20, 50 => 50, 100 => 100), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Número de registros a mostrar', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Número de registros a mostrar', 'onchange' => "data_ajax($url_control)"))); ?>
+                    <div class="row">
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="panel-body input-group input-group-sm">
+                                <span class="input-group-addon">Número de registros a mostrar:</span>
+                                <?php // echo $this->form_complete->create_element(array('id'=>'per_page', 'type'=>'dropdown', 'options'=>array(2=>2,3=>3,4=>4,10=>10, 20=>20, 50=>50, 100=>100), 'attributes'=>array('class'=>'form-control', 'placeholder'=>'Número de registros a mostrar', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Número de registros a mostrar', 'onchange'=>"data_ajax(site_url+'/bonos_titular/get_buscar_cursos_encuestas', '#form_buscador', '#listado_resultado_empleado')")));      ?>
+                                <?php echo $this->form_complete->create_element(array('id' => 'per_page', 'type' => 'dropdown', 'options' => array(5 => 5, 10 => 10, 20 => 20, 50 => 50, 100 => 100), 'attributes' => array('class' => 'form-control', 'placeholder' => 'Número de registros a mostrar', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Número de registros a mostrar', 'onchange' => "data_ajax($url_control)"))); ?>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="panel-body input-group input-group-sm">
+                                <span class="input-group-addon">Ordenar por:</span>
+                                <?php echo $this->form_complete->create_element(array('id' => 'order', 'type' => 'dropdown', 'options' => $ordenar_por, 'attributes' => array('class' => 'form-control', 'placeholder' => 'Ordernar por', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Ordenar por', 'onchange' => "data_ajax($url_control)"))); ?>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="panel-body input-group input-group-sm">
+                                <span class="input-group-addon">Tipo de orden:</span>
+                                <?php echo $this->form_complete->create_element(array('id' => 'order_type', 'type' => 'dropdown', 'options' => $order_by, 'attributes' => array('class' => 'form-control', 'placeholder' => 'Tipo de orden', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Tipo de orden', 'onchange' => "data_ajax($url_control)"))); ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-4">
-                        <div class="panel-body input-group input-group-sm">
-                            <span class="input-group-addon">Ordenar por:</span>
-                            <?php echo $this->form_complete->create_element(array('id' => 'order', 'type' => 'dropdown', 'options' => $ordenar_por, 'attributes' => array('class' => 'form-control', 'placeholder' => 'Ordernar por', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Ordenar por', 'onchange' => "data_ajax($url_control)"))); ?>
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12 text-left">
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-4">
-                        <div class="panel-body input-group input-group-sm">
-                            <span class="input-group-addon">Tipo de orden:</span>
-                            <?php echo $this->form_complete->create_element(array('id' => 'order_type', 'type' => 'dropdown', 'options' => $order_by, 'attributes' => array('class' => 'form-control', 'placeholder' => 'Tipo de orden', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Tipo de orden', 'onchange' => "data_ajax($url_control)"))); ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12 col-sm-12 text-left">
-                    </div>
-                </div>
-                <div id="listado_resultado_empleado">
+                    <div id="listado_resultado_empleado">
 
-                </div>
-                <div id="listado_resultado">
+                    </div>
+                    <div id="listado_resultado">
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<?php
-echo js("busquedas/busqueda.js");
-?>
+    <?php
+    echo js("busquedas/busqueda.js");
+    ?>
 
-<script type="text/javascript">
-    $(document).ready(function () {
-    });
-    $(window).load(function () {
-//        $( "#btn_buscar_b" ).trigger( "click" );
+    <script type="text/javascript">
+        $(document).ready(function () {
+        });
+        $(window).load(function () {
+    //        $( "#btn_buscar_b" ).trigger( "click" );
+    <?php if (!empty($exportar)) { ?>
+                $("#btn_export").click(function (event) {
+                    event.preventDefault();
+                    //alert('fasdfasd');
+                    $("<?php echo $formulario; ?>").attr("action", site_url + "/<?php echo $exportar; ?>");
+                    $("<?php echo $formulario; ?>").submit();
+                    //data_ajax(site_url+"/buscador/export_data", "#form_buscador", "#listado_resultado");        
+                });
+    <?php } ?>
     });
 </script>

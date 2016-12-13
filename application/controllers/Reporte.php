@@ -17,7 +17,7 @@ class Reporte extends CI_Controller {
     public function __construct() {
         parent::__construct();
 
-        $this->load->database();
+//        $this->load->database();
         $this->load->library('form_complete');
         $this->load->library('form_validation');
         $this->load->model('Reporte_model', 'rep_mod'); // modelo de reporte
@@ -146,7 +146,7 @@ class Reporte extends CI_Controller {
                                     $reglasgral[] = array('reglas_evaluacion_cve' => $reglas_validas['reglas_evaluacion_cve'],
                                         'rol_evaluado_cve' => $reglas_validas['rol_evaluado_cve'],
                                         'encuesta_cve' => $reglas_validas['encuesta_cve'],
-                                        'eva_tipo' => $reglas_validas['eva_tipo']
+                                        'eva_tipo' => $reglas_validas['eva_tipo'],
                                     );
                                 }
                             }
@@ -268,7 +268,7 @@ class Reporte extends CI_Controller {
             if ($this->input->post()) {
                 $data_post = $this->input->post(null, true);
                 $row['res_busqueda'] = $this->rep_mod->get_busca_cursos_nombre($data_post['b']);
-                $data['html'] = $this->load->view('pruebas/lista_res', $row, true);
+                $data['html'] = $this->load->view('reporte/vistas_grupos/lista_res_curso', $row, true);
                 $data['curso'] = 0;
                 if (count($row['res_busqueda']) == 1) {
                     $data['curso'] = $row['res_busqueda'][0]["idcurso"];
@@ -282,16 +282,17 @@ class Reporte extends CI_Controller {
         if ($this->input->is_ajax_request()) {
             if ($this->input->post()) {
                 $data_post = $this->input->post(null, true);
-//                pr($data_post);
                 switch ($data_post['tipo']) {
                     case "c":
                         $result = $this->rep_mod->get_busca_bloques_grupos($data_post['curso'], null);
+//                            pr($result);
                         $bs['empty'] = 0;
                         if (!empty($result)) {
                             $data['bloques_p'] = dropdown_options($result, 'bloque', 'bloque');
-                            $data['cursoid'] = $data_post['curso'];//Agrega curso
+                            $data['cursoid'] = $data_post['curso']; //Agrega curso
                             $bs['html'] = $this->load->view('reporte/vistas_grupos/view_bloque', $data, TRUE);
                             $bs['empty'] = 1;
+//                            pr($bs);
                         }
                         echo json_encode($bs);
                         exit();
@@ -300,13 +301,17 @@ class Reporte extends CI_Controller {
                         $gs['empty'] = 0;
                         if (!empty($result)) {
                             $data['grupos_p'] = dropdown_options($result, 'mdl_groups_cve', 'mdl_groups_cve');
-                            $data['cursoid'] = $data_post['curso'];//Agrega curso
-                            $data['bloqueid'] = $data_post['bloque'];//Agrega curso
+                            $data['cursoid'] = $data_post['curso']; //Agrega curso
+                            $data['bloqueid'] = $data_post['bloque']; //Agrega curso
                             $gs['html'] = $this->load->view('reporte/vistas_grupos/view_grupo', $data, TRUE);
                             $gs['empty'] = 1;
                         }
                         echo json_encode($gs);
                         exit();
+                    case "*":
+//                        pr($data_post);
+//                        exit();
+                        break;
                 }
             }
         }

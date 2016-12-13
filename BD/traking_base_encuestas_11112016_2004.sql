@@ -50,4 +50,36 @@ ALTER TABLE encuestas.sse_reglas_evaluacion ADD COLUMN eval_is_satisfaccion nume
 
 ALTER TABLE encuestas.sse_result_evaluacion_encuesta_curso DROP COLUMN eval_is_satisfaccion;--demas equivocación
 
+--Ejecución LEAS fecha 07/12/2016 Agrega campos para poder saber el rol que valido y el rol a quién se valida ---------------------
+------------------------------------------------------  No se llevo a cabo ----------------------------------------------------
+ALTER TABLE encuestas.sse_result_evaluacion_encuesta_curso ADD COLUMN evaluador_rol_id int4 null;
+ALTER TABLE encuestas.sse_result_evaluacion_encuesta_curso ADD COLUMN evaluado_rol_id int4 null;
 
+ALTER TABLE encuestas.sse_result_evaluacion_encuesta_curso DROP COLUMN evaluado_rol_id int4;
+ALTER TABLE encuestas.sse_result_evaluacion_encuesta_curso DROP COLUMN evaluador_rol_id int4;
+
+-----------Ejecución agregar campos para identificar umae, unidad_normativa y clave
+ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN is_umae char(1) null;
+ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN cve_unidad char(10) null;
+ALTER TABLE departments.ssd_cat_dependencia ADD column cve_normativa char(10) null;
+
+CREATE TABLE departments.ssd_regiones (
+	cve_regiones int4 NOT NULL,
+	name_region varchar(20),
+	CONSTRAINT ssd_region_pkey PRIMARY KEY (cve_regiones)
+)
+WITH (
+	OIDS=FALSE
+);
+
+ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN
+ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN is_umae char(1) null;
+
+alter table departments.ssd_cat_delegacion add column cve_regiones int4;
+alter table departments.ssd_cat_delegacion add
+  CONSTRAINT fkcve_regiones
+  FOREIGN KEY (cve_regiones) 
+  REFERENCES  departments.ssd_regiones(cve_regiones);
+
+update departments.ssd_cat_dependencia set is_umae = 0;
+update departments.ssd_cat_dependencia set is_umae = 1 where cve_depto_adscripcion like '%0000' and ind_umae=1;
