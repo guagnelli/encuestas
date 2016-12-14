@@ -83,3 +83,6 @@ alter table departments.ssd_cat_delegacion add
 
 update departments.ssd_cat_dependencia set is_umae = 0;
 update departments.ssd_cat_dependencia set is_umae = 1 where cve_depto_adscripcion like '%0000' and ind_umae=1;
+
+---Agreagar a departamentos región Ejecución Jesús Díaz  13/12/2016
+

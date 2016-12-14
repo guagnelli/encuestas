@@ -14,32 +14,37 @@ class Reporte_bonos_implementacion_model extends CI_Model {
         $this->confFind = new config_busqueda();
     }
 
-    public function get_query_calculo($param_clculo) {
-//        pr($param_clculo);
-        foreach ($param_clculo['join'] as $value) {//Aplica joins
+    public function get_query_calculo($param_calculo) {
+//        pr($param_calculo);
+        foreach ($param_calculo['join'] as $value) {//Aplica joins
             $this->db->join($value['tabla'], $value['on'], $value['escape']);
         }
 
-        foreach ($param_clculo['group_by'] as $value) {//Aplica group by
+        foreach ($param_calculo['group_by'] as $value) {//Aplica group by
             $this->db->group_by($value);
         }
-        if (isset($param_clculo['where']) AND ! empty($param_clculo['where'])) {
-            foreach ($param_clculo['where'] as $value) {//Aplica group by
+        if (isset($param_calculo['where']) AND ! empty($param_calculo['where'])) {
+            foreach ($param_calculo['where'] as $value) {//Aplica group by
 //            pr($value);
                 $funcion = $value['escape'];
                 $this->db->{$funcion}($value['campo'], $value['value']);
             }
         }
-        $this->db->select($param_clculo['select']); //Agrega select para traer los campos 
+        $this->db->select($param_calculo['select']); //Agrega select para traer los campos 
         $ejecuta = $this->db->get($this->confFind->getFromCalculoPromedio());
         $result = $query = $ejecuta->result_array();
 //        $query->free_result();
-        pr($this->db->last_query());
+//        pr($this->db->last_query());
 //        pr($result);
         $datos_result['datos'] = array();
         foreach ($result as $val) {
-            $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']] = $val;
-//            $datos_result['reglas'][$val['rol_evaluador_cve']][$val['rol_evaluado_cve']] = array($val['rol_evaluador_cve'], $val['rol_evaluado_cve']);
+            if (isset($val['mdl_groups_cve']) AND isset($val['bloque'])) {
+                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']][$val['mdl_groups_cve']] = $val;
+            } else if (isset($val['bloque'])) {
+                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']] = $val;
+            } else {
+                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']] = $val;
+            }
         }
 //        pr($datos_result);
         return $datos_result;
@@ -48,7 +53,8 @@ class Reporte_bonos_implementacion_model extends CI_Model {
     public function get_reporte_bonos_implementacion($parametros) {
         $array_result = $this->confFind->getArrayConfigPrincipal($parametros);
         $array_config_principal = $array_result['principal'];
-//        pr($array_config);
+//        pr($array_result);
+//        exit();
         $this->db->start_cache();/**         * *************Inicio cache  *************** */
 //        $this->db->from($this->confFind->getFrom());
         foreach ($array_config_principal['join'] as $value) {//Aplica joins
@@ -83,12 +89,12 @@ class Reporte_bonos_implementacion_model extends CI_Model {
         $query = $ejecuta->result_array();
 
         $this->db->flush_cache(); //Limpia la cache
-        pr($this->db->last_query());
+//        pr($this->db->last_query());
         //Resultados de cálculo de promedios 
         $array_config_calculo = $array_result['calculo_prom'];
 //        pr($num_rows);
         $result['result'] = $query;
-        $result['result_promedio'] = $this->get_query_calculo($array_config_calculo);
+        $result['result_promedio'] = $this->get_query_calculo($array_config_calculo, $parametros['is_bloque_o_grupo']);
         $result['num_rows'] = $num_rows;
         $result['total'] = count($num_rows);
 //        $query->free_result();
@@ -121,13 +127,15 @@ class config_busqueda {
             array('tabla' => 'encuestas.sse_encuestas enc', 'on' => 'enc.encuesta_cve = eeec.encuesta_cve', 'escape' => ''),
             array('tabla' => 'encuestas.sse_reglas_evaluacion reg', 'on' => 'reg.reglas_evaluacion_cve = enc.reglas_evaluacion_cve', 'escape' => ''),
             array('tabla' => 'public.mdl_role revaluado', 'on' => 'revaluado.id=reg.rol_evaluado_cve', 'escape' => 'left'),
+            array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = vdc.idc and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
         );
     }
 
     function getGroupByBasico() {
         return array(
             'eeec.course_cve', 'vdc.clave', 'vdc.namec', 'evaluado_user_cve', 'vdc.tutorizado',
-            'vdc.tex_tutorizado', 'vdc.tipo_curso', 'evaluado.firstname',
+            'vdc.tex_tutorizado', 'vdc.tipo_curso',
+            'evaluado.firstname',
             'evaluado.lastname', 'evaluado.username', 'revaluado."name"', 'revaluado.id',
             'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion',
         );
@@ -142,18 +150,13 @@ class config_busqueda {
         return array('cbg.bloque');
     }
 
+    /**  querys para grupo y bloque */
     function getSelectGrupo() {
         return array('cbg.mdl_groups_cve');
     }
 
     function getGroupByGrupo() {
         return array('cbg.mdl_groups_cve');
-    }
-
-    private function getJoinBasicosBloqueGrupo() {
-        return array(
-            array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = vdc.idc and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
-        );
     }
 
     function getWhere() {
@@ -165,7 +168,12 @@ class config_busqueda {
             'grupo' => array('campo' => 'cbg.mdl_groups_cve', 'escape' => 'where', 'value' => ''),
             'bloque' => array('campo' => 'cbg.bloque', 'escape' => 'where', 'value' => ''),
             'rol_evaluado' => array('campo' => 'revaluado.id', 'escape' => 'where', 'value' => ''),
-            '' => array('campo' => '', 'escape' => '', 'value' => ''),
+            'region' => array('campo' => 'vd.cve_regiones', 'escape' => 'where', 'value' => ''),
+            'delegacion' => array('campo' => 'vd.cve_delegacion', 'escape' => 'where', 'value' => ''),
+            'umae' => array('campo' => 'evaluado.cve_departamental', 'escape' => 'where', 'value' => ''),
+            'is_bono' => array('campo' => 'enc.is_bono', 'escape' => 'where', 'value' => ''),
+            'tipo_implementacion' => array('campo' => 'vdc.tutorizado', 'escape' => 'where', 'value' => ''),
+            'anio' => array('campo' => 'vdc.anio', 'escape' => 'where', 'value' => ''),
         );
     }
 
@@ -187,11 +195,6 @@ class config_busqueda {
             array('tabla' => 'encuestas.sse_reglas_evaluacion reg', 'on' => 'reg.reglas_evaluacion_cve = enc.reglas_evaluacion_cve', 'escape' => ''),
             array('tabla' => 'public.mdl_user evaluador', 'on' => 'evaluador.id = eeec.evaluado_user_cve', 'escape' => ''),
             array('tabla' => 'tutorias.mdl_userexp uexp', 'on' => 'uexp.userid = evaluador.id', 'escape' => ''),
-        );
-    }
-
-    private function getJoinBloqueGrupoCalculoPromedio() {
-        return array(
             array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = eeec.course_cve and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
         );
     }
@@ -219,14 +222,30 @@ class config_busqueda {
         $array_where = $this->getWhere(); //Obtiene colección de posibles where
         $array_where_calculo_promedio = $this->getWhereCalculoPromedio(); //Obtiene colección de posibles where
         $principal['join'] = $this->getJoinBasicos();
-        $principal['select'] = $this->getSelectBasicos();
         $principal['group_by'] = $this->getGroupByBasico();
+        $principal['select'] = $this->getSelectBasicos();
         $principal['where'] = array();
         //***Carga arrays con datos del cálculo del prmedio 
         $calculo_prom['join'] = $this->getJoinBasicosCalculoPromedio();
-        $calculo_prom['select'] = $this->getSelectBasicoCalculoPromedio();
         $calculo_prom['group_by'] = $this->getGroupByBasicoCalculoPromedio();
+        $calculo_prom['select'] = $this->getSelectBasicoCalculoPromedio();
 
+        //Agregar el grupo como agrupamiento en el grup by y el select
+        switch ($paramPost['is_bloque_o_grupo']) {
+            case 'grupo':
+                $principal['select'] = array_merge($principal['select'], $this->getSelectBloque(), $this->getSelectGrupo());
+                $principal['group_by'] = array_merge($principal['group_by'], $this->getGroupByBloque(), $this->getGroupByGrupo());
+                $calculo_prom['select'] = array_merge($calculo_prom['select'], $this->getSelectBloque(), $this->getSelectGrupo());
+                $calculo_prom['group_by'] = array_merge($calculo_prom['group_by'], $this->getGroupByBloque(), $this->getGroupByGrupo());
+                break;
+            case 'bloque':
+                $principal['select'] = array_merge($principal['select'], $this->getSelectBloque());
+                $principal['group_by'] = array_merge($principal['group_by'], $this->getGroupByBloque());
+                $calculo_prom['select'] = array_merge($calculo_prom['select'], $this->getSelectBloque());
+                $calculo_prom['group_by'] = array_merge($calculo_prom['group_by'], $this->getGroupByBloque());
+                break;
+            default :
+        }
 
         //Verifica primer where referente con la clave o nommbre del curso
         if (isset($paramPost['text_buscar_instrumento']) AND ! empty($paramPost['text_buscar_instrumento'])) {//Texto del curso
@@ -234,13 +253,8 @@ class config_busqueda {
             $tmp_where['value'] = $paramPost['text_buscar_instrumento'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
         }
-//        pr($paramPost);
+//        Condición por rol del evaluado;
         if (!empty($paramPost['rol_evaluado'])) {
-
-//        if ($add_rol_evaluador) {
-//            $principal['join'] = array_merge($principal['join'], $this->getJoinRolEvaluador());
-//            $principal['select'] = array_merge($principal['select'], $this->getSelectRolEvaluador());
-//            $principal['group_by'] = array_merge($principal['group_by'], $this->getGroupByRolEvaluador());
             //condición where para el rol evaluado
             $tmp_where = $array_where['rol_evaluado'];
             $tmp_where['value'] = $paramPost['rol_evaluado'];
@@ -252,47 +266,44 @@ class config_busqueda {
             $tmp_where['value'] = $paramPost['rol_evaluado'];
             $calculo_prom['where'][] = $tmp_where;
         }
-//        }
-        //Agrega join de bloques a query principal
-        $principal['join'] = array_merge($principal['join'], $this->getJoinBasicosBloqueGrupo());
-        $principal['select'] = array_merge($principal['select'], $this->getSelectBloque());
-        $principal['group_by'] = array_merge($principal['group_by'], $this->getGroupByBloque());
-        
-        //Agrega join de calculo de promedio a query cálculo de promedio
-        $calculo_prom['join'] = array_merge($calculo_prom['join'], $this->getJoinBloqueGrupoCalculoPromedio());
-        $calculo_prom['select'] = array_merge($calculo_prom['select'], $this->getSelectBloque());
-        $calculo_prom['group_by'] = array_merge($calculo_prom['group_by'], $this->getGroupByBloque());
-
-//        if (!empty($paramPost['bloque'])) {
-//            //condición where para el bloque
-//            $tmp_where = $array_where['bloque'];
-//            $tmp_where['value'] = $paramPost['bloque'];
-//            $principal['where'][] = $tmp_where;
-//            /* ---- Condicion por bloque para el cálculo del promedió */
-//            $calculo_prom['where'][] = $tmp_where; //Agrega a la condición un bloque 
-//        }
-//
-//        if (isset($paramPost['bloque'])) {
-//
-//            /* ---- Agrupación por bloque para el calculo del promedio */
-//            //Filtrar por grupo
-//            if (isset($paramPost['grupo'])) {
-//                $principal['select'] = array_merge($principal['select'], $this->getSelectGrupo());
-//                $principal['group_by'] = array_merge($principal['group_by'], $this->getGroupByGrupo());
-//
-//                if (!empty($paramPost['grupo'])) {
-//                    //condición where para el grupo
-//                    $tmp_where = $array_where['grupo'];
-//                    $tmp_where['value'] = $paramPost['grupo'];
-//                    $principal['where'][] = $tmp_where;
-//                    $calculo_prom['where'][] = $tmp_where; //Agrega a la condición un grupo
-//                }
-//
-//                /* ---- Agrupación por grupo -------------------- */
-//                $calculo_prom['select'] = array_merge($calculo_prom['select'], $this->getSelectGrupo());
-//                $calculo_prom['group_by'] = array_merge($calculo_prom['group_by'], $this->getGroupByGrupo());
-//            }
-//        }
+        //Condición delegación del evaluado
+        if (!empty($paramPost['delegacion'])) {
+            $tmp_where = $array_where['delegacion'];
+            $tmp_where['value'] = $paramPost['delegacion'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+            
+        }
+        //Condición umae del evaluado
+        if (!empty($paramPost['umae'])) {
+            $tmp_where = $array_where['umae'];
+            $tmp_where['value'] = $paramPost['umae'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+            
+        }
+        //Condición por región
+        if (!empty($paramPost['region'])) {
+            $tmp_where = $array_where['region'];
+            $tmp_where['value'] = $paramPost['region'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+        }
+        //Condición por región
+        if (!empty($paramPost['is_bono'])) {
+            $tmp_where = $array_where['is_bono'];
+            $tmp_where['value'] = $paramPost['is_bono'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+        }
+        //Condición por región
+        if (!empty($paramPost['tipo_implementacion'])) {
+            $tmp_where = $array_where['tipo_implementacion'];
+            $tmp_where['value'] = $paramPost['tipo_implementacion'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+        }
+        //Condición por región
+        if (!empty($paramPost['anio'])) {
+            $tmp_where = $array_where['anio'];
+            $tmp_where['value'] = $paramPost['anio'];
+            $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
+        }
 
         //Verifica where para busqueda del evaluado matrucula y nombre
         if (isset($paramPost['text_buscar_docente_evaluado']) AND ! empty($paramPost['text_buscar_docente_evaluado'])) {//Texto del curso
@@ -300,6 +311,8 @@ class config_busqueda {
             $tmp_where['value'] = $paramPost['text_buscar_docente_evaluado'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
         }
+        //Verifica where para busqueda del evaluado matrucula y nombre
+
         $result['principal'] = $principal; //Guarda datos de la consulta principal
         $result['calculo_prom'] = $calculo_prom; //Guarda datos de la consulta principal
         return $result;

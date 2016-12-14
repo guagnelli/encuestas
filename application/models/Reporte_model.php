@@ -8,6 +8,8 @@ class Reporte_model extends CI_Model {
             GF_EVALUADO = 'evaluado',
             GF_EVALUADO_DETALLE = 'evaluado_detalle',
             GF_EVALUADO_P = 'evaluado_p',
+            GF_EVALUADO_IMP = 'evaluado_implementacion',
+            GF_ENCUESTA_IMP = 'encuesta_implementacion',
             GF_EVALUADOR = 'evaluador',
             GF_EVALUADOR_DETALLE = 'evaluador_detalle',
             GF_ENCUESTA = 'encuesta',
@@ -447,6 +449,12 @@ class Reporte_model extends CI_Model {
             case 'delg_umae':
                 $del_umae = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_delegacion', 'select' => array('nom_delegacion', 'cve_delegacion')));
                 return dropdown_options($del_umae, 'cve_delegacion', 'nom_delegacion');
+            case 'delegacion':
+                $delegacion = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_delegacion', 'select' => array('nom_delegacion', 'cve_delegacion')));
+                return dropdown_options($delegacion, 'cve_delegacion', 'nom_delegacion');
+            case 'umae':
+                $umae = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_dependencia', 'select' => array('cve_depto_adscripcion', 'nom_dependencia'), 'where' => array("is_umae = '1'")));
+                return dropdown_options($umae, 'cve_depto_adscripcion', 'nom_dependencia');
             case 'instrumento': return $this->get_lista_roles_regla_evaluacion();
             case 'buscar_por': return array('clavecurso' => 'Clave instrumento', 'nombrecurso' => 'Nombre instrumento');
             case 'buscar_categoria': return array('categoria' => 'Categoría');
@@ -458,6 +466,7 @@ class Reporte_model extends CI_Model {
                 return $temp_grupo;
             case 'bloques_p': return array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5');
             case 'is_bono_p': return array(1 => 'Si', 0 => 'No');
+            case 'is_bloque_o_grupo': return array('' => 'Seleccione agrupamiento', 'bloque' => 'Por bloque', 'grupo' => 'Por grupo');
             case 'tipo_implementacion': return array(1 => 'Tutorizado', 0 => 'No tutorizado');
             case 'tipo_course':
                 $tipo_course = $this->config->item('tipo_curso_DCG');
@@ -474,6 +483,8 @@ class Reporte_model extends CI_Model {
             Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'order_by'),
             Reporte_model::GF_EVALUADO_DETALLE => array('buscar_docente_evaluado', 'buscar_categoria', 'rol_evaluado', 'region', 'delg_umae', 'umae', 'buscar_adscripcion', 'order_by'),
             Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by'),
+            Reporte_model::GF_EVALUADO_IMP => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by', 'region', 'umae', 'delegacion'),
+            Reporte_model::GF_ENCUESTA_IMP => array('is_bloque_o_grupo'),
             Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'ordenar_por', 'order_by'),
             Reporte_model::GF_EVALUADOR_DETALLE => array('buscar_docente_evaluado', 'buscar_categoria', 'rol_evaluador', 'region', 'delg_umae', 'umae', 'buscar_adscripcion', 'order_by'),
             Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
@@ -490,11 +501,11 @@ class Reporte_model extends CI_Model {
      * @return string Listado de reglas de evaluación por roles
      * 
      */
-    public function get_lista_roles_regla_evaluacion($tipo = 'normal') {
+    public function get_lista_roles_regla_evaluacion($tipo = 'normal', $all = '*') {
 
         $roles_prop = $this->config->item('prop_roles');
 //        pr($roles_prop);
-        $reglas_db = $this->get_regla_evaluacion_nombre();
+        $reglas_db = $this->get_regla_evaluacion_nombre($all);
         $result = array();
         switch ($tipo) {
             case 'normal':
@@ -515,7 +526,7 @@ class Reporte_model extends CI_Model {
         }
         return $result;
     }
-    
+
     /**
      * 
      * @return string Listado de reglas de evaluación por roles
@@ -534,7 +545,7 @@ class Reporte_model extends CI_Model {
      * @return type
      * Obtiene las reglas de evaliación, nombres e identificadores BD
      */
-    public function get_regla_evaluacion_nombre() {
+    public function get_regla_evaluacion_nombre($all = '*') {
         $select = array('reg.reglas_evaluacion_cve', 'mrlo."name"', 'rol_evaluado_cve', 'mrlr."name"',
             'rol_evaluador_cve', 'reg.tutorizado',
             "case reg.tutorizado when 1 then 'Tutorizado' when 0 then 'No tutorizado' end as text_tutorizado"
@@ -544,6 +555,10 @@ class Reporte_model extends CI_Model {
         $this->db->join('mdl_role mrlr', 'mrlr.id = reg.rol_evaluador_cve');
         $this->db->order_by('reg.tutorizado', 'desc');
         $this->db->order_by('rol_evaluador_cve', 'asc');
+        if($all == 'excepcion'){
+        $this->db->where('is_excepcion > 0');
+            
+        }
         $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
 
         return $query->result_array();

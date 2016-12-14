@@ -2356,39 +2356,6 @@ class Encuestas_model extends CI_Model {
         return $resultado;
     }
 
-    private function getReglaCursoPrioridad($parametros) {
-        if (is_null($parametros)) {
-            return array();
-        }
-        $select = array("reg.reglas_evaluacion_cve", "reg.rol_evaluado_cve", "reg.rol_evaluador_cve",
-            "reg.is_excepcion", "reg.tutorizado", "reg.is_bono", "reg.ord_prioridad",
-            "enc.encuesta_cve", "enc.eva_tipo", "reg.eval_is_satisfaccion", "enc.tipo_encuesta",
-            '0 as "rol_evaluador_real"'
-        );
-        $this->db->select($select);
-        $this->db->where_in('reg.rol_evaluador_cve', $parametros['role_evaluador']);
-        $this->db->where('reg.tutorizado', $parametros['tutorizado']);
-        $this->db->where('encc.course_cve', $parametros['cur_id']);
-        $this->db->order_by('reg.rol_evaluador_cve', 'asc'); //Importante obtrener el de mayor presedencia
-        $this->db->order_by('reg.ord_prioridad', 'asc'); //Importante obtrener el de mayor presedencia
-//        $this->db->limit(1); //Importante obtrener el de mayor presedencia
-
-        $this->db->join('encuestas.sse_encuestas enc', 'enc.reglas_evaluacion_cve=reg.reglas_evaluacion_cve');
-        $this->db->join('encuestas.sse_encuesta_curso encc', 'encc.encuesta_cve=enc.encuesta_cve');
-        $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
-
-
-        $resultado = $query->result_array();
-        $this->db->flush_cache();
-        $query->free_result(); //Libera la memoria                                
-        pr($this->db->last_query());
-//        if (!empty($resultado)) {
-//            $resultado = $resultado[0];
-//        }
-
-        return $resultado;
-    }
-
     private function getReglasRolEvaluador($parametros = null) {
         if (is_null($parametros)) {
             return array();
@@ -2417,72 +2384,7 @@ class Encuestas_model extends CI_Model {
         return $resultado;
     }
 
-    /**
-     * 
-     * @param type $parametros
-     * @return type
-     * $parametros = array de 'role_evaluador', int 'tutorizado', int 'cur_id'
-     */
-    public function getReglasEvaluacionCurso($param = null) {
-        $reglas_aplica = array();
-        $parametros = array('role_evaluador' => $param['role_evaluador'], 'tutorizado' => $param['tutorizado'], 'cur_id' => $param['cur_id']);
-        $result_prioridad = $this->getReglaCursoPrioridad($parametros); //Obtiene reglas 
-        pr($result_prioridad);
-//            exit();
-        foreach ($result_prioridad as $reglas) {//Recorre roles
-            $tmp_reg = array();
-//            $parametros = array('role_evaluador' => $rol, 'tutorizado' => $param['tutorizado'], 'cur_id' => $param['cur_id']);
-//            $result_prioridad = $this->getReglasRolEvaluador($parametros); //Obtiene reglas 
-//            $result_prioridad = $this->getReglaCursoPrioridad($parametros); //Obtiene reglas 
-//            pr($result_prioridad);
-//                pr($result_prioridad);
-            if ($reglas['is_excepcion'] == 0) {
-//                pr($reglas);
-                $tmp_reg[$reglas['rol_evaluador_cve']][$reglas['encuesta_cve']][$reglas['reglas_evaluacion_cve']] = $reglas;
-//                pr($tmp_reg);
-//                $reglas_aplica += $tmp_reg;
-            } else {
-//                        pr('<>---------------<>');
-//                        pr($reglas);
-                $where = " WHERE reg.reglas_evaluacion_cve = " . $reglas['reglas_evaluacion_cve'];
-                $query_recursive = "WITH RECURSIVE busca_excepcion AS (
-                    SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, 
-                    reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad, reg.eval_is_satisfaccion
-                    FROM encuestas.sse_reglas_evaluacion reg "
-                        . $where .
-                        " UNION all 
-                    select bex.is_excepcion, rer.rol_evaluado_cve, rer.rol_evaluador_cve, 
-                    rer.is_excepcion, rer.tutorizado, rer.is_bono, rer.ord_prioridad, rer.eval_is_satisfaccion 
-                    from busca_excepcion bex
-                    join encuestas.sse_reglas_evaluacion rer on rer.reglas_evaluacion_cve = bex.is_excepcion
-                    )
-                    select * FROM busca_excepcion order by ord_prioridad asc
-                    "
-                ;
-
-                $query = $this->db->query($query_recursive);
-//                pr($this->db->last_query());
-                $result = $query->result_array();
-                foreach ($result as $val_r) {
-                    if (!isset($tmp_reg[$val_r['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']])) {
-//                                pr($val_r);
-                        $aux_parm = $val_r;
-                        $aux_parm['encuesta_cve'] = $reglas['encuesta_cve'];
-                        $aux_parm['eva_tipo'] = $reglas['eva_tipo'];
-                        $aux_parm['tipo_encuesta'] = $reglas['tipo_encuesta'];
-                        $aux_parm['rol_evaluador_real'] = $reglas['rol_evaluador_cve'];
-//                                $tmp_reg[$val_r['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']] = $aux_parm;
-                        $tmp_reg[$reglas['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']] = $aux_parm;
-                    }
-                }
-//     
-            }
-            
-//            $reglas_aplica = array_merge ($reglas_aplica, $tmp_reg);
-            $reglas_aplica += array_merge ($reglas_aplica, $tmp_reg);
-        }
-        return $reglas_aplica;
-    }
+    
 
     /**
      * 
@@ -2729,6 +2631,101 @@ class Encuestas_model extends CI_Model {
         $query->free_result(); //Libera la memoria
 
         return $resultado;
+    }
+
+    private function getReglaCursoPrioridad($parametros) {
+        if (is_null($parametros)) {
+            return array();
+        }
+        $select = array("reg.reglas_evaluacion_cve", "reg.rol_evaluado_cve", "reg.rol_evaluador_cve",
+            "reg.is_excepcion", "reg.tutorizado", "enc.is_bono", "reg.ord_prioridad",
+            "enc.encuesta_cve", "enc.eva_tipo", "reg.eval_is_satisfaccion", "enc.tipo_encuesta",
+            '0 as "rol_evaluador_real"'
+        );
+        $this->db->select($select);
+        $this->db->where('reg.rol_evaluador_cve', $parametros['role_evaluador']);
+        $this->db->where('reg.tutorizado', $parametros['tutorizado']);
+        $this->db->where('encc.course_cve', $parametros['cur_id']);
+        $this->db->order_by('reg.ord_prioridad', 'asc'); //Importante obtrener el de mayor presedencia
+//        $this->db->limit(1); //Importante obtrener el de mayor presedencia
+
+        $this->db->join('encuestas.sse_encuestas enc', 'enc.reglas_evaluacion_cve=reg.reglas_evaluacion_cve');
+        $this->db->join('encuestas.sse_encuesta_curso encc', 'encc.encuesta_cve=enc.encuesta_cve');
+        $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
+
+
+        $resultado = $query->result_array();
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria                                
+        pr($this->db->last_query());
+//        if (!empty($resultado)) {
+//            $resultado = $resultado[0];
+//        }
+
+        return $resultado;
+    }
+
+    /**
+     * @Autor LEAS
+     * @fecha 1/12/2016
+     * @param type $parametros
+     * @return type
+     * $parametros = array de 'role_evaluador', int 'tutorizado', int 'cur_id'
+     */
+    public function getReglasEvaluacionCurso($param = null) {
+        $reglas_aplica = array();
+        foreach ($param['role_evaluador'] as $rol) {//Recorre roles
+            $parametros = array('role_evaluador' => $rol, 'tutorizado' => $param['tutorizado'], 'cur_id' => $param['cur_id']);
+//            $result_prioridad = $this->getReglasRolEvaluador($parametros); //Obtiene reglas 
+            $result_prioridad = $this->getReglaCursoPrioridad($parametros); //Obtiene reglas 
+            //pr($result_prioridad);
+            if (!empty($result_prioridad)) {
+//                pr($result_prioridad);
+                $tmp_reg = array();
+                foreach ($result_prioridad as $reglas) {
+                    if ($reglas['is_excepcion'] == 0) {
+                        $tmp_reg[$reglas['rol_evaluador_cve']][$reglas['encuesta_cve']][$reglas['reglas_evaluacion_cve']] = $reglas;
+                    } else {
+//                        pr('<>---------------<>');
+//                        pr($reglas);
+                        $where = " WHERE reg.reglas_evaluacion_cve = " . $reglas['reglas_evaluacion_cve'];
+                        $query_recursive = "WITH RECURSIVE busca_excepcion AS (
+                    SELECT reg.reglas_evaluacion_cve, reg.rol_evaluado_cve, reg.rol_evaluador_cve, 
+                    reg.is_excepcion, reg.tutorizado, reg.is_bono, reg.ord_prioridad, reg.eval_is_satisfaccion
+                    FROM encuestas.sse_reglas_evaluacion reg "
+                                . $where .
+                                " UNION all 
+                    select bex.is_excepcion, rer.rol_evaluado_cve, rer.rol_evaluador_cve, 
+                    rer.is_excepcion, rer.tutorizado, rer.is_bono, rer.ord_prioridad, rer.eval_is_satisfaccion 
+                    from busca_excepcion bex
+                    join encuestas.sse_reglas_evaluacion rer on rer.reglas_evaluacion_cve = bex.is_excepcion
+                    )
+                    select * FROM busca_excepcion order by ord_prioridad asc
+                    "
+                        ;
+
+                        $query = $this->db->query($query_recursive);
+//                        pr($this->db->last_query());
+                        $result = $query->result_array();
+                        foreach ($result as $val_r) {
+                            if (!isset($tmp_reg[$val_r['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']])) {
+//                                pr($val_r);
+                                $aux_parm = $val_r;
+                                $aux_parm['encuesta_cve'] = $reglas['encuesta_cve'];
+                                $aux_parm['eva_tipo'] = $reglas['eva_tipo'];
+                                $aux_parm['tipo_encuesta'] = $reglas['tipo_encuesta'];
+                                $aux_parm['rol_evaluador_real'] = $reglas['rol_evaluador_cve'];
+//                                $tmp_reg[$val_r['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']] = $aux_parm;
+                                $tmp_reg[$reglas['rol_evaluador_cve']][$reglas['encuesta_cve']][$val_r['reglas_evaluacion_cve']] = $aux_parm;
+                            }
+                        }
+//     
+                    }
+                }
+                $reglas_aplica += $tmp_reg;
+            }
+        }
+        return $reglas_aplica;
     }
 
 }

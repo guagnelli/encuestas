@@ -57,12 +57,21 @@
             </div>
         </div>
     <?php } ?>
-    <?php if (isset($delg_umae)) { ?>
+    <?php if (isset($delegacion)) { ?>
         <div class="col-lg-6 col-sm-6">
             <div class="panel-body  input-group input-group-sm">
                 <!--<span class="input-group-addon">Sesiones:</span>-->
-                <label for="evaluado">Delegación - UMAE evaluado</label>
-                <?php echo $this->form_complete->create_element(array('id' => 'delg_umae', 'type' => 'dropdown', 'options' => $delg_umae, 'first' => array('' => 'Seleccione delegación o UMAE'), 'attributes' => array('name' => 'categoria', 'class' => 'form-control', 'placeholder' => 'Delegación o UMAE', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Delegación o UMAE', 'onchange' => "data_ajax($url_control)"))); ?>
+                <label for="evaluado">Delegación</label>
+                <?php echo $this->form_complete->create_element(array('id' => 'delegacion', 'type' => 'dropdown', 'options' => $delegacion, 'first' => array('' => 'Seleccione delegación'), 'attributes' => array('name' => 'delegacion', 'class' => 'form-control', 'placeholder' => 'Delegación', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Delegación', 'onchange' => "data_ajax($url_control)"))); ?>
+            </div>
+        </div>
+    <?php } ?>
+    <?php if (isset($umae)) { ?>
+        <div class="col-lg-6 col-sm-6">
+            <div class="panel-body  input-group input-group-sm">
+                <!--<span class="input-group-addon">Sesiones:</span>-->
+                <label for="evaluado">UMAE</label>
+                <?php echo $this->form_complete->create_element(array('id' => 'umae', 'type' => 'dropdown', 'options' => $umae, 'first' => array('' => 'Seleccione UMAE'), 'attributes' => array('name' => 'UMAE', 'class' => 'form-control', 'placeholder' => 'UMAE', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'UMAE', 'onchange' => "data_ajax($url_control)"))); ?>
             </div>
         </div>
     <?php } ?>

@@ -21,8 +21,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Región</th>
                 <th>Delegación</th>
                 <th>Clave de Adscripción</th>
-                <?php foreach ($reglas_evaluacion as $val) { ?>
-                    <th><?php echo $val; ?></th>
+                <?php if (!empty($reglas_evaluacion)) { ?>
+                    <?php foreach ($reglas_evaluacion as $val) {
+                        ?>
+                        <th><?php echo $val; ?></th>
+                    <?php } ?>
                 <?php } ?>
 <!--<th>Opciones</th>-->
             </tr>
@@ -31,9 +34,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php foreach ($result as $key => $val) { ?>
 
                 <?php
-                $evaluado = (isset($val['name_rol_evaluado'])) ? $val['name_rol_evaluado'] : '--';
-                $bloque = (isset($val['bloque'])) ? $val['bloque'] : '--';
-                $grupo = (isset($val['mdl_groups_cve'])) ? $val['mdl_groups_cve'] : '--';
+                $grupo = isset($val['mdl_groups_cve']) ? $val['mdl_groups_cve'] : '--';
+                $bloque = isset($val['bloque']) ? $val['bloque'] : '--';
                 echo "<tr id='id_row_" . $key . "' data-keyrow=" . $key . ">";
                 echo "<td>" . $val['clave'] . "</td>";
                 echo "<td>" . $val['namec'] . "</td>";
@@ -43,23 +45,28 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 echo "<td>" . $grupo . "</td>";
                 echo "<td>" . $val['username'] . "</td>";
                 echo "<td>" . $val['name_evaluado'] . "</td>";
-                echo "<td>" . $evaluado . "</td>";
+                echo "<td>" . $val['name_rol_evaluado'] . "</td>";
                 echo "<td>" . $val['name_region'] . "</td>";
-                echo "<td>" . $val['cve_depto_adscripcion'] . "</td>";
                 echo "<td>" . $val['nom_delegacion'] . "</td>";
-                foreach ($reglas_evaluacion as $key_rol => $vp) {
-                    if (isset($result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol])) {
-                        echo "<td>" . $result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol]['promedio'] . " %</td>";
-                    } else {
-//                        echo "<td>".$val['course_cve']. ', '. $val['evaluado_user_cve'] . ', ' . $val['tutorizado'] . ', ' .$key_rol ."</td>";
-                        echo "<td> </td>";
+                echo "<td>" . $val['cve_depto_adscripcion'] . "</td>";
+                if (!empty($reglas_evaluacion)) {
+                    foreach ($reglas_evaluacion as $key_rol => $vp) {
+                        if (isset($val['mdl_groups_cve']) AND isset($val['bloque']) AND isset($result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol][$val['bloque']][$val['mdl_groups_cve']])) {
+                            echo "<td>" . $result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol][$val['bloque']][$val['mdl_groups_cve']]['promedio'] . " %</td>";
+                        } else if (isset($val['bloque']) AND isset($result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol][$val['bloque']])) {
+                            echo "<td>" . $result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol][$val['bloque']]['promedio'] . " %</td>";
+                        } else if (isset($result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol])) {
+                            echo "<td>" . $result_promedio[$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$key_rol]['promedio'] . " %</td>";
+                        } else {
+                            echo "<td> </td>";
+                        }
                     }
                 }
                 echo "<tr>";
                 ?>
             <?php } ?>
         </tbody>
-        <tfoot>
+<!--        <tfoot>
             <tr>
                 <td></td>
                 <td></td>
@@ -83,7 +90,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td></td>
                 <td></td>
             </tr>
-        </tfoot>
+        </tfoot>-->
     </table>
 </div>
 

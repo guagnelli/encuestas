@@ -63,9 +63,9 @@ class Reporte_bonos extends CI_Controller {
 //         $this->filtrosreportes_tpl->getVista(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
 
 
-        $reglas_evaluacion = $this->rep_mod->get_lista_roles_regla_evaluacion('roles');
+        $reglas_evaluacion = $this->rep_mod->get_lista_roles_regla_evaluacion('roles', 'excepcion');
         $this->session->set_userdata('reglas_evaluacion', $reglas_evaluacion);
-        $this->session->set_userdata('reglas_evaluacion', $reglas_evaluacion);
+//        $this->session->set_userdata('reglas_evaluacion', $reglas_evaluacion);
 
         $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
         $this->template->setMainTitle('Reporte de implementación');
@@ -89,6 +89,7 @@ class Reporte_bonos extends CI_Controller {
                 $data['current_row'] = $data_post['current_row'];
                 $data['per_page'] = $data_post['per_page'];
                 $data['reglas_evaluacion'] = $this->session->userdata('reglas_evaluacion');
+//                pr($data['reglas_evaluacion']);
                 //Configuracion del reporte
                 $c_r = $this->filtrosreportes_tpl->getArrayVistasReportes(FiltrosReportes_Tpl::RB_IMPLEMENTACION);
                 //Mostrar resultados
