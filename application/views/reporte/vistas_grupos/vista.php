@@ -76,11 +76,11 @@ echo form_open($controlador, array('id' => 'form_curso'));
                 <div class="row">
                     <div class="col-lg-12 col-sm-12 text-right">
                         <div class="input-group-btn" >
-                            <button type="button" id="btn_buscar_b" aria-expanded="false" class="btn btn-primary browse" title="Buscar" data-toggle="tooltip" onclick="data_ajax(<?php echo $url_control; ?>)" >
+                            <button type="button" id="btn_buscar_b" name="btn_buscar_b" aria-expanded="false" class="btn btn-primary browse" title="Buscar" data-toggle="tooltip" onclick="data_ajax(<?php echo $url_control; ?>)" >
                                 Buscar <span aria-hidden="true" class="glyphicon glyphicon-search"></span>
                             </button>
                             <?php if (!empty($exportar)) { ?>
-                                <button type="button" id="btn_export" aria-expanded="false" class="btn btn-primary browse" title="Exportar" data-toggle="tooltip" style="margin-left:10px;">
+                                <button type="button" id="btn_export" name="btn_export" aria-expanded="false" class="btn btn-primary browse" title="Exportar" data-toggle="tooltip" style="margin-left:10px;">
                                     Exportar<span aria-hidden="true" class="glyphicon glyphicon-export"></span>
                                 </button>
                                 <?php } ?>
@@ -124,7 +124,10 @@ echo form_open($controlador, array('id' => 'form_curso'));
     </div>
 
     <?php
-    echo js("busquedas/busqueda.js");
+    //echo js("busquedas/busqueda.js");
+    foreach ($js as $file_js) {
+        echo js($file_js);
+    }
     ?>
 
     <script type="text/javascript">

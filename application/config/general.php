@@ -6,6 +6,10 @@ if (!defined('BASEPATH'))
 
 $config['salt'] = "B0no5"; ///SALT
 
+$config['rol_alumno'] = array(
+    array('rol_id' => 5, 'rol_nom' => 'Alumno'),
+);
+
 $config['rol_docente'] = array(
     array('rol_id' => 14, 'rol_nom' => 'Coordinador de curso'),
     array('rol_id' => 18, 'rol_nom' => 'Coordinador de tutores'),
@@ -14,7 +18,7 @@ $config['rol_docente'] = array(
     array('rol_id' => 30, 'rol_nom' => 'Coordinador normativo')
 );
 
-$config['menu_super_admin'] = array('resultadocursoencuesta' => array('*'), 'encuestas' => array('*'), 'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 'encuestausuario' => array('*'), 'resultadocurenrealizada' => array('*'), 'pagina_no_encontrada' => array('*'));
+$config['menu_super_admin'] = array('resultadocursoencuesta' => array('*'), 'encuestas' => array('*'), 'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 'encuestausuario' => array('*'), 'resultadocurenrealizada' => array('*'), 'pagina_no_encontrada' => array('*'), 'resultadocursoindicador' => array('*'));
 $config['menu_validador'] = array('login' => array('cerrar_session', 'cerrar_session_ajax'), 'dashboard' => array('*'), 'tarjeton' => array('*'), 'pagina_no_encontrada' => array('index'), 'bonos_titular' => array('*'), 'bono_perfil_empleado' => array('*'));
 $config['menu_no_logueado'] = array('login' => array('*'));
 

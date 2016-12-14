@@ -239,7 +239,8 @@ class Template {
         if (is_null($url))
             $url = 'get_data_ajax';
         $this->CI->load->library(array('pagination', 'table'));
-        $config['base_url'] = site_url(array('reporte', $url)); //Path que se utilizará en la generación de los links
+        $path = (is_array($url)) ? $url : array('reporte', $url);
+        $config['base_url'] = site_url($path); //Path que se utilizará en la generación de los links
         //        $config['total_rows'] = $pagination_data['alumnos']['total']; //Número total de registros
         $config['total_rows'] = $pagination_data['total_empleados']; //Número total de registros $pagination_data['alumnos']['total'];
         //        $config['per_page'] = $pagination_data['per_page']; //Sobreescribir número de registros a mostrar

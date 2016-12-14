@@ -80,13 +80,13 @@ class FiltrosReportes_Tpl extends Template {
             ),
             FiltrosReportes_Tpl::RB_ENCUESTAS_DETALLE => array(
                 FiltrosReportes_Tpl::C_VIEW_FILTRO => 'reporte/detalle/detalle',
-                FiltrosReportes_Tpl::C_VIEW_RESULT => '',
+                FiltrosReportes_Tpl::C_VIEW_RESULT => 'reporte/detalle/tb_result_detalle',
                 FiltrosReportes_Tpl::C_CONTROL_FILTRO => 'reporte_detallado/index',
                 FiltrosReportes_Tpl::C_CONTROL_RESULT => '',
-                FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(),
+                FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(Reporte_model::GF_CURSO_DETALLE, Reporte_model::GF_ENCUESTA_DETALLE, Reporte_model::GF_EVALUADO_DETALLE, Reporte_model::GF_EVALUADOR_DETALLE, Reporte_model::GF_GENERAL),
                 FiltrosReportes_Tpl::C_TITULO => 'Reporte detallado',
-                FiltrosReportes_Tpl::C_TITULO => 'Reporte detallado',
-                FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/reporte_detallado/get_buscar_cursos_encuestas', '#form_reporte_detallado_implementacion', '#listado_resultado_empleado'",
+                FiltrosReportes_Tpl::C_SUBTITULO => '',
+                FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/reporte_detallado/get_buscar_cursos_encuestas', '#form_curso', '#listado_resultado_empleado'",
                 FiltrosReportes_Tpl::C_NAME_FORMULARIO => "",
                 FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "",
                 FiltrosReportes_Tpl::C_LINK_EXPORTAR => "reporte_detalle/",
@@ -122,11 +122,11 @@ class FiltrosReportes_Tpl extends Template {
 
     function getNumEspaciosVistaGrupos($grupo_vista) {
         switch ($grupo_vista) {
-            case Reporte_model::GF_EVALUADO:
+            case Reporte_model::GF_EVALUADO: case Reporte_model::GF_EVALUADO_DETALLE:
                 return 2;
             case Reporte_model::GF_EVALUADO_P:
                 return 2;
-            case Reporte_model::GF_EVALUADOR:
+            case Reporte_model::GF_EVALUADOR: case Reporte_model::GF_EVALUADOR_DETALLE:
                 return 2;
             default :
                 return 1;
@@ -209,13 +209,15 @@ class FiltrosReportes_Tpl extends Template {
             }
             $data_info['controlador'] = $prop[FiltrosReportes_Tpl::C_CONTROL_FILTRO];
             $data_info['subtitulo'] = $prop[FiltrosReportes_Tpl::C_SUBTITULO];
-            if (!is_null($data_extra)) {
+            if (!is_null($data_extra) && (isset($data_extra['curso_url']) || isset($data_extra['texto_titulo']) || isset($data_extra['curso']))) {
                 $data_info['url_control'] = $data_extra['curso_url'];
                 $data_info['text_extra'] = $data_extra['texto_titulo'];
                 $data_info['curso'] = $data_extra['curso'];
             } else {
                 $data_info['url_control'] = $prop[FiltrosReportes_Tpl::C_URL_CONTROL];
             }
+            
+            $data['js'] = (isset($data_extra['js']) && !empty($data_extra['js'])) ? $data_extra['js'] : array('busquedas/busqueda.js');
 //            pr($data_info);
             $data['vistas'] = array(); //Carga datos para ver en grupo
             $data['exportar'] = $prop[FiltrosReportes_Tpl::C_LINK_EXPORTAR]; //Carga datos para ver en grupo

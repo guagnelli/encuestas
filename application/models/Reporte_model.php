@@ -6,10 +6,14 @@ class Reporte_model extends CI_Model {
 
     const
             GF_EVALUADO = 'evaluado',
+            GF_EVALUADO_DETALLE = 'evaluado_detalle',
             GF_EVALUADO_P = 'evaluado_p',
             GF_EVALUADOR = 'evaluador',
+            GF_EVALUADOR_DETALLE = 'evaluador_detalle',
             GF_ENCUESTA = 'encuesta',
+            GF_ENCUESTA_DETALLE = 'encuesta_detalle',
             GF_CURSO = 'curso',
+            GF_CURSO_DETALLE = 'curso_detalle',
             GF_GENERAL = 'general'
 
     ;
@@ -420,10 +424,21 @@ class Reporte_model extends CI_Model {
                 $rol = $this->config->item('rol_docente');
                 return dropdown_options($rol, 'rol_id', 'rol_nom');
             case 'rol_evaluador':
-                $rol = $this->config->item('rol_docente');
+                //$rol = $this->config->item('rol_docente');
+                $rol = array_merge($this->config->item('rol_alumno'), $this->config->item('rol_docente'));
                 return dropdown_options($rol, 'rol_id', 'rol_nom');
+            case 'region':
+                $region = $this->get_general_catalogos(array('from' => 'departments.ssd_regiones', 'select' => array('name_region', 'cve_regiones')));
+                return dropdown_options($region, 'cve_regiones', 'name_region');
+            case 'umae':
+                return dropdown_options($this->get_lista_umae(), 'cve_depto_adscripcion', 'nom_dependencia');
             case 'ordenar_por': return array(
                     'nombre' => 'Nombre',
+                    'nrolevaluador' => 'Rol evaluador',
+                    'nrolevaluado' => 'Rol evaluado',
+                    'ngrupo' => 'Grupo');
+            case 'ordenar_detalle_por': return array(
+                    'descripcion_encuestas' => 'Encuesta',
                     'nrolevaluador' => 'Rol evaluador',
                     'nrolevaluado' => 'Rol evaluado',
                     'ngrupo' => 'Grupo');
@@ -457,11 +472,15 @@ class Reporte_model extends CI_Model {
     private function getDatosPorGrupo() {
         $array = array(
             Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADO_DETALLE => array('buscar_docente_evaluado', 'buscar_categoria', 'rol_evaluado', 'region', 'delg_umae', 'umae', 'buscar_adscripcion', 'order_by'),
             Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by'),
             Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_EVALUADOR_DETALLE => array('buscar_docente_evaluado', 'buscar_categoria', 'rol_evaluador', 'region', 'delg_umae', 'umae', 'buscar_adscripcion', 'order_by'),
             Reporte_model::GF_ENCUESTA => array('tipo_encuesta', 'instrumento', 'grupos_p', 'bloques_p', 'ordenar_por', 'order_by'),
+            Reporte_model::GF_ENCUESTA_DETALLE => array('tipo_encuesta', 'instrumento', 'grupos_p', 'is_bono_p', 'bloques_p', 'order_by'),
             Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),
-            Reporte_model::GF_GENERAL => array(),
+            Reporte_model::GF_CURSO_DETALLE => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'order_by'),
+            Reporte_model::GF_GENERAL => array('ordenar_detalle_por'),
         );
         return $array;
     }
@@ -495,6 +514,20 @@ class Reporte_model extends CI_Model {
                 break;
         }
         return $result;
+    }
+    
+    /**
+     * 
+     * @return string Listado de reglas de evaluación por roles
+     * 
+     */
+    public function get_lista_umae() {
+        $this->db->select("cve_depto_adscripcion, nom_dependencia||'('||cve_depto_adscripcion||')' as nom_dependencia");
+        $this->db->where("ind_umae=1 and is_umae='1'");
+        $this->db->order_by('nom_dependencia', 'asc');
+        $query = $this->db->get('departments.ssd_cat_dependencia');
+
+        return $query->result_array();
     }
 
     /**
