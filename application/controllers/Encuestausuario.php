@@ -305,6 +305,8 @@ class Encuestausuario extends CI_Controller {
                 $guardar_evaluacion = $this->enc_mod->guarda_reactivos_evaluacion($campos_evaluacion);
                 if ($guardar_evaluacion) {
                     $datos['mensaje'] = 'El registro de la evaluación ha sido guardado correctamente';
+                    $datos['idusuario']=$this->input->post('iduevaluador');
+                    $datos['idcurso']=$this->input->post('idcurso');
                     $this->session->set_flashdata('success', 'El registro de la evaluación ha sido guardado correctamente'); // devuelve mensaje flash
                     $main_contet = $this->load->view('encuesta/final', $datos, true);
                     $this->template->setMainContent($main_contet);
@@ -335,7 +337,7 @@ class Encuestausuario extends CI_Controller {
         }
     }
 
-    public function lista_encuesta_usuario() {
+    public function lista_encuesta_usuario_old14122016() {
         if ($this->input->get()) {
             $data_get = $this->input->get(null, true);
 //                pr($data_get);
@@ -364,9 +366,9 @@ class Encuestausuario extends CI_Controller {
 //                $rolescusercurso = array(14, 18, 32, 5);
                 $parametros = array('role_evaluador' => $rolescusercurso, 'tutorizado' => $tutorizado, 'cur_id' => $idcurso);
                 $reglas_validas = $this->enc_mod->getReglasEvaluacionCurso($parametros);
-                pr($reglas_validas);
+//pr($reglas_validas);
 
-                exit();
+                //exit();
 
                 foreach ($rolescusercurso as $key => $value) {
 
@@ -376,7 +378,7 @@ class Encuestausuario extends CI_Controller {
                     $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                         'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '1'));
 
-                    pr($reglas_validas);
+                    //pr($reglas_validas);
                     foreach ($reglas_validas as $keyr => $valuer) {
                         //pr($value['is_excepcion']);
                         if ($valuer['is_excepcion'] == 0) {
@@ -486,5 +488,163 @@ class Encuestausuario extends CI_Controller {
             $this->template->getTemplate();
         }
     }
+    public function lista_encuesta_usuario() {
+        if ($this->input->get()) {
+            $data_get = $this->input->get(null, true);
+//                pr($data_get);
+            $idusuario = $data_get['iduser'];
+            $idcurso = $data_get['idcurso'];
+            $sesion_valida = valida_sesion_activa($idusuario);
+            $sesion_valida = 1;
+            if ($sesion_valida) {
 
+                $datos = array();
+
+                $datos_curso = $this->cur_mod->listado_cursos(array('cur_id' => $idcurso));
+//                pr($datos_curso);
+                $tutorizado = null;
+                if (!empty($datos_curso['data'])) {
+                    $tutorizado = $datos_curso['data'][0]['tutorizado'];
+                }
+                //pr($datos_curso);
+                //var_dump($datos_curso['data'][0]['tutorizado']);
+                //$datos_roles_curso=$this->cur_mod->listar_roles_curso(array('cur_id'=>$idcurso));
+                //pr($datos_roles_curso['data']);
+                //pr(array_values($datos_roles_curso['data
+                //roles por curso por usuario
+                $rolescusercurso = $this->enc_mod->get_roles_usercurso(array('user_id' => $idusuario, 'cur_id' => $idcurso));
+                
+//                $rolescusercurso = array(14, 18, 32, 5);
+                $parametros = array('role_evaluador' => $rolescusercurso, 'tutorizado' => $tutorizado, 'cur_id' => $idcurso);
+                $reglas_validas = $this->enc_mod->getReglasEvaluacionCurso($parametros);
+                //pr($reglas_validas);
+
+                //exit();
+
+                foreach ($rolescusercurso as $key => $value) {
+
+                    //checar reglas validas con encuestas asignadas al curso
+                    //pr($value);
+
+                    $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
+                        'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '1'));
+
+                    //pr($reglas_validas);
+                    foreach ($reglas_validas as $keyr => $valuer) {
+                    
+                            $reglasgral[] = array('reglas_evaluacion_cve' => $valuer['reglas_evaluacion_cve'],
+                                'rol_evaluado_cve' => $valuer['rol_evaluado_cve'],
+                                'encuesta_cve' => $valuer['encuesta_cve'],
+                                'eva_tipo' => $valuer['eva_tipo'],
+                                'is_bono' => $valuer['is_bono'],
+                            );
+                            //pr($reglasgral);
+                 
+                    }
+                    if (isset($reglasgral)) {
+                        foreach ($reglasgral as $keyrg => $valuerg) {
+
+                            //pr($valuerg['eva_tipo']);
+
+                            if($valuerg['eva_tipo']==1)
+                                    {
+                                        echo "entra";
+                                        //por grupo
+                                         $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario, 'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuer['rol_evaluado_cve']));
+                                
+                                        //pr($datos_usuario);
+                                        if (isset($datos_usuario) || isset($datos_curso) || !empty($datos_usuario) || !empty($datos_curso)) 
+                                        {
+                                            //pr($datos_usuario);
+                                            foreach ($datos_usuario as $key => $value) {
+
+                                                //role evaluador
+                                                $role_evaluador = $value['cve_rol'];
+                                                pr($role_evaluador);
+                                                //grupo del evaluador
+                                                $gpo_evaluador = $value['cve_grupo']; # code...
+                                                //pr($gpo_evaluador);
+
+
+
+
+                                                $datos_user_aeva[] = $this->enc_mod->listado_eval(array('gpo_evaluador' => $gpo_evaluador, 'role_evaluado' => $valuer['rol_evaluado_cve'],
+                                                    'cur_id' => $idcurso, 'encuesta_cve' => $valuer['encuesta_cve'],
+                                                    'evaluador_user_cve' => $idusuario,
+                                                    'role_evaluador' => $role_evaluador,'eva_tipo' => $valuer['eva_tipo'])
+                                                );
+
+                                               
+                                           }  
+                                       }
+                                    }
+                                    elseif ($valuer['eva_tipo'] == 2) 
+                                    {
+                                       
+                                       echo "entra2";//por bloque   # code...
+                                        $datos_usuario_bloque = $this->enc_mod->get_datos_usuarios_bloque(array('user_id' => $idusuario, 'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuer['rol_evaluado_cve']));
+                                        //pr($datos_usuario_bloque);
+
+                                         if (isset($datos_usuario_bloque) || isset($datos_curso) || !empty($datos_usuario_bloque) || !empty($datos_curso)) 
+                                        {
+                                            foreach ($datos_usuario_bloque as $keyb => $valueb) {
+
+                                            
+                                            $role_evaluador = $valueb['cve_rol'];
+                                            $bloque_evaluador = $valueb['bloque']; # code...  
+                                             
+
+                                            $datos_user_aeva[] = $this->enc_mod->listado_eval(array('bloque_evaluador' => $bloque_evaluador, 
+                                                    'role_evaluado' => $valuer['rol_evaluado_cve'],
+                                                    'cur_id' => $idcurso, 'encuesta_cve' => $valuerg['encuesta_cve'],
+                                                    'evaluador_user_cve' => $idusuario,
+                                                    'role_evaluador' => $role_evaluador,'eva_tipo' => $valuer['eva_tipo'])
+                                                );  
+                                                                                      
+                                           }  
+                                       }
+
+                                        
+                                    }
+                                    else
+                                    {
+                                        //por usuario
+                                        $datos_user_aeva[] = $this->enc_mod->listado_eval(array('role_evaluado' => $valuer['rol_evaluado_cve'],
+                                    'cur_id' => $idcurso, 'encuesta_cve' => $valuer['encuesta_cve'],
+                                    'evaluador_user_cve' => $idusuario, 'role_evaluador' => $value));
+                                    }
+
+
+                            # code...
+                        }
+                        $datos['datos_user_aeva'] = $datos_user_aeva;
+                    }
+
+
+//                    pr($datos_user_aeva);
+                    # code...
+                }
+
+                //pr($datos_user_aeva);
+                $datos['datos_curso'] = $datos_curso;
+                //$datos['datos_usuario']=$datos_usuario;
+                //$datos['datos_user_aeva'];
+                //pr( $datos);
+                $datos['iduevaluador'] = $idusuario;
+
+
+
+
+
+
+                # code...
+            } else {//Muestra mensaje que no hay permisos
+                $datos['coment_general'] = 'El usuario actual no cuenta con permisos para ver el curso actual. '
+                        . '<br><br>Por favor verifique la ruta o inicie sesión nuevamente ';
+            }
+            $main_contet = $this->load->view('encuesta/lista_usuarios', $datos, true);
+            $this->template->setMainContent($main_contet);
+            $this->template->getTemplate();
+        }
+    }
 }

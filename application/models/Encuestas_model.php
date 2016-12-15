@@ -1628,7 +1628,7 @@ class Encuestas_model extends CI_Model {
             $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_groups.name as ngpo, 
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
-                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
+                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
                     and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
 
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
@@ -1641,7 +1641,7 @@ class Encuestas_model extends CI_Model {
             $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role,' . $params['gpo_evaluador'] . ' as ngpo,
               (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
-                    (select evaluacion_resul_cve from encuestas.sse_result_evaluacion where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
+                    (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
                         and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado';
 
 
@@ -1665,7 +1665,7 @@ class Encuestas_model extends CI_Model {
           $resultado = $query->result_array();
 
           } */
-        pr($this->db->last_query());
+        //pr($this->db->last_query());
         $resultado = $query->result_array();
         //$this->db->flush_cache();
         //$query->free_result(); //Libera la memoria                                
@@ -1694,7 +1694,7 @@ class Encuestas_model extends CI_Model {
         return $resultado;
     }
 
-    public function guarda_reactivos_evaluacion($params = null) {
+    public function guarda_reactivos_evaluacion_old($params = null) {
 
         $ob_si = 0;
         $ob_no = 0;
@@ -1750,29 +1750,7 @@ class Encuestas_model extends CI_Model {
             //pr($query);
             if ($query->num_rows() == 0) {
 
-                $pregresp = $this->get_pregunta_respuesta($pregunta, $respuesta);
-
-                if ($pregresp[0]['obligada'] == 1) {
-                    if ($pregresp[0]['ponderacion'] == 1) {
-
-
-                        $ob_si++;
-                    } else {
-
-
-                        $ob_no++;
-                    }
-                } else {
-                    if ($pregresp[0]['ponderacion'] == 1) {
-
-
-                        $notob_si++;
-                    } else {
-
-
-                        $notob_no++;
-                    }         # code...
-                }
+                             
 
 
                 $this->db->insert('encuestas.sse_evaluacion', $data);
@@ -1815,6 +1793,8 @@ class Encuestas_model extends CI_Model {
             'base' => $promedio[0]['base_reg'],
             'calif_emitida' => $promedio[0]['porcentaje']
         );
+
+
         $this->db->insert('encuestas.sse_result_evaluacion_encuesta_curso', $datares);
 
 
@@ -1838,6 +1818,134 @@ class Encuestas_model extends CI_Model {
         //$insert_id = $this->db->insert_id();
         //return $insert_id;
     }
+
+    public function guarda_reactivos_evaluacion($params = null) {
+
+//        pr($params);
+//        exit();
+        $encuesta_cve = $params['encuesta_cve'];
+        $course_cve = $params['curso_cve'];
+        $group_id = $params['grupo_cve'];
+        $evaluado_user_cve = $params['evaluado_user_cve'];
+        $evaluador_user_cve = $params['evaluador_user_cve'];
+        $evaluado_rol_cve = $params['evaluado_rol_id'];
+        $evaluador_rol_cve = $params['evaluador_rol_id'];
+        $is_bono = $params['is_bono'];
+
+        $data = array(
+            'encuesta_cve' => $encuesta_cve,
+            'course_cve' => $course_cve,
+            'group_id' => $group_id,
+            'evaluado_user_cve' => $evaluado_user_cve,
+            'evaluado_rol_id' => $evaluado_rol_cve,
+            'evaluador_user_cve' => $evaluador_user_cve,
+            'evaluador_rol_id' => $evaluador_rol_cve,
+        );
+//        pr($params);
+
+        $this->db->trans_begin(); // inicio de transaccion
+        //pr($params['reactivos']);
+        foreach ($params['reactivos'] as $key => $value) {
+            $pregunta = $key;
+            $respuesta = $value;
+
+            $data ['preguntas_cve'] = $pregunta;
+            $data ['reactivos_cve'] = $respuesta;
+            $data ['respuesta_abierta'] = $params['respuesta_abierta'];
+            $data ['fecha'] = $params['fecha'];
+
+            $this->db->where('encuesta_cve', $params['encuesta_cve']);
+            $this->db->where('evaluado_user_cve', $params['evaluado_user_cve']);
+            $this->db->where('evaluador_user_cve', $params['evaluador_user_cve']);
+            $this->db->where('course_cve', $params['curso_cve']);
+            $this->db->where('group_id', $params['grupo_cve']);
+            $this->db->where('preguntas_cve', $pregunta);
+            //$this->db->where('reactivos_cve', $respuesta);
+
+            $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
+            //pr($query);
+            if ($query->num_rows() == 0) {
+
+                $pregresp = $this->get_pregunta_respuesta($pregunta, $respuesta);
+                $this->db->insert('encuestas.sse_evaluacion', $data);
+            }
+        }
+
+        $validacion = $this->get_validar_encuesta_contestada($data, 'promedio');
+        if ($validacion <1) {//Valida 
+
+            //curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
+            $parametrosp = array(
+                'curso_cve' => $course_cve,
+                'grupo_cve' => $group_id,
+                'evaluado_user_cve' => $evaluado_user_cve,
+                'evaluado_rol_id' => $evaluado_rol_cve,
+                'evaluador_rol_id' => $evaluador_rol_cve,
+                'evaluador_user_cve' => $evaluador_user_cve,
+                'encuesta_cve' => $encuesta_cve,
+                'is_bono' => $is_bono)
+            ;
+
+            $promedio = $this->get_promedio_encuesta_encuesta($parametrosp);
+//        pr($promedio);
+            //GUARDAR EN RESUL_ENCUESTA
+            $datares = array(
+                'encuesta_cve' => $encuesta_cve,
+                'course_cve' => $course_cve,
+                'group_id' => $group_id,
+                'evaluado_user_cve' => $evaluado_user_cve,
+                'evaluador_user_cve' => $evaluador_user_cve,
+                'total_puntua_si' => $promedio[0]['puntua_reg'],
+                'total_nos' => $promedio[0]['total_no'],
+                'total_no_puntua_napv' => $promedio[0]['total_no_aplica_cuenta_promedio'],
+                'total_reactivos_bono' => $promedio[0]['total'],
+                'base' => $promedio[0]['base_reg'],
+                'calif_emitida' => $promedio[0]['porcentaje']
+            );
+            $this->db->insert('encuestas.sse_result_evaluacion_encuesta_curso', $datares);
+        }
+
+        $this->db->trans_complete();
+        if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+            $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+
+            return false;
+        } else {
+
+            $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+            return true;
+        }
+
+        //$this->db->insert('encuestas.sse_evaluacion', $data);
+        //$insert_id = $this->db->insert_id();
+        //return $insert_id;
+    }
+
+    public function get_validar_encuesta_contestada($params, $tipo = 'respuestas') {
+        if ($tipo == 'respuestas') {
+            $where = array(
+                'encuesta_cve', 'course_cve ', 'group_id', 'evaluado_user_cve',
+                'evaluador_user_cve', 'evaluado_rol_id', 'evaluador_rol_id'
+            );
+            $from = 'encuestas.sse_evaluacion';
+        } else if ($tipo == 'promedio') {
+            $where = array(
+                'encuesta_cve', 'course_cve', 'group_id', 'evaluado_user_cve',
+                'evaluador_user_cve'
+            );
+            $from = 'encuestas.sse_result_evaluacion_encuesta_curso';
+        }
+        foreach ($where as $val) {
+            $this->db->where($val, $params[$val]);
+        }
+        $query = $this->db->get($from);
+        //pr($this->db->last_query());
+        return $query->num_rows();
+    }
+
+
+
+
 
     public function get_pregunta_respuesta($pregunta = null, $respuesta = null) {
 
@@ -2466,7 +2574,7 @@ class Encuestas_model extends CI_Model {
 //        pr($string_query);
         $query = $this->db->query($string_query);
         $result = $query->result_array();
-        pr($this->db->last_query());
+        //pr($this->db->last_query());
 //        pr($result);
         return $result;
     }
@@ -2657,7 +2765,7 @@ class Encuestas_model extends CI_Model {
         $resultado = $query->result_array();
         $this->db->flush_cache();
         $query->free_result(); //Libera la memoria                                
-        pr($this->db->last_query());
+        //pr($this->db->last_query());
 //        if (!empty($resultado)) {
 //            $resultado = $resultado[0];
 //        }
