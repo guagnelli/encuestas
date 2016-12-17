@@ -145,11 +145,13 @@ class Reporte_bonos extends CI_Controller {
             $data['reglas_evaluacion'] = $this->session->userdata('reglas_evaluacion');
 
             $filename = "ExportReporteImplementacion_" . date("d-m-Y_H-i-s") . ".xls";
-            header("Content-Type: application/vnd.ms-excel;charset=UTF-8");
+            header("Content-Type: application/vnd.ms-excel; charset=UTF-8;");
+//            header("Content-Type: application/octet-stream; charset=UTF-8;");
             header("Content-Encoding: UTF-8");
             header("Content-Disposition: attachment; filename=$filename");
             header("Pragma: no-cache");
             header("Expires: 0");
+            echo "\xEF\xBB\xBF"; // UTF-8 BOM
             echo $this->load->view('reporte/bonos/tb_result_bnos', $data, TRUE);
 //            $this->load->view('reporte/listado_usuariosrep_xsl', $data);
             //Mostrar resultados
