@@ -85,4 +85,5 @@ update departments.ssd_cat_dependencia set is_umae = 0;
 update departments.ssd_cat_dependencia set is_umae = 1 where cve_depto_adscripcion like '%0000' and ind_umae=1;
 
 ---Agreagar a departamentos región Ejecución Jesús Díaz  13/12/2016
-
+-- Agregar "default current_timestamp" a tala encuestas.sse_evaluacion
+alter table encuestas.sse_evaluacion alter column fecha set default current_timestamp;
