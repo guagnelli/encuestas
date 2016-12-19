@@ -133,6 +133,7 @@ class Reporte_bonos extends CI_Controller {
             $data_post = $this->input->post();
 //                pr($data_post);
             $data_post['current_row'] = 0;
+            unset($data_post['per_page']);
             $data = array();
             $resultado = $this->rbi_mod->get_reporte_bonos_implementacion($data_post);
             $data['total'] = $resultado['total'];
@@ -141,7 +142,7 @@ class Reporte_bonos extends CI_Controller {
             $data['result_promedio'] = $resultado['result_promedio']['datos'];
             $data['num_rows'] = $resultado['num_rows'];
             $data['current_row'] = $data_post['current_row'];
-            $data['per_page'] = $data_post['per_page'];
+//            $data['per_page'] = $data_post['per_page'];
             $data['reglas_evaluacion'] = $this->session->userdata('reglas_evaluacion');
 
             $filename = "ExportReporteImplementacion_" . date("d-m-Y_H-i-s") . ".xls";

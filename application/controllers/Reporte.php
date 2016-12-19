@@ -255,6 +255,37 @@ class Reporte extends CI_Controller {
             </script>';
     }
 
+    public function exportar_datos($current_row = null) {
+        if (!is_null($this->input->post())) { //Se verifica que se haya recibido información por método post
+//aqui va la nueva conexion a la base de datos del buscador
+//Se guarda lo que se busco asi como la matricula de quien realizo la busqueda
+            $filtros = $this->input->post();
+            unset($filtros['per_page']);
+//            pr($filtros);
+//            exit();
+            $filtros['current_row'] = 0;
+
+//pr($filtros);
+            $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+            $data = $filtros;
+            $data['total_empleados'] = $resultado['total'];
+            $data['empleados'] = $resultado['data'];
+            $data['current_row'] = $filtros['current_row'];
+            $data['per_page'] = $this->input->post('per_page');
+
+            $filename = "ExportReportePuntosBonos" . date("d-m-Y_H-i-s") . ".xls";
+            header("Content-Type: application/vnd.ms-excel; charset=UTF-8;");
+//            header("Content-Type: application/octet-stream; charset=UTF-8;");
+            header("Content-Encoding: UTF-8");
+            header("Content-Disposition: attachment; filename=$filename");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            echo "\xEF\xBB\xBF"; // UTF-8 BOM
+            echo $this->load->view('reporte/listado_usuariosenc', $data, TRUE);
+//          
+        }
+    }
+
     public function lista_anios($anio_inicio, $anio_fin) {
         $anios = array();
         for ($anio = $anio_inicio; $anio <= $anio_fin; $anio++) {
