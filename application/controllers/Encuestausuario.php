@@ -477,7 +477,6 @@ class Encuestausuario extends CI_Controller {
 
 
 
-
                 # code...
             } else {//Muestra mensaje que no hay permisos
                 $datos['coment_general'] = 'El usuario actual no cuenta con permisos para ver el curso actual. '
