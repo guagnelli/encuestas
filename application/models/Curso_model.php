@@ -239,18 +239,28 @@ class Curso_model extends CI_Model {
      * $result['max_boque'] = 5;
      */
     function getGruposBloques($param) {
-        $ind_ct = "(select max(concat(u.firstname,' ', u.lastname,' (',u.username,')')) 
-                    FROM public.mdl_user u 
-                    JOIN public.mdl_role_assignments ra ON ra.userid = u.id 
-                    JOIN public.mdl_context ct ON ct.id = ra.contextid 
-                    JOIN public.mdl_course c ON c.id = ct.instanceid 
-                    JOIN public.mdl_role r ON r.id = ra.roleid 
-                    RIGHT JOIN public.mdl_groups g ON g.courseid = c.id 
-                    RIGHT JOIN public.mdl_groups_members gm ON gm.userid = u.id AND gm.groupid = g.id 
-                    JOIN public.mdl_enrol en ON en.courseid = c.id 
-                    JOIN public.mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id 
-                    where c.id = vdc.idc and r.id=18 and g.id=mdlg.id) as ct_bloque 
-                 ";
+//        $ind_ct = "(select max(concat(u.firstname,' ', u.lastname,' (',u.username,')')) 
+//                    FROM public.mdl_user u 
+//                    JOIN public.mdl_role_assignments ra ON ra.userid = u.id 
+//                    JOIN public.mdl_context ct ON ct.id = ra.contextid 
+//                    JOIN public.mdl_course c ON c.id = ct.instanceid 
+//                    JOIN public.mdl_role r ON r.id = ra.roleid 
+//                    RIGHT JOIN public.mdl_groups g ON g.courseid = c.id 
+//                    RIGHT JOIN public.mdl_groups_members gm ON gm.userid = u.id AND gm.groupid = g.id 
+//                    JOIN public.mdl_enrol en ON en.courseid = c.id 
+//                    JOIN public.mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id 
+//                    where c.id = vdc.idc and r.id=18 and g.id=mdlg.id) as ct_bloque 
+//                 ";
+        $ind_ct = "(SELECT concat(muser.firstname,' ', muser.lastname,' (',muser.username,')')
+                        FROM tutorias.mdl_userexp expe
+                        JOIN public.mdl_user muser ON muser.id= expe.userid 
+                        JOIN public.mdl_role mr ON mr.id= expe.role and mr.id IN(18)
+                        JOIN public.mdl_groups mg ON mg.id=expe.grupoid 
+                        JOIN public.mdl_course c ON c.id=expe.cursoid
+                        WHERE 
+                        expe.cursoid = vdc.idc
+                        and mg.id = mdlg.id
+                    ) as ct_bloque";
 
         $select = array(
             'vdc.idc', 'vdc.clave',

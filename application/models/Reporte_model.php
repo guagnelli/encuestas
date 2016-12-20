@@ -466,7 +466,7 @@ class Reporte_model extends CI_Model {
                 return $temp_grupo;
             case 'bloques_p': return array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5');
             case 'is_bono_p': return array(1 => 'Si', 0 => 'No');
-            case 'is_bloque_o_grupo': return array('' => 'Seleccione agrupamiento', 'bloque' => 'Por bloque', 'grupo' => 'Por grupo');
+            case 'is_bloque_o_grupo': return array('' => 'Seleccione agrupamiento', 'bloque' => 'Por bloque'/*, 'grupo' => 'Por grupo'*/);
             case 'tipo_implementacion': return array(1 => 'Tutorizado', 0 => 'No tutorizado');
             case 'tipo_course':
                 $tipo_course = $this->config->item('tipo_curso_DCG');

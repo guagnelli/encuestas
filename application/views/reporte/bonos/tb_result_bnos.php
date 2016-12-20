@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Tipo implementación</th>
                 <th>Tipo</th>
                 <th>Bloque</th>
-                <th>Grupo</th>
+                <!--<th>Grupo</th>-->
                 <th>Matricula</th>
                 <th>Nombre evaluado</th>    
                 <th>Rol evaluado</th>
@@ -42,7 +42,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 echo "<td>" . $val['tipo_curso'] . "</td>";
                 echo "<td>" . $val['tex_tutorizado'] . "</td>";
                 echo "<td>" . $bloque . "</td>";
-                echo "<td>" . $grupo . "</td>";
+//                echo "<td>" . $grupo . "</td>";
                 echo "<td>" . $val['username'] . "</td>";
                 echo "<td>" . $val['name_evaluado'] . "</td>";
                 echo "<td>" . $val['name_rol_evaluado'] . "</td>";

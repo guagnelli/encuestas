@@ -72,9 +72,6 @@ WITH (
 	OIDS=FALSE
 );
 
-ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN
-ALTER TABLE departments.ssd_cat_dependencia ADD COLUMN is_umae char(1) null;
-
 alter table departments.ssd_cat_delegacion add column cve_regiones int4;
 alter table departments.ssd_cat_delegacion add
   CONSTRAINT fkcve_regiones
