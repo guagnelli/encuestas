@@ -133,6 +133,7 @@ class Reporte_bonos extends CI_Controller {
             $data_post = $this->input->post();
 //                pr($data_post);
             $data_post['current_row'] = 0;
+            unset($data_post['per_page']);
             $data = array();
             $resultado = $this->rbi_mod->get_reporte_bonos_implementacion($data_post);
             $data['total'] = $resultado['total'];
@@ -141,15 +142,17 @@ class Reporte_bonos extends CI_Controller {
             $data['result_promedio'] = $resultado['result_promedio']['datos'];
             $data['num_rows'] = $resultado['num_rows'];
             $data['current_row'] = $data_post['current_row'];
-            $data['per_page'] = $data_post['per_page'];
+//            $data['per_page'] = $data_post['per_page'];
             $data['reglas_evaluacion'] = $this->session->userdata('reglas_evaluacion');
 
             $filename = "ExportReporteImplementacion_" . date("d-m-Y_H-i-s") . ".xls";
-            header("Content-Type: application/vnd.ms-excel;charset=UTF-8");
+            header("Content-Type: application/vnd.ms-excel; charset=UTF-8;");
+//            header("Content-Type: application/octet-stream; charset=UTF-8;");
             header("Content-Encoding: UTF-8");
             header("Content-Disposition: attachment; filename=$filename");
             header("Pragma: no-cache");
             header("Expires: 0");
+            echo "\xEF\xBB\xBF"; // UTF-8 BOM
             echo $this->load->view('reporte/bonos/tb_result_bnos', $data, TRUE);
 //            $this->load->view('reporte/listado_usuariosrep_xsl', $data);
             //Mostrar resultados

@@ -18,7 +18,18 @@ $config['rol_docente'] = array(
     array('rol_id' => 30, 'rol_nom' => 'Coordinador normativo')
 );
 
-$config['menu_super_admin'] = array('resultadocursoencuesta' => array('*'), 'encuestas' => array('*'), 'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 'encuestausuario' => array('*'), 'resultadocurenrealizada' => array('*'), 'pagina_no_encontrada' => array('*'), 'resultadocursoindicador' => array('*'));
+$config['menu_super_admin'] = array('resultadocursoencuesta' => array('*'), 'encuestas' => array('*'), 
+    'dashboard' => array('*'), 'curso' => array('*'), 'modal' => array('*'), 
+    'cursoencuesta' => array('*'), 'email' => array('*'), 'evaluacion' => array('*'), 
+    'encuestasusuario' => array('*'), 'resultadocurso' => array('*'), 'reporte' => array('*'), 
+    'grupo' => array('*'), 'login' => array('*'), 'seccion' => array('*'), 
+    'encuestausuario' => array('*'), 'resultadocurenrealizada' => array('*'), 
+    'pagina_no_encontrada' => array('*'), 'resultadocursoindicador' => array('*'),
+    'reporte_bonos' => array('*'), 
+    'reporte_detallado' => array('*'), 
+    'reporte_general' => array('*'), 
+);
+
 $config['menu_validador'] = array('login' => array('cerrar_session', 'cerrar_session_ajax'), 'dashboard' => array('*'), 'tarjeton' => array('*'), 'pagina_no_encontrada' => array('index'), 'bonos_titular' => array('*'), 'bono_perfil_empleado' => array('*'));
 $config['menu_no_logueado'] = array('login' => array('*'));
 

@@ -62,8 +62,9 @@ class FiltrosReportes_Tpl extends Template {
                 FiltrosReportes_Tpl::C_TITULO => 'Resumen de bonos',
                 FiltrosReportes_Tpl::C_SUBTITULO => '', //'Listado de encuestas',
                 FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/reporte/get_data_ajax2', '#form_curso', '#listado_resultado_empleado'",
-                FiltrosReportes_Tpl::C_NAME_FORMULARIO => "",
-                FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "",
+                FiltrosReportes_Tpl::C_NAME_FORMULARIO => "#form_curso",
+                FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "#listado_resultado_empleado",
+                FiltrosReportes_Tpl::C_LINK_EXPORTAR => "reporte/exportar_datos",
             ),
             FiltrosReportes_Tpl::RB_IMPLEMENTACION => array(
                 FiltrosReportes_Tpl::C_VIEW_FILTRO => 'reporte/bonos/bonos',

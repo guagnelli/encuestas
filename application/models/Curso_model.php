@@ -226,4 +226,119 @@ class Curso_model extends CI_Model {
         return $resultado;
     }
 
+    /**
+     * 
+     * @author LEAS 
+     * @fecha LEAS 
+     * @param type $param where de la consulta, caso de uso en especial es el 
+     * identificador del curso y su valor ejem. "array('vdc.idc'=>838)"
+     * @return type Grupos abiertos en el curso, maximo valor de 
+     * bloque (numerico entero si existe, si no, retorna cero) y total de registros(grupos)
+     * $result['grupos'] = $query->result_array();
+     * $result['total_grupos'] = 20;
+     * $result['max_boque'] = 5;
+     */
+    function getGruposBloques($param) {
+        $ind_ct = "(select max(concat(u.firstname,' ', u.lastname,' (',u.username,')')) 
+                    FROM public.mdl_user u 
+                    JOIN public.mdl_role_assignments ra ON ra.userid = u.id 
+                    JOIN public.mdl_context ct ON ct.id = ra.contextid 
+                    JOIN public.mdl_course c ON c.id = ct.instanceid 
+                    JOIN public.mdl_role r ON r.id = ra.roleid 
+                    RIGHT JOIN public.mdl_groups g ON g.courseid = c.id 
+                    RIGHT JOIN public.mdl_groups_members gm ON gm.userid = u.id AND gm.groupid = g.id 
+                    JOIN public.mdl_enrol en ON en.courseid = c.id 
+                    JOIN public.mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id 
+                    where c.id = vdc.idc and r.id=18 and g.id=mdlg.id) as ct_bloque 
+                 ";
+
+        $select = array(
+            'vdc.idc', 'vdc.clave',
+            'cbg.bloque', 'mdlg.id', 'mdlg."name"', $ind_ct
+        );
+        $group_by = array(
+            'vdc.idc, vdc.clave',
+            'cbg.bloque', 'mdlg.id', 'mdlg."name"'
+        );
+        $this->db->start_cache(); //Inicio cache -------------------------------
+
+        $this->db->join('public.mdl_groups mdlg', 'mdlg.courseid = vdc.idc');
+        $this->db->join('encuestas.sse_curso_bloque_grupo cbg', 'cbg.course_cve = vdc.idc and cbg.mdl_groups_cve = mdlg.id', 'left');
+        foreach ($param as $key => $value) {
+            $this->db->where($key, $value);
+        }
+
+        $this->db->stop_cache(); //Fin cache ------------------------------------
+        $num_rows = $this->db->query($this->db->select('count(*) as total')->get_compiled_select('encuestas.view_datos_curso vdc'))->result_array();
+        $this->db->reset_query(); //Reset de query 
+        $max_bloque = $this->db->query($this->db->select('max(cbg.bloque) as max_bloque')->get_compiled_select('encuestas.view_datos_curso vdc'))->result_array();
+        $this->db->reset_query(); //Reset de query 
+        //Agrega los agrupamientos
+        foreach ($group_by as $g) {
+            $this->db->group_by($g);
+        }
+        //Agrega el order by
+        $this->db->order_by('mdlg."name"');
+//      pr($max_bloque);
+//      pr($num_rows);
+        $this->db->select($select);
+        $query = $this->db->get('encuestas.view_datos_curso vdc');
+        $result['grupos'] = $query->result_array();
+        $result['total_grupos'] = $num_rows[0]['total'];
+        $result['max_boque'] = (!empty($max_bloque[0]['max_bloque'])) ? $max_bloque[0]['max_bloque'] : 0;
+        return $result;
+    }
+
+    public function detalle_curso($where) {
+        $select = array('vdc.idc', "CONCAT(vdc.clave,'-',vdc.namec) as name_curso", 'vdc.tex_tutorizado', 'vdc.tipo_curso');
+        $this->db->select($select);
+        foreach ($where as $campo => $idc) {
+            $this->db->where($campo, $idc);
+        }
+        $query = $this->db->get('encuestas.view_datos_curso vdc');
+        $this->db->reset_query();
+        return $query->result_array();
+    }
+
+    public function insertUpdate_CursoBloqueGrupo($post) {
+        if (!isset($post['curso']) AND empty($post['curso']) AND ! is_numeric($post['curso'])) {
+            return 0;
+        }
+        $curso = $post['curso'];
+        $max_bloque = $post['max_bloques'];
+        unset($post['curso']);
+        unset($post['max_bloques']);
+        $this->db->trans_begin();
+        foreach ($post as $key => $value) {
+            $explode = explode("_", $key);
+            $grup = $explode[1];
+            $result = $this->get_existBloqueGrupo(array('course_cve' => $curso, 'mdl_groups_cve' => $grup));
+            if (!empty($result)) {//Actualización
+                $this->db->where('course_cve', $curso);
+                $this->db->where('mdl_groups_cve', $grup);
+                $this->db->update('encuestas.sse_curso_bloque_grupo', array('bloque' => $value));
+            } else {//Inserta
+                $datos = array('course_cve' => $curso, 'mdl_groups_cve' => $grup, 'bloque' => $value);
+                $this->db->insert('encuestas.sse_curso_bloque_grupo', $datos); //Almacena usuario
+            }
+        }
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return 0;
+        } else {
+            $this->db->trans_commit();
+            return 1;
+        }
+    }
+
+    public function get_existBloqueGrupo($where) {
+        foreach ($where as $key => $value) {
+            $this->db->where($key, $value);
+        }
+        $query = $this->db->get('encuestas.sse_curso_bloque_grupo');
+        $result = $query->result_array();
+        return $result;
+    }
+
 }

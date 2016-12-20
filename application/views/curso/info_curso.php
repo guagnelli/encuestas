@@ -84,7 +84,7 @@
         </div>
         <div class="panel-body">
             <div class="row">            
-                <div class="col-xs-12 col-sm-8 col-md-8">
+                <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="col-xs-12 col-md-12">
                         <h3>Roles que participan en la implementación:</h3><br>
                         <div class="list-group">
@@ -161,21 +161,31 @@
 
                 </div>
 
-                <div class="col-xs-12 col-sm-4 col-md-4">
-                    <h3>Grupos de implementación</h3>
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <h3>Grupos de implementación <?php echo $total_grupos; ?></h3>
                     <div class="list-group">
-                        <div class="list-group-item left" style="width:30%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">Bloque</div>
-                        <div class="list-group-item right" style="width:70%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">Grupo</div>
-                        <?php
-                        foreach ($grupos['data'] as $row) {
-                            ?>
-                            <div class="list-group-item left" style="width:30%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;"><?php echo rand(1, 4); ?></div>
-                            <div class="list-group-item right" data-groupId="<?php echo $row['grup_id']; ?>" style="width:70%; vertical-align: middle; height: 100%; line-height:100%; vertical-align: middle;">
-                                <?php echo $row['grup_nom']; ?>
-                            </div>
-                            <?php
-                        }
-                        ?>
+                        <table class="table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Bloque</th>
+                                    <th>Grupo</th>
+                                    <th>CT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                foreach ($grupos as $row) {
+                                    $bloquespr = (!empty($row['bloque'])) ? $row['bloque'] : '--';
+                                    $ct = (!empty($row['ct_bloque'])) ? $row['ct_bloque'] : '--';
+                                    echo '<tr>';
+                                    echo '<td>' . $bloquespr . '</td>';
+                                    echo '<td data-groupId="' . $row['id'] . '">' . $row['name'] . '</td>';
+                                    echo '<td>' . $ct . '</td>';
+                                    echo '</tr>';
+                                }
+                                ?>
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
