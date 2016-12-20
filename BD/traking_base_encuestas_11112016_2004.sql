@@ -84,3 +84,8 @@ update departments.ssd_cat_dependencia set is_umae = 1 where cve_depto_adscripci
 ---Agreagar a departamentos región Ejecución Jesús Díaz  13/12/2016
 -- Agregar "default current_timestamp" a tala encuestas.sse_evaluacion
 alter table encuestas.sse_evaluacion alter column fecha set default current_timestamp;
+
+--Agregar columna para guardar grupos que califican a CT 20/12/2016  ejecución Luis, pedido por Jesús, Hilda y Elizabeth
+alter table encuestas.sse_evaluacion add column grupos_ids_text varchar(256);
+alter table encuestas.sse_result_evaluacion_encuesta_curso add column grupos_ids_text varchar(256);
+
