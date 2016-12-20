@@ -325,7 +325,8 @@ $config['TIPO_INSTRUMENTOV'] = array(
 
 $config['EVA_TIPO'] = array(
     'POR_GRUPO' => array('valor' => 1, 'text' => 'Por grupo'),
-    'POR_USUARIO' => array('valor' => 2, 'text' => 'Por usuario'),
+    'POR_BLOQUE' => array('valor' => 2, 'text' => 'Por bloque'),
+    'POR_USUARIO' => array('valor' => 3, 'text' => 'Por usuario'),
 );
 
 
