@@ -1415,7 +1415,7 @@ class Encuestas_model extends CI_Model {
 
 
             $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
-            pr($this->db->last_query());
+            //pr($this->db->last_query());
         } else {
             //Buscar en sied
             /* select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, 
@@ -1455,7 +1455,7 @@ class Encuestas_model extends CI_Model {
 
             $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
 
-            pr($this->db->last_query());
+            //pr($this->db->last_query());
         }
 
 
@@ -1619,7 +1619,7 @@ class Encuestas_model extends CI_Model {
         if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {
 
 
-            $this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
+            //$this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
             //$this->db->where('tutorias.mdl_userexp.role',$params['role_evaluado']);
             $this->db->where('tutorias.mdl_userexp.grupoid', $params['gpo_evaluador']);
 
@@ -1634,6 +1634,40 @@ class Encuestas_model extends CI_Model {
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
             $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
             $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+        }
+        elseif (isset($params['bloque_evaluador']) && !empty($params['bloque_evaluador'])) {
+        /*SELECT "public"."mdl_user"."firstname", "public"."mdl_user"."lastname", "public"."mdl_role"."name" as "role", "public"."mdl_groups"."name" as "ngpo", 
+(select public.mdl_role.name from public.mdl_role where id=32) as evaluador, 535 as "regla", 
+"public"."mdl_groups"."id" as "gpoid", "tutorias"."mdl_userexp"."cursoid" as "cursoid", 
+"public"."mdl_user"."id" as "userid", 
+(select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=535 and course_cve=838 and group_id=11856 and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=1738)  as realizado
+FROM "tutorias"."mdl_userexp"
+JOIN "public"."mdl_user" ON "public"."mdl_user"."id"= "tutorias"."mdl_userexp"."userid"
+JOIN "public"."mdl_role" ON "public"."mdl_role"."id"= "tutorias"."mdl_userexp"."role"
+JOIN "public"."mdl_groups" ON "public"."mdl_groups"."id"="tutorias"."mdl_userexp"."grupoid"
+JOIN encuestas.sse_curso_bloque_grupo on encuestas.sse_curso_bloque_grupo.mdl_groups_cve = public.mdl_groups.id 
+WHERE "tutorias"."mdl_userexp"."cursoid" = '838'
+AND "tutorias"."mdl_userexp"."role" = 18
+and encuestas.sse_curso_bloque_grupo.bloque=2*/
+
+            //$this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
+
+            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
+            $this->db->where('encuestas.sse_curso_bloque_grupo.bloque', $params['bloque_evaluador']);
+            
+
+            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_groups.name as ngpo, 
+                (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
+                    $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
+                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
+                    and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
+
+            $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
+            $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+            $this->db->join('encuestas.sse_curso_bloque_grupo', 'encuestas.sse_curso_bloque_grupo.mdl_groups_cve = public.mdl_groups.id');
+        
+
         } else {
 
 
@@ -1657,6 +1691,10 @@ class Encuestas_model extends CI_Model {
             $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
         }
 
+
+
+
+
         $query = $this->db->get('tutorias.mdl_userexp');
 
         /* if ($query->num_rows() > 0){
@@ -1665,7 +1703,7 @@ class Encuestas_model extends CI_Model {
           $resultado = $query->result_array();
 
           } */
-        //pr($this->db->last_query());
+        pr($this->db->last_query());
         $resultado = $query->result_array();
         //$this->db->flush_cache();
         //$query->free_result(); //Libera la memoria                                
@@ -2133,9 +2171,9 @@ class Encuestas_model extends CI_Model {
         $select_params = array(
             'reglas_evaluacion_cve',
             'CONCAT(
-                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluado_cve" = "mdl_role"."id"), 
+                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluador_cve" = "mdl_role"."id"), 
                     \' - \',
-                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluador_cve" = "mdl_role"."id"),
+                    (SELECT "mdl_role"."name" FROM "public"."mdl_role" WHERE "sse_reglas_evaluacion"."rol_evaluado_cve" = "mdl_role"."id"),
                     \' - \',
                     CASE WHEN tutorizado=1 THEN \'tutorizado\'
                         WHEN tutorizado=0 THEN \'no tutorizado\'
@@ -2835,5 +2873,153 @@ class Encuestas_model extends CI_Model {
         }
         return $reglas_aplica;
     }
+
+
+
+public function get_datos_usuarios_bloque($params=null){
+    $resultado = array();
+    $arrol=array();
+    /*SELECT public.mdl_course.id as cve_curso, public.mdl_user.firstname as nombres, public.mdl_user.lastname as apellidos, 
+cbg.bloque, 
+public.mdl_role.id AS cve_rol, public.mdl_role.name AS rol_nombre 
+FROM tutorias.mdl_userexp 
+JOIN public.mdl_user ON public.mdl_user.id= tutorias.mdl_userexp.userid 
+JOIN public.mdl_role ON public.mdl_role.id= tutorias.mdl_userexp.role 
+JOIN public.mdl_groups ON public.mdl_groups.id=tutorias.mdl_userexp.grupoid 
+JOIN public.mdl_course ON public.mdl_course.id=tutorias.mdl_userexp.cursoid
+JOIN encuestas.sse_curso_bloque_grupo cbg on cbg.mdl_groups_cve = public.mdl_groups.id
+WHERE 
+public.mdl_role.id NOT IN(32) 
+AND public.mdl_user.id = '2272' 
+AND tutorias.mdl_userexp.cursoid = '838'
+group by public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname
+order by cbg.bloque*/
+
+     $sql="SELECT mdl_role.id FROM mdl_course
+    INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
+    INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
+    INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
+    INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
+    WHERE mdl_course.id=".$params['cur_id']." and mdl_user.id=".$params['user_id'];
+        
+        $result = $this->db->query($sql);
+        if($result->num_rows() > 0){
+
+        $usuariosrol = $result->result_array();
+        $result->free_result();
+        foreach($usuariosrol as $index=>$value){    
+             
+             $arrol[]=$value['id'];
+             }
+
+        }
+ 
+
+
+
+        if(in_array(5,$arrol))
+        {
+          //Buscar en moodle
+
+            
+            if(isset($params['user_id']) && !empty($params['user_id']))
+            {
+                 $this->db->where('u.id',$params['user_id']);
+            } 
+           if(isset($params['cur_id']) && !empty($params['cur_id']))
+            {
+                 $this->db->where('c.id',$params['cur_id']);
+            } 
+
+            $this->db->join('public.mdl_role_assignments ra', 'ra.userid = u.id');
+            $this->db->join('public.mdl_context ct','ct.id = ra.contextid');
+            $this->db->join('public.mdl_course c', 'c.id = ct.instanceid');
+            $this->db->join('public.mdl_role r','r.id = ra.roleid');
+            $this->db->join('public.mdl_groups g', 'g.courseid = c.id','right');
+            $this->db->join('public.mdl_groups_members gm','gm.userid = u.id AND gm.groupid = g.id','right');
+            $this->db->join('public.mdl_enrol en', 'en.courseid = c.id');
+            $this->db->join('public.mdl_user_enrolments ue','ue.enrolid = en.id AND ue.userid = u.id');
+            $this->db->join('encuestas.sse_curso_bloque_grupo cbg','cbg.mdl_groups_cve = public.mdl_groups.id');
+
+            $busqueda = array(
+                    'c.id AS cve_curso',   
+                    'u.firstname AS nombres', 
+                    'u.lastname AS apellidos',
+                    'cbg.bloque',  
+                    'r.id AS cve_rol_evaluador', 
+                    'r.name AS rol_nombre');
+
+            $this->db->select($busqueda);
+
+            $this->db->group_by('public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname');
+            $this->db->order_by('cbg.bloque');
+
+
+
+            $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
+
+        }
+        else
+        {
+          //Buscar en sied
+        /*select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, 
+        public.mdl_groups.name, public.mdl_course.id ,*
+        from tutorias.mdl_userexp 
+        inner join public.mdl_user on public.mdl_user.id= tutorias.mdl_userexp.userid
+        inner join public.mdl_role on public.mdl_role.id= tutorias.mdl_userexp.role
+        inner join public.mdl_groups on public.mdl_groups.id=tutorias.mdl_userexp.grupoid
+        inner join public.mdl_course on public.mdl_course.id=tutorias.mdl_userexp.cursoid
+        where cursoid=761 and mdl_user.id=7848*/
+            if(isset($params['rol_evaluado_cve']) && !empty($params['rol_evaluado_cve']))
+            {
+                 $this->db->where_not_in('public.mdl_role.id',$params['rol_evaluado_cve']);
+            }
+
+            if(isset($params['user_id']) && !empty($params['user_id']))
+            {
+                 $this->db->where('public.mdl_user.id',$params['user_id']);
+            } 
+           if(isset($params['cur_id']) && !empty($params['cur_id']))
+            {
+                 $this->db->where('tutorias.mdl_userexp.cursoid',$params['cur_id']);
+            } 
+
+            $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            $this->db->join('public.mdl_role','public.mdl_role.id= tutorias.mdl_userexp.role');
+            $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
+            $this->db->join('public.mdl_course','public.mdl_course.id=tutorias.mdl_userexp.cursoid');
+            $this->db->join('encuestas.sse_curso_bloque_grupo cbg','cbg.mdl_groups_cve = public.mdl_groups.id');
+            
+            $busqueda = array(
+                    'public.mdl_course.id as cve_curso', 
+                    'public.mdl_user.firstname as nombres', 
+                    'public.mdl_user.lastname as apellidos', 
+                    'cbg.bloque', 
+                    'public.mdl_role.id AS cve_rol', 
+                    'public.mdl_role.name AS rol_nombre');
+            $this->db->select($busqueda);
+
+            $this->db->group_by('public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname');
+            $this->db->order_by('cbg.bloque');
+            $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
+
+
+
+        }  
+
+
+        
+       
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
+
+
+
 
 }

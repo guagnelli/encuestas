@@ -28,7 +28,7 @@
             <tbody>
                 <?php
                 foreach ($datos_user_aeva as $val) {
-                    pr($val);
+                    //pr($val);
                     if (isset($val[0])) {
                         if (isset($val[0]['ngpo']) && $val[0]['ngpo'] != '0') {
                             $grupo = $val[0]['ngpo'];
@@ -54,7 +54,7 @@
                     if (isset($val[0]['gpoid']) && $val[0]['gpoid'] > 0) {
                         echo $val[0]['gpoid'];
                     } else {
-                        echo '--';
+                        echo '0';
                     }
                     ?>">
                     <input type="hidden" id="iduevaluador" name="iduevaluador" value="<?php echo $iduevaluador ?>">
