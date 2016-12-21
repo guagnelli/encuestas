@@ -99,8 +99,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     foreach ($preguntas as $key_p => $pregunta) {
                         //echo '<td>'.$respuestas[$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']]['texto'].'</td>';
                         //if(isset($dato['course_cve']) && isset($dato['group_id']) && isset($dato['encuesta_cve']) && isset($dato['evaluado_user_cve']) && isset($dato['evaluador_user_cve']) && isset($pregunta['preguntas_cve'])) {
-                        if(isset($respuestas[$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']])) {
-                            echo '<td>'.$respuestas[$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']]['texto'].'</td>';
+                        if(isset($respuestas[$dato['course_cve']][$dato['grupos_ids_text']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']])) {
+                            echo '<td>'.$respuestas[$dato['course_cve']][$dato['grupos_ids_text']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$pregunta['preguntas_cve']]['texto'].'</td>';
                         } else {
                             echo '<td></td>';
                         }
