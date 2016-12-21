@@ -12,10 +12,29 @@
         }
         ?>
     </div>
+    <div class="panel-heading">  
+        <table>
+            <tr>
+                <th>
+                    NOMBRE DE IMPLEMENTACIÓN:
+                </th>
+            </tr>
+            <tr>                
+                <td>
+                    <h3> <?php echo $cursocompleto; ?></h3> 
+                </td>
+            </tr>
+        </table>
+      </div>
+    </div>
+
+
+  
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered">
             <thead>
                 <tr>
+                    <th>Regla</th>
                     <th>Rol evaluador</th>
 
                     <th>Rol a evaluar</th>
@@ -37,7 +56,7 @@
                         }
 
                         echo '<tr>
-                       
+                        <td >' . $val[0]['regla'] . '</td >
                         <td >' . $val[0]['evaluador'] . '</td >
                         <td >' . $val[0]['role'] . '</td > 
                          <td >' . $val[0]['firstname'] . ' ' . $val[0]['lastname'] . '</td>

@@ -49,9 +49,10 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
                 <div id="detalle_instrumento">                
                     <div class="table-responsive">
                         <table class="table table-bordered">
+
                             <tr>
                                 <td>
-                                    <label>Nombre del instrumento:</label>
+                                    <label>Nombre de la implementación:</label>
                                 </td>
                                 <!--<td colspan="5">
                                     <h3><?php //echo $instrumento[0]['descripcion_encuestas']; ?></h3>
@@ -77,6 +78,12 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
                                     <h4><a><?php //echo ($instrumento[0]['tutorizado'] != 0) ? $check_ok : $check_no; ?></a></h4>
                                 </td>
                             </tr>-->
+                             <td><h3><?php echo $cursocompleto; ?></h3></td>
+                            </tr>
+                             <tr>
+                                <td>
+                                    <label>Nombre del instrumento:</label>
+                                </td>
                                 <td colspan="4"><h3><?php echo $instrumento[0]['descripcion_encuestas']; ?></h3></td>
                             </tr>
                             <tr>

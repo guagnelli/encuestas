@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	//$('[data-toggle="tooltip"]').tooltip(); //Llamada a tooltip
     //$('#btn_buscar_b').unbind("click");
-    var evento = $('#btn_buscar_b').attr("onclick"); //Obtener funcionamiento
+    var evento_buscar = $('#btn_buscar_b').attr("onclick"); //Obtener funcionamiento
     $('#btn_buscar_b').attr("onclick", ""); //Remover evento asignado
     $('#btn_buscar_b').click(function(event) {
         event.preventDefault(); //Prevenir evento por default
@@ -11,7 +11,7 @@ $(document).ready(function(){
         if(anio==="" || instrumento_regla==="" || is_bono==="" || ($('#encuesta').length>0 && $('#encuesta').val()==="")){
             alert('No ha seleccionado todos los campos obligatorios');
         } else {
-            jQuery.globalEval(evento);
+            jQuery.globalEval(evento_buscar);
         }
     });
 

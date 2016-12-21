@@ -174,7 +174,7 @@ $config = array(
         array(
             'field' => 'EVA_TIPO',
             'label' => 'EVA_TIPO',
-            'rules' => 'required|in_list[POR_USUARIO,POR_GRUPO]'
+            'rules' => 'required|in_list[POR_BLOQUE,POR_GRUPO,POR_USUARIO]'
         ),
 
     ),

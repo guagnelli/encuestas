@@ -149,7 +149,7 @@ class Reporte_detallado_model extends CI_Model {
         $this->db->join('encuestas.sse_result_evaluacion_encuesta_curso res_eva_enc', 'res_eva_enc.encuesta_cve = eva.encuesta_cve and res_eva_enc.course_cve = eva.course_cve and res_eva_enc.evaluado_user_cve = eva.evaluado_user_cve and res_eva_enc.evaluador_user_cve = eva.evaluador_user_cve', 'left');
         $this->db->join('encuestas.sse_curso_bloque_grupo curso_bloque_grupo', 'curso_bloque_grupo.course_cve=res_eva_enc.course_cve and curso_bloque_grupo.mdl_groups_cve=res_eva_enc.group_id', 'left');
         $this->db->join('encuestas.sse_reglas_evaluacion eva_reg', 'eva_reg.reglas_evaluacion_cve=enc.reglas_evaluacion_cve', 'left');
-        $this->db->join('public.mdl_groups grupo', 'grupo.id=eva.group_id', 'left');
+        //$this->db->join('public.mdl_groups grupo', 'grupo.id=eva.group_id', 'left');
         $this->db->join('public.mdl_user evaluado', 'evaluado.id=eva.evaluado_user_cve', 'left');
         $this->db->join('public.mdl_role rol_evaluado', 'rol_evaluado.id=eva.evaluado_rol_id', 'left');
         $this->db->join('tutorias.mdl_usertutor tut_evaluado', 'tut_evaluado.nom_usuario=evaluado.username and tut_evaluado.id_curso=eva.course_cve and eva.evaluado_rol_id <> 5', 'left');
@@ -165,7 +165,7 @@ class Reporte_detallado_model extends CI_Model {
         $this->db->join('departments.ssv_departamentos depto_tut_evaluador', 'depto_tut_evaluador.cve_depto_adscripcion=tut_evaluador.cve_departamento', 'left');
         
         $this->db->group_by("enc.encuesta_cve, enc.descripcion_encuestas, enc.is_bono, enc.reglas_evaluacion_cve, curso_bloque_grupo.bloque, enc.tipo_encuesta, enc.eva_tipo, tex_tutorizado,
-            eva.course_cve, curso.namec, curso.clave, curso.tipo_curso, curso.tipo_curso_id, curso.horascur, curso.anio, curso.fecha_inicio, curso.fecha_fin, eva.group_id, grupo.name, 
+            eva.course_cve, curso.namec, curso.clave, curso.tipo_curso, curso.tipo_curso_id, curso.horascur, curso.anio, curso.fecha_inicio, curso.fecha_fin, eva.group_id, eva.grupos_ids_text, 
             eva.evaluado_user_cve, eva.evaluado_rol_id, rol_evaluado.name, tut_evaluado.cve_departamento, 
             tut_evaluado.cve_categoria, cat_tut_evaluado.nom_nombre, depto_tut_evaluado.nom_depto_adscripcion, depto_tut_evaluado.cve_regiones, depto_tut_evaluado.name_region, depto_tut_evaluado.cve_delegacion, depto_tut_evaluado.nom_delegacion,
             eva.evaluador_user_cve, eva.evaluador_rol_id, rol_evaluador.name, 
@@ -173,7 +173,7 @@ class Reporte_detallado_model extends CI_Model {
             evaluado.username, evaluado.firstname, evaluado.lastname, evaluador.username, evaluador.firstname, evaluador.lastname, enc.reglas_evaluacion_cve,
             prereg_evaluador.cve_departamental, tut_evaluador.cve_departamento, depto_tut_evaluador.nom_depto_adscripcion, depto_tut_evaluador.cve_regiones, depto_tut_evaluador.name_region, depto_tut_evaluador.cve_delegacion, depto_tut_evaluador.nom_delegacion,
             depto_pre_evaluador.nom_depto_adscripcion, depto_pre_evaluador.cve_regiones, depto_pre_evaluador.name_region, depto_pre_evaluador.cve_delegacion, depto_pre_evaluador.nom_delegacion, res_eva_enc.calif_emitida");
-
+        //eva.group_id, grupo.name
         $this->db->stop_cache();
         /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
         ///////////////////////////// Obtener número de registros ///////////////////////////////
@@ -183,7 +183,7 @@ class Reporte_detallado_model extends CI_Model {
         /////////////////////////////// FIN número de registros /////////////////////////////////
         $busqueda = array(
             "enc.encuesta_cve", "enc.descripcion_encuestas", "enc.is_bono", "enc.tipo_encuesta", "enc.eva_tipo", "tex_tutorizado",
-            "eva.course_cve", "curso.namec", "curso.clave as curso_clave", "curso.tipo_curso", "curso.tipo_curso_id", "curso.horascur", "curso.anio", "curso.fecha_inicio", "curso.fecha_fin", "eva.group_id", "grupo.name as grupo_nombre", "curso_bloque_grupo.bloque", 
+            "eva.course_cve", "curso.namec", "curso.clave as curso_clave", "curso.tipo_curso", "curso.tipo_curso_id", "curso.horascur", "curso.anio", "curso.fecha_inicio", "curso.fecha_fin", "eva.grupos_ids_text", "'' as grupo_nombre", "curso_bloque_grupo.bloque", 
             "eva.evaluado_user_cve", "eva.evaluado_rol_id", "rol_evaluado.name as evaluado_rol_nombre", 
                 "tut_evaluado.cve_departamento as depto_tut_id", "depto_tut_evaluado.nom_depto_adscripcion as depto_tut_nombre", "depto_tut_evaluado.cve_regiones as reg_tut_cve", "depto_tut_evaluado.name_region as reg_tut_nombre", "depto_tut_evaluado.cve_delegacion as depto_tut_id_del", "depto_tut_evaluado.nom_delegacion as depto_tut_nom_del", 
                 "(select * from departments.get_rama_completa(tut_evaluado.cve_departamento, 7)) as rama_tut_evaluado", 
@@ -196,7 +196,18 @@ class Reporte_detallado_model extends CI_Model {
             "tut_evaluador.cve_categoria as evaluador_cat_tut_id", "cat_tut_evaluador.nom_nombre as evaluador_cat_tut_nom", "prereg_evaluador.cve_cat as evaluador_cat_pre_id", "cat_pre_evaluador.nom_nombre as evaluador_cat_pre_nom", 
             "evaluado.username as evaluado_matricula", "evaluado.firstname as evaluado_nombre", "evaluado.lastname as evaluado_apellido", "evaluador.username as evaluador_matricula", "evaluador.firstname as evaluador_nombre", "evaluador.lastname as evaluador_apellido",
             "enc.reglas_evaluacion_cve", "res_eva_enc.calif_emitida", "(select u.firstname||' '||u.lastname||' ('||u.username||')'
-                FROM public.mdl_user u
+                FROM tutorias.mdl_userexp ue
+                JOIN public.mdl_user u ON u.id=ue.userid 
+                JOIN public.mdl_role r ON r.id=ue.role 
+                JOIN public.mdl_groups g ON g.id=ue.grupoid 
+                JOIN public.mdl_course c ON c.id=ue.cursoid
+                JOIN encuestas.sse_curso_bloque_grupo cbg ON cbg.mdl_groups_cve=g.id
+                WHERE ue.role=18 
+                AND ue.grupoid=eva.group_id
+                AND ue.cursoid = eva.course_cve
+                GROUP BY u.firstname, u.lastname, u.username) AS ct_bloque"
+        ); //"grupo.name as grupo_nombre"
+        /* FROM public.mdl_user u
                 JOIN public.mdl_role_assignments ra ON ra.userid = u.id
                 JOIN public.mdl_context ct ON ct.id = ra.contextid
                 JOIN public.mdl_course c ON c.id = ct.instanceid
@@ -206,8 +217,7 @@ class Reporte_detallado_model extends CI_Model {
                 JOIN public.mdl_enrol en ON en.courseid = c.id
                 JOIN public.mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id
                 where  
-                c.id = eva.course_cve and r.id=18 and g.id=eva.group_id) as ct_bloque"
-        );
+                c.id = eva.course_cve and r.id=18 and g.id=eva.group_id*/
         
         $this->db->select($busqueda);
         if (isset($params['order']) && !empty($params['order'])) {
@@ -261,7 +271,8 @@ class Reporte_detallado_model extends CI_Model {
             
             $temp = $query->result_array();
             foreach ($temp as $key_d => $dato) {
-                $resultado['data'][$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$dato['preguntas_cve']] = $dato;
+                //$resultado['data'][$dato['course_cve']][$dato['group_id']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$dato['preguntas_cve']] = $dato;
+                $resultado['data'][$dato['course_cve']][$dato['grupos_ids_text']][$dato['encuesta_cve']][$dato['evaluado_user_cve']][$dato['evaluador_user_cve']][$dato['preguntas_cve']] = $dato;
             }
             //pr($resultado['data']);
             //$this->db->flush_cache();
