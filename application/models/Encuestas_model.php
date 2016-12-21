@@ -1703,7 +1703,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
           $resultado = $query->result_array();
 
           } */
-        pr($this->db->last_query());
+        //pr($this->db->last_query());
         $resultado = $query->result_array();
         //$this->db->flush_cache();
         //$query->free_result(); //Libera la memoria                                
@@ -2895,72 +2895,7 @@ AND tutorias.mdl_userexp.cursoid = '838'
 group by public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname
 order by cbg.bloque*/
 
-     $sql="SELECT mdl_role.id FROM mdl_course
-    INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id
-    INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid
-    INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid
-    INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid
-    WHERE mdl_course.id=".$params['cur_id']." and mdl_user.id=".$params['user_id'];
-        
-        $result = $this->db->query($sql);
-        if($result->num_rows() > 0){
-
-        $usuariosrol = $result->result_array();
-        $result->free_result();
-        foreach($usuariosrol as $index=>$value){    
-             
-             $arrol[]=$value['id'];
-             }
-
-        }
- 
-
-
-
-        if(in_array(5,$arrol))
-        {
-          //Buscar en moodle
-
-            
-            if(isset($params['user_id']) && !empty($params['user_id']))
-            {
-                 $this->db->where('u.id',$params['user_id']);
-            } 
-           if(isset($params['cur_id']) && !empty($params['cur_id']))
-            {
-                 $this->db->where('c.id',$params['cur_id']);
-            } 
-
-            $this->db->join('public.mdl_role_assignments ra', 'ra.userid = u.id');
-            $this->db->join('public.mdl_context ct','ct.id = ra.contextid');
-            $this->db->join('public.mdl_course c', 'c.id = ct.instanceid');
-            $this->db->join('public.mdl_role r','r.id = ra.roleid');
-            $this->db->join('public.mdl_groups g', 'g.courseid = c.id','right');
-            $this->db->join('public.mdl_groups_members gm','gm.userid = u.id AND gm.groupid = g.id','right');
-            $this->db->join('public.mdl_enrol en', 'en.courseid = c.id');
-            $this->db->join('public.mdl_user_enrolments ue','ue.enrolid = en.id AND ue.userid = u.id');
-            $this->db->join('encuestas.sse_curso_bloque_grupo cbg','cbg.mdl_groups_cve = public.mdl_groups.id');
-
-            $busqueda = array(
-                    'c.id AS cve_curso',   
-                    'u.firstname AS nombres', 
-                    'u.lastname AS apellidos',
-                    'cbg.bloque',  
-                    'r.id AS cve_rol_evaluador', 
-                    'r.name AS rol_nombre');
-
-            $this->db->select($busqueda);
-
-            $this->db->group_by('public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname');
-            $this->db->order_by('cbg.bloque');
-
-
-
-            $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
-
-        }
-        else
-        {
+     
           //Buscar en sied
         /*select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, 
         public.mdl_groups.name, public.mdl_course.id ,*
@@ -2994,20 +2929,15 @@ order by cbg.bloque*/
                     'public.mdl_course.id as cve_curso', 
                     'public.mdl_user.firstname as nombres', 
                     'public.mdl_user.lastname as apellidos', 
-                    'cbg.bloque', 
+                    'cbg.bloque',
+                    'public.mdl_groups.id AS cve_grupo', 
                     'public.mdl_role.id AS cve_rol', 
                     'public.mdl_role.name AS rol_nombre');
             $this->db->select($busqueda);
 
-            $this->db->group_by('public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname');
+            $this->db->group_by('public.mdl_course.id, cbg.bloque, public.mdl_role.id, public.mdl_role.name, public.mdl_user.firstname, public.mdl_user.lastname,public.mdl_groups.id');
             $this->db->order_by('cbg.bloque');
             $query = $this->db->get('tutorias.mdl_userexp'); //Obtener conjunto de encuestas
-
-
-
-        }  
-
-
         
        
         $resultado = $query->result_array();
