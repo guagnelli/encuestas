@@ -62,7 +62,8 @@ class Encuestas extends CI_Controller
         }
         else
         {
-            redirect('http://11.32.41.92/kio/sied');
+            $url_sied = $this->config->item('url_sied');
+            redirect($url_sied);
             //redirect('http://11.32.41.13/kio/sied');        # code...
         }    
  
