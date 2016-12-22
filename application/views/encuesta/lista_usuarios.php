@@ -21,7 +21,7 @@
             </tr>
             <tr>                
                 <td>
-                    <h3> <?php echo $cursocompleto; ?></h3> 
+                    <h3> <?php echo $datos_curso['data'][0]['cur_nom_completo']; ?></h3> 
                 </td>
             </tr>
         </table>
@@ -50,7 +50,8 @@
                     //pr($val);
                     if (isset($val[0])) {
                         if (isset($val[0]['ngpo']) && $val[0]['ngpo'] != '0') {
-                            $grupo = $val[0]['ngpo'];
+                            //$grupo = $val[0]['ngpo'];
+                            $grupo = (!empty($val[0]['ngpo'])) ? implode(str_getcsv(trim($val[0]['ngpo'], '{}')), ', ') : '';
                         } else {
                             $grupo = '--';
                         }

@@ -183,7 +183,7 @@ class Reporte_detallado_model extends CI_Model {
         /////////////////////////////// FIN número de registros /////////////////////////////////
         $busqueda = array(
             "enc.encuesta_cve", "enc.descripcion_encuestas", "enc.is_bono", "enc.tipo_encuesta", "enc.eva_tipo", "tex_tutorizado",
-            "eva.course_cve", "curso.namec", "curso.clave as curso_clave", "curso.tipo_curso", "curso.tipo_curso_id", "curso.horascur", "curso.anio", "curso.fecha_inicio", "curso.fecha_fin", "eva.grupos_ids_text", "'' as grupo_nombre", "curso_bloque_grupo.bloque", 
+            "eva.course_cve", "curso.namec", "curso.clave as curso_clave", "curso.tipo_curso", "curso.tipo_curso_id", "curso.horascur", "curso.anio", "curso.fecha_inicio", "curso.fecha_fin", "eva.grupos_ids_text", "curso_bloque_grupo.bloque", 
             "eva.evaluado_user_cve", "eva.evaluado_rol_id", "rol_evaluado.name as evaluado_rol_nombre", 
                 "tut_evaluado.cve_departamento as depto_tut_id", "depto_tut_evaluado.nom_depto_adscripcion as depto_tut_nombre", "depto_tut_evaluado.cve_regiones as reg_tut_cve", "depto_tut_evaluado.name_region as reg_tut_nombre", "depto_tut_evaluado.cve_delegacion as depto_tut_id_del", "depto_tut_evaluado.nom_delegacion as depto_tut_nom_del", 
                 "(select * from departments.get_rama_completa(tut_evaluado.cve_departamento, 7)) as rama_tut_evaluado", 
@@ -205,7 +205,8 @@ class Reporte_detallado_model extends CI_Model {
                 WHERE ue.role=18 
                 AND ue.grupoid=eva.group_id
                 AND ue.cursoid = eva.course_cve
-                GROUP BY u.firstname, u.lastname, u.username) AS ct_bloque"
+                GROUP BY u.firstname, u.lastname, u.username) AS ct_bloque",
+            "(SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id =ANY(regexp_split_to_array(eva.grupos_ids_text, ',')::bigint[])) AS grupo_nombre"
         ); //"grupo.name as grupo_nombre"
         /* FROM public.mdl_user u
                 JOIN public.mdl_role_assignments ra ON ra.userid = u.id

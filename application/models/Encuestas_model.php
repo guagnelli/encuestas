@@ -1585,6 +1585,24 @@ class Encuestas_model extends CI_Model {
         return $varole;
     }
 
+    public function listado_eval_update_grupo($params = array()) {
+        $this->db->trans_begin();
+
+        $this->db->where($params['conditions']);
+
+        $this->db->update('encuestas.sse_evaluacion', $params['fields']);
+        pr($this->db->last_query());
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
+            $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
+            return false;
+        } else {
+            $this->db->trans_commit(); // si la transacción es correcta retornar TRUE
+            return true;
+        }
+    }
+
     public function listado_eval($params = null) {
         // $resultado = array();
 
@@ -1612,7 +1630,7 @@ class Encuestas_model extends CI_Model {
           else
           {
           $realizado=0;
-          } */
+          }  pr($params);*/
         $this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
 
 
@@ -1625,7 +1643,7 @@ class Encuestas_model extends CI_Model {
 
             $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
 
-            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_groups.name as ngpo, 
+            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, public.mdl_groups.name as ngpo, NULL AS grupos_ids_text
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                 (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
@@ -1654,9 +1672,15 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
 
             $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
             $this->db->where('encuestas.sse_curso_bloque_grupo.bloque', $params['bloque_evaluador']);
+
+            if(isset($params['grupos']) && !empty($params['grupos'])){
+                $grupo_condition = "(SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id IN (".$params['grupos'].")) AS ngpo, '".$params['grupos']."' as grupos_ids_text";
+            } else {
+                $grupo_condition = "public.mdl_groups.name as ngpo, NULL AS grupos_ids_text";
+            }
             
 
-            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_groups.name as ngpo, 
+            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, '.$grupo_condition.', 
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                 (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
@@ -1672,7 +1696,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
 
 
             $params['gpo_evaluador'] = 0;
-            $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role,' . $params['gpo_evaluador'] . ' as ngpo,
+            $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $params['gpo_evaluador'] . ' as ngpo, NULL AS grupos_ids_text,
               (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                     (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
@@ -1879,6 +1903,20 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
             'evaluador_user_cve' => $evaluador_user_cve,
             'evaluador_rol_id' => $evaluador_rol_cve,
         );
+        $datos_encuesta_usuario = $this->session->userdata('datos_encuesta_usuario');
+        if(!is_null($datos_encuesta_usuario)){ //Guardar grupos, para el caso de que el tipo sea por bloques
+            foreach ($datos_encuesta_usuario as $key_du => $value_du) {
+                foreach ($value_du as $key_gr => $value_gr) {
+                    if($value_gr['rol_id']==$evaluado_rol_cve && $value_gr['cursoid']==$course_cve && $value_gr['gpoid']==$group_id && $value_gr['userid']==$evaluado_user_cve){
+                        $data['grupos_ids_text'] = $value_gr['grupos_ids_text'];
+                    }
+                }
+            }
+        }
+        //pr($_SESSION);
+        //pr($datos_encuesta_usuario);
+        //pr($data);
+        //exit();
 //        pr($params);
 
         $this->db->trans_begin(); // inicio de transaccion

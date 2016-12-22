@@ -78,7 +78,7 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
                                     <h4><a><?php //echo ($instrumento[0]['tutorizado'] != 0) ? $check_ok : $check_no; ?></a></h4>
                                 </td>
                             </tr>-->
-                             <td><h3><?php echo $cursocompleto; ?></h3></td>
+                             <td colspan="4"><h3><?php echo $curso['data'][0]['cur_nom_completo']; ?></h3></td>
                             </tr>
                              <tr>
                                 <td>
@@ -104,6 +104,9 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
                     </div>
                 </div>
                 <?php
+                if(isset($mensaje)) {
+                    echo "<font color='red'>".$mensaje."</font>";
+                }
                 //echo "<h2>Instrumento: ".$instrumento[0]['descripcion_encuestas']."</h2><br>";
                 //echo "<h3>Rol a evaluar: ".$instrumento[0]['name']."</h3><br><br>";
 
@@ -162,11 +165,9 @@ $check_no = '<span class="glyphicon glyphicon-remove" aria-hidden="true" style="
 
 
                 echo form_close();
-                if(isset($mensaje))
-                {
-                    echo $mensaje;
-
-                }         
+                if(isset($mensaje)) {
+                    echo "<font color='red'>".$mensaje."</font>";
+                }
                 
         } 
 
