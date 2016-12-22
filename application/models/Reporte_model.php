@@ -177,7 +177,7 @@ class Reporte_model extends CI_Model {
             $this->db->limit($params['per_page'], $params['current_row']);
         }
         $query = $this->db->get('mdl_user'); //Obtener conjunto de registros
-//        pr($this->db->last_query());                                  
+        pr($this->db->last_query());                                  
         $resultado['total'] = $num_rows[0]->total;
         $resultado['columns'] = $query->list_fields();
         $resultado['data'] = $query->result_array();

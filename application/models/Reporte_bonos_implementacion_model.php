@@ -108,7 +108,7 @@ class config_busqueda {
     function getSelectBasicos() {
         return array(
             'eeec.course_cve', 'eeec.evaluado_user_cve', 'vdc.clave', 'vdc.namec', 'vdc.tex_tutorizado', 'vdc.tutorizado',
-            'vdc.tipo_curso', "concat(evaluado.firstname, ' ', evaluado.lastname) as name_evaluado",
+            'vdc.tipo_curso', 'enc.is_bono', "concat(evaluado.firstname, ' ', evaluado.lastname) as name_evaluado",
             "evaluado.username", 'revaluado."name" as "name_rol_evaluado"', 'revaluado.id "id_rol_evaluado"',
             'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion'
         );
@@ -134,7 +134,7 @@ class config_busqueda {
     function getGroupByBasico() {
         return array(
             'eeec.course_cve', 'vdc.clave', 'vdc.namec', 'evaluado_user_cve', 'vdc.tutorizado',
-            'vdc.tex_tutorizado', 'vdc.tipo_curso',
+            'vdc.tex_tutorizado', 'vdc.tipo_curso', 'enc.is_bono',
             'evaluado.firstname',
             'evaluado.lastname', 'evaluado.username', 'revaluado."name"', 'revaluado.id',
             'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion',
@@ -182,7 +182,7 @@ class config_busqueda {
     function getSelectBasicoCalculoPromedio() {
         return array(
             'eeec.course_cve', 'reg.tutorizado',
-            'eeec.evaluado_user_cve',
+            'eeec.evaluado_user_cve', 'enc.is_bono',
             'reg.rol_evaluado_cve', 'reg.rol_evaluador_cve',
             'round(sum(total_puntua_si)::numeric * 100/sum(base)::numeric,3) as promedio',
         );
@@ -201,7 +201,7 @@ class config_busqueda {
 
     function getGroupByBasicoCalculoPromedio() {
         return array(
-            'eeec.course_cve', 'reg.tutorizado', 'eeec.evaluado_user_cve', 'reg.rol_evaluado_cve', 'rol_evaluador_cve'
+            'eeec.course_cve', 'reg.tutorizado', 'enc.is_bono', 'eeec.evaluado_user_cve', 'reg.rol_evaluado_cve', 'rol_evaluador_cve'
         );
     }
 
@@ -218,6 +218,7 @@ class config_busqueda {
     }
 
     function getArrayConfigPrincipal($paramPost) {
+//        pr($paramPost);
         //***Carga arrays con datos basicos de la consulta principal
         $array_where = $this->getWhere(); //Obtiene colección de posibles where
         $array_where_calculo_promedio = $this->getWhereCalculoPromedio(); //Obtiene colección de posibles where
@@ -287,13 +288,16 @@ class config_busqueda {
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
         }
         //Condición por región
-        if (!empty($paramPost['is_bono'])) {
+        if (is_numeric($paramPost['is_bono'])) {
+//            pr($paramPost['is_bono']);
             $tmp_where = $array_where['is_bono'];
             $tmp_where['value'] = $paramPost['is_bono'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
         }
+        
         //Condición por región
-        if (!empty($paramPost['tipo_implementacion'])) {
+        if (is_numeric($paramPost['tipo_implementacion'])) {
+//            pr($paramPost['tipo_implementacion']);
             $tmp_where = $array_where['tipo_implementacion'];
             $tmp_where['value'] = $paramPost['tipo_implementacion'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso

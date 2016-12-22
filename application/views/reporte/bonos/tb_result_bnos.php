@@ -13,6 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Curso</th>
                 <th>Tipo implementación</th>
                 <th>Tipo</th>
+                <th>Aplica para bono</th>
                 <th>Bloque</th>
                 <!--<th>Grupo</th>-->
                 <th>Matricula</th>
@@ -36,11 +37,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php
                 $grupo = isset($val['mdl_groups_cve']) ? $val['mdl_groups_cve'] : '--';
                 $bloque = isset($val['bloque']) ? $val['bloque'] : '--';
+                $bono = ($val['is_bono'] == 1) ? 'Si' : 'No';
                 echo "<tr id='id_row_" . $key . "' data-keyrow=" . $key . ">";
                 echo "<td>" . $val['clave'] . "</td>";
                 echo "<td>" . $val['namec'] . "</td>";
                 echo "<td>" . $val['tipo_curso'] . "</td>";
                 echo "<td>" . $val['tex_tutorizado'] . "</td>";
+                echo "<td>" . $bono . "</td>";
                 echo "<td>" . $bloque . "</td>";
 //                echo "<td>" . $grupo . "</td>";
                 echo "<td>" . $val['username'] . "</td>";
