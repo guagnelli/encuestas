@@ -229,12 +229,15 @@ class Reporte extends CI_Controller {
 //pr($filtros);
                 $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
                 $data = $filtros;
-                $data['total_empleados'] = $resultado['total'];
+                $data['total'] = $resultado['total'];
                 $data['empleados'] = $resultado['data'];
                 $data['current_row'] = $filtros['current_row'];
                 $data['per_page'] = $this->input->post('per_page');
-//pr($data);
-                $this->listado_resultado($data, array('form_recurso' => '#form_empleado', 'elemento_resultado' => '#listado_resultado_empleado')); //Generar listado en caso de obtener datos
+//pr($data);    
+                //Configuracion del reporte
+                $c_r = $this->filtrosreportes_tpl->getArrayVistasReportes(FiltrosReportes_Tpl::RB_RESUMEN_PUNTOS);
+
+                $this->listado_resultado($data, array('form_recurso' => $c_r[FiltrosReportes_Tpl::C_NAME_FORMULARIO], 'elemento_resultado' => $c_r[FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO])); //Generar listado en caso de obtener datos
             }
         } else {
 
@@ -243,6 +246,23 @@ class Reporte extends CI_Controller {
     }
 
     private function listado_resultado($data, $form) {
+        $data['controller'] = 'Reporte';
+        $data['action'] = 'get_data_ajax2';
+        $pagination = $this->template->pagination_data_general($data); //Crear mensaje y links de paginación
+        //$pagination = $this->template->pagination_data_buscador_asignar_validador($data); //Crear mensaje y links de paginación
+        $links = "<div class='col-sm-5 dataTables_info' style='line-height: 50px;'>" . $pagination['total'] . "</div>
+                    <div class='col-sm-7 text-right'>" . $pagination['links'] . "</div>";
+//        $datos['lista_docentes_validar'] = $data['lista_docentes_validar'];
+        echo $links . $this->load->view('reporte/listado_usuariosenc', $data, TRUE) . $links . '
+                <script>
+                $("ul.pagination li a").click(function(event){
+                    data_ajax(this, "' . $form['form_recurso'] . '", "' . $form['elemento_resultado'] . '");
+                    event.preventDefault();
+                });
+                </script>';
+    }
+
+    private function listado_resultado_v0($data, $form) {
         $pagination = $this->template->pagination_data_empleado($data, 'get_data_ajax2'); //Crear mensaje y links de paginación
         $links = "<div class='col-sm-5 dataTables_info' style='line-height: 50px;'>" . $pagination['total'] . "</div>
                 <div class='col-sm-7 text-right'>" . $pagination['links'] . "</div>";

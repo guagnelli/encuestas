@@ -89,3 +89,10 @@ alter table encuestas.sse_evaluacion alter column fecha set default current_time
 alter table encuestas.sse_evaluacion add column grupos_ids_text varchar(256);
 alter table encuestas.sse_result_evaluacion_encuesta_curso add column grupos_ids_text varchar(256);
 
+--
+-- Actualiza relación de la delegación con sus regiones 
+--
+update departments.ssd_cat_delegacion set cve_regiones = 1 where cve_delegacion in ('01', '02', '03', '06', '11', '14', '17', '19', '26', '27');
+update departments.ssd_cat_delegacion set cve_regiones = 2 where cve_delegacion in ('05', '08', '10', '20', '25', '29', '34');
+update departments.ssd_cat_delegacion set cve_regiones = 3 where cve_delegacion in ('07', '37', '38', '12', '18', '21', '22', '23', '28', '30', '31', '32');
+update departments.ssd_cat_delegacion set cve_regiones = 4 where cve_delegacion in ('13', '15', '16', '24', '33', '35', '36', '04');
