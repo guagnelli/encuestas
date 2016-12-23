@@ -227,7 +227,9 @@ class Reporte extends CI_Controller {
                 $filtros['current_row'] = (isset($current_row) && !empty($current_row)) ? $current_row : 0;
 
 //pr($filtros);
-                $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+//                $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+                $resultado = $this->rep_mod->reporte_usuarios_vista_cursos($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+//                pr($resultado);
                 $data = $filtros;
                 $data['total'] = $resultado['total'];
                 $data['empleados'] = $resultado['data'];
@@ -286,7 +288,8 @@ class Reporte extends CI_Controller {
             $filtros['current_row'] = 0;
 
 //pr($filtros);
-            $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+//            $resultado = $this->rep_mod->reporte_usuarios($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
+            $resultado = $this->rep_mod->reporte_usuarios_vista_cursos($filtros); 
             $data = $filtros;
             $data['total_empleados'] = $resultado['total'];
             $data['empleados'] = $resultado['data'];
