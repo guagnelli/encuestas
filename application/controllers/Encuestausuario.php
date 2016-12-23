@@ -516,7 +516,6 @@ class Encuestausuario extends CI_Controller {
                 foreach ($rolescusercurso as $key => $value) 
                 {
                     
-
                     //checar reglas validas con encuestas asignadas al curso
                     //pr($value);
 
