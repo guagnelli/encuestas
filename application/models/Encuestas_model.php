@@ -1299,7 +1299,7 @@ class Encuestas_model extends CI_Model {
                         'encuesta_cve' => $value,
                         'alcance_curso_cve' => '0'
                     );
-                    $this->db->insert('sse_encuesta_curso', $data);
+                    $this->db->insert('encuestas.sse_encuesta_curso', $data);
                     $insert_id = $this->db->insert_id();
                     $row['ingresado'] = $insert_id;
                 } else {
@@ -1415,7 +1415,7 @@ class Encuestas_model extends CI_Model {
 
 
             $query = $this->db->get('public.mdl_user u'); //Obtener conjunto de encuestas
-            //pr($this->db->last_query());
+//            pr($this->db->last_query());
         } else {
             //Buscar en sied
             /* select public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name, 
@@ -1457,6 +1457,7 @@ class Encuestas_model extends CI_Model {
 
             //pr($this->db->last_query());
         }
+//            pr($this->db->last_query());
 
 
         $resultado = $query->result_array();
@@ -1643,7 +1644,7 @@ class Encuestas_model extends CI_Model {
 
             $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
 
-            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, public.mdl_groups.name as ngpo, NULL AS grupos_ids_text
+            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, public.mdl_groups.name as ngpo, \'\' AS grupos_ids_text,
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                 (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
@@ -1676,7 +1677,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
             if(isset($params['grupos']) && !empty($params['grupos'])){
                 $grupo_condition = "(SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id IN (".$params['grupos'].")) AS ngpo, '".$params['grupos']."' as grupos_ids_text";
             } else {
-                $grupo_condition = "public.mdl_groups.name as ngpo, NULL AS grupos_ids_text";
+                $grupo_condition = "public.mdl_groups.name as ngpo, \'\' AS grupos_ids_text";
             }
             
 
@@ -1696,7 +1697,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
 
 
             $params['gpo_evaluador'] = 0;
-            $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $params['gpo_evaluador'] . ' as ngpo, NULL AS grupos_ids_text,
+            $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $params['gpo_evaluador'] . ' as ngpo, \'\' AS grupos_ids_text,
               (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                     (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
@@ -2841,7 +2842,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
         $resultado = $query->result_array();
         $this->db->flush_cache();
         $query->free_result(); //Libera la memoria                                
-        //pr($this->db->last_query());
+//        pr($this->db->last_query());
 //        if (!empty($resultado)) {
 //            $resultado = $resultado[0];
 //        }
@@ -2862,7 +2863,7 @@ and encuestas.sse_curso_bloque_grupo.bloque=2*/
             $parametros = array('role_evaluador' => $rol, 'tutorizado' => $param['tutorizado'], 'cur_id' => $param['cur_id']);
 //            $result_prioridad = $this->getReglasRolEvaluador($parametros); //Obtiene reglas 
             $result_prioridad = $this->getReglaCursoPrioridad($parametros); //Obtiene reglas 
-            //pr($result_prioridad);
+//            pr($result_prioridad);
             if (!empty($result_prioridad)) {
 //                pr($result_prioridad);
                 $tmp_reg = array();

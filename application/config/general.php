@@ -306,8 +306,12 @@ $config['ENCUESTAS_RESPUESTAS_PREGUNTA'] = array(
 //      $config['url_sied_logout'] = 'http://11.32.41.92/kio/sied/app/login/logout.php';    
 // }
 
-$config['url_sied'] = 'http://11.32.41.30/kio/sied';
-$config['url_sied_logout'] = 'http://11.32.41.30/kio/sied/app/login/logout.php';
+//Liga sied productivo
+//$config['url_sied'] = 'http://11.32.41.30/kio/sied';
+//$config['url_sied_logout'] = 'http://11.32.41.30/kio/sied/app/login/logout.php';
+
+$config['url_sied'] = 'http://innovaedu.imss.gob.mx/sied';
+$config['url_sied_logout'] = 'http://innovaedu.imss.gob.mx/sied/app/login/logout.php';
 //$config['url_sied'] = 'http://11.32.41.92/kio/sied';
 //$config['url_sied_logout'] = 'http://11.32.41.92/kio/sied/app/login/logout.php';
 
