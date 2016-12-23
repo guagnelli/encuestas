@@ -43,7 +43,7 @@
         <div class="col-lg-6 col-sm-6">
             <div class="panel-body  input-group input-group-sm">
                 <!--<span class="input-group-addon">Sesiones:</span>-->
-                <label for="region"><span style="color:blue;">*</span> Región</label>
+                <label for="region"> Región</label>
                 <?php echo $this->form_complete->create_element(array('id' => 'region', 'type' => 'dropdown', 'options' => $region, 'first' => array('' => 'Seleccione región'), 'attributes' => array('name' => 'rol_evaluado', 'class' => 'form-control', 'placeholder' => 'Región', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Región', 'onchange' => "data_ajax($url_control)"))); ?>
             </div>
         </div>
@@ -52,7 +52,7 @@
         <div class="col-lg-6 col-sm-6">
             <div class="panel-body  input-group input-group-sm">
                 <!--<span class="input-group-addon">Sesiones:</span>-->
-                <label for="evaluado"><span style="color:blue;">*</span> Rol del evaluado</label>
+                <label for="evaluado"> Rol del evaluado</label>
                 <?php echo $this->form_complete->create_element(array('id' => 'rol_evaluado', 'type' => 'dropdown', 'options' => $rol_evaluado, 'first' => array('' => 'Seleccione un rol'), 'attributes' => array('name' => 'rol_evaluado', 'class' => 'form-control', 'placeholder' => 'Rol evaluado', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Rol que desempeño como docente', 'onchange' => "data_ajax($url_control)"))); ?>
             </div>
         </div>
