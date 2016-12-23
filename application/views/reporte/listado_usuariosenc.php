@@ -19,6 +19,7 @@
                     <th>Clave curso</th>
                     <th>Curso</th>
                     <th>Fecha inicio</th>
+                    <th>Año</th>
                     <th>Tutorizado</th>
                     <th>Rol del docente evaluado</th>
                     <th>Puntos rol</th>
@@ -62,6 +63,7 @@
                     <td>' . $val['cur_clave'] . '</td>
                     <td>' . $val['cur_nom_completo']. '</td>
                     <td>' . $val['fecha_inicio'] . '</td>                   
+                    <td>' . $val['anio'] . '</td>                   
                     <td>' . $val['tex_tutorizado'] . '</td>
                     <td>' . $val['rol_nom'] . '</td>
                     <td>'.$puntos_rol.'</td>
