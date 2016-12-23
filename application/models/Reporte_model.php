@@ -546,19 +546,19 @@ class Reporte_model extends CI_Model {
      * Obtiene las reglas de evaliación, nombres e identificadores BD
      */
     public function get_regla_evaluacion_nombre($all = '*') {
-        $select = array('reg.reglas_evaluacion_cve', 'mrlo."name"', 'rol_evaluado_cve', 'mrlr."name"',
-            'rol_evaluador_cve', 'reg.tutorizado',
+        $select = array('reg.reglas_evaluacion_cve', 'mrlo."name"', 'reg.rol_evaluado_cve', 'mrlr."name"',
+            'reg.rol_evaluador_cve', 'reg.tutorizado',
             "case reg.tutorizado when 1 then 'Tutorizado' when 0 then 'No tutorizado' end as text_tutorizado"
         );
         $this->db->select($select);
-        $this->db->join('mdl_role mrlo', 'mrlo.id = reg.rol_evaluado_cve');
-        $this->db->join('mdl_role mrlr', 'mrlr.id = reg.rol_evaluador_cve');
+        $this->db->join('public.mdl_role mrlo', 'mrlo.id = reg.rol_evaluado_cve');
+        $this->db->join('public.mdl_role mrlr', 'mrlr.id = reg.rol_evaluador_cve');
         $this->db->order_by('reg.tutorizado', 'desc');
-        $this->db->order_by('rol_evaluador_cve', 'asc');
-        if($all == 'excepcion'){
-        $this->db->where('is_excepcion > 0');
+        $this->db->order_by('reg.rol_evaluador_cve', 'asc');
+        //if($all == 'excepcion'){
+        //$this->db->where('reg.is_excepcion > 0');
             
-        }
+        //}
         $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
 
         return $query->result_array();
