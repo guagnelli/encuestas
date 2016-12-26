@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 // pr($formulario);
-$o = array('ordenar_detalle_por', 'ordenar_por', 'order_columns'); //Ordenmiento variantes 
+$o = array('ordenar_detalle_por', 'ordenar_por', 'order_columns', 'ordenar_por_puntos'); //Ordenmiento variantes 
 $order = array();
 foreach ($o as $val) {
 //    pr(${$val});

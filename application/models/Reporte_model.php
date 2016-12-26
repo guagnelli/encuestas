@@ -177,7 +177,93 @@ class Reporte_model extends CI_Model {
             $this->db->limit($params['per_page'], $params['current_row']);
         }
         $query = $this->db->get('mdl_user'); //Obtener conjunto de registros
-//        pr($this->db->last_query());                                  
+        pr($this->db->last_query());
+        $resultado['total'] = $num_rows[0]->total;
+        $resultado['columns'] = $query->list_fields();
+        $resultado['data'] = $query->result_array();
+        //pr($resultado['data']);
+        $this->db->flush_cache();
+        $query->free_result(); //Libera la memoria         
+
+        return $resultado;
+    }
+
+    public function reporte_usuarios_vista_cursos($params = null) {
+        $resultado = array();
+        $where_array = array (
+            'matriculado' =>'upper(muser.username)',
+            'namedocentedo' =>"upper(concat(muser.nom, ' ', muser.pat, ' ', muser.mat))",
+            'rol_evaluado' =>'mr.id',
+            'anio' =>'vdc.anio',
+//            $this->db->like('upper(shortname)', strtoupper($text));
+        );
+        
+//        pr($params);
+//        exit();
+        ///////////////////// Iniciar almacenado de parámetros en cache /////////////////////////
+        $this->db->start_cache();
+
+        if (isset($params['rol_evaluado']) && !empty(trim($params['rol_evaluado']))) {
+            //$guarda_busqueda = true;
+            $this->db->where($where_array['rol_evaluado'], $params['rol_evaluado']);
+        }
+        if (isset($params['text_buscar_docente_evaluado']) && !empty(trim($params['text_buscar_docente_evaluado']))) {
+            //$guarda_busqueda = true;
+            $this->db->like($where_array[$params['tipo_buscar_docente_evaluado']], strtoupper($params['text_buscar_docente_evaluado']));
+        }
+
+        if (isset($params['anio']) && !empty($params['anio'])) {
+            //$guarda_busqueda = true;
+            $this->db->where($where_array['anio'], $params['anio']);
+        }/**/
+
+        //pr($params);
+        $this->db->join('public.mdl_role_assignments mras', 'mras.userid=muser.id');
+        $this->db->join('public.mdl_role mr', 'mr.id=mras.roleid AND mr.id IN (14,18,32,33,30)');
+        $this->db->join('public.mdl_context mct', 'mct.id=mras.contextid');
+        $this->db->join('encuestas.view_datos_curso vdc', 'vdc.idc = mct.instanceid');
+        //$this->db->group_by("mdl_user.id");
+
+        $this->db->stop_cache();
+        /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
+        ///////////////////////////// Obtener número de registros ///////////////////////////////
+        $nr = $this->db->get_compiled_select('public.mdl_user muser'); //Obtener el total de registros
+        $num_rows = $this->db->query("SELECT count(*) AS total FROM (" . $nr . ") AS temp")->result();
+        //pr($this->db1->last_query());
+        /////////////////////////////// FIN número de registros /////////////////////////////////
+        $busqueda = array(
+            'muser.id', 'muser.username AS emp_matricula', 
+            'vdc.idc AS cur_id',
+            "concat(muser.nom, ' ', muser.pat, ' ', muser.mat) AS emp_nombre", 
+            'muser.curp AS emp_curp',
+            'vdc.clave AS cur_clave',
+            'vdc.namec AS cur_nom_completo',
+            'vdc.fecha_inicio',
+            'vdc.horascur',
+            'vdc.anio',
+            'vdc.fecha_fin AS fecha_fin', 
+            'mr.id AS rol_id',
+            'mr."name" AS rol_nom',
+            'vdc.tutorizado',
+            'vdc.tex_tutorizado', 
+            'vdc.tipo_curso_id',
+            'vdc.tipo_curso',
+            'vdc.alcance_curso', 
+            'vdc.puntaje_duracion', 
+            'vdc.horascur'
+        );
+
+
+        $this->db->select($busqueda);
+        if (isset($params['order']) && !empty($params['order'])) {
+            $tipo_orden = (isset($params['order_type']) && !empty($params['order_type'])) ? $params['order_type'] : "ASC";
+            $this->db->order_by($params['order'], $tipo_orden);
+        }
+        if (isset($params['per_page']) && isset($params['current_row'])) { //Establecer límite definido para paginación 
+            $this->db->limit($params['per_page'], $params['current_row']);
+        }
+        $query = $this->db->get('public.mdl_user muser'); //Obtener conjunto de registros
+//        pr($this->db->last_query());
         $resultado['total'] = $num_rows[0]->total;
         $resultado['columns'] = $query->list_fields();
         $resultado['data'] = $query->result_array();
@@ -439,13 +525,20 @@ class Reporte_model extends CI_Model {
                     'nrolevaluador' => 'Rol evaluador',
                     'nrolevaluado' => 'Rol evaluado',
                     'ngrupo' => 'Grupo');
+            case 'ordenar_por_puntos': return array(
+                    'muser.username' => 'Matrícula', 'muser.nom' => 'Nombre del evaluado',
+                    'vdc.clave' => 'Clave curso', 'vdc.namec' => 'Nombre curso',
+                    'vdc.fecha_inicio' => 'Añio', 'mr.id' => 'Rol evaluado',
+                    );
             case 'ordenar_detalle_por': return array(
                     'descripcion_encuestas' => 'Encuesta',
                     'nrolevaluador' => 'Rol evaluador',
                     'nrolevaluado' => 'Rol evaluado',
                     'ngrupo' => 'Grupo');
             case 'order_by': return array('ASC' => 'Ascendente', 'DESC' => 'Descendente');
-            case 'order_columns': return array('emp_matricula' => 'Matrícula', 'cve_depto_adscripcion' => 'Adscripción', 'cat_nombre' => 'Categoría', 'grup_nom' => 'BD');
+            case 'order_columns': return array('emp_matricula' => 'Matrícula', 
+                'cve_depto_adscripcion' => 'Adscripción', 
+                'cat_nombre' => 'Categoría', 'grup_nom' => 'BD');
             case 'delg_umae':
                 $del_umae = $this->get_general_catalogos(array('from' => 'departments.ssd_cat_delegacion', 'select' => array('nom_delegacion', 'cve_delegacion')));
                 return dropdown_options($del_umae, 'cve_delegacion', 'nom_delegacion');
@@ -466,7 +559,7 @@ class Reporte_model extends CI_Model {
                 return $temp_grupo;
             case 'bloques_p': return array(1 => 'Bloque 1', 2 => 'Bloque 2', 3 => 'Bloque 3', 4 => 'Bloque 4', 5 => 'Bloque 5');
             case 'is_bono_p': return array(1 => 'Si', 0 => 'No');
-            case 'is_bloque_o_grupo': return array('' => 'Seleccione agrupamiento', 'bloque' => 'Por bloque'/*, 'grupo' => 'Por grupo'*/);
+            case 'is_bloque_o_grupo': return array('' => 'Seleccione agrupamiento', 'bloque' => 'Por bloque'/* , 'grupo' => 'Por grupo' */);
             case 'tipo_implementacion': return array(1 => 'Tutorizado', 0 => 'No tutorizado');
             case 'tipo_course':
                 $tipo_course = $this->config->item('tipo_curso_DCG');
@@ -482,7 +575,7 @@ class Reporte_model extends CI_Model {
         $array = array(
             Reporte_model::GF_EVALUADO => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'order_by'),
             Reporte_model::GF_EVALUADO_DETALLE => array('buscar_docente_evaluado', 'buscar_categoria', 'rol_evaluado', 'region', 'delg_umae', 'umae', 'buscar_adscripcion', 'order_by'),
-            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by'),
+            Reporte_model::GF_EVALUADO_P => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por_puntos', 'anios', 'order_by'),
             Reporte_model::GF_EVALUADO_IMP => array('buscar_docente_evaluado', 'rol_evaluado', 'ordenar_por', 'anios', 'order_by', 'region', 'umae', 'delegacion'),
             Reporte_model::GF_ENCUESTA_IMP => array('is_bloque_o_grupo'),
             Reporte_model::GF_EVALUADOR => array('buscar_docente_evaluado', 'rol_evaluador', 'buscar_adscripcion', 'ordenar_por', 'order_by'),
@@ -557,7 +650,6 @@ class Reporte_model extends CI_Model {
         $this->db->order_by('reg.rol_evaluador_cve', 'asc');
         //if($all == 'excepcion'){
         //$this->db->where('reg.is_excepcion > 0');
-            
         //}
         $query = $this->db->get('encuestas.sse_reglas_evaluacion reg');
 

@@ -2,10 +2,10 @@
 
     $this->config->load('general');
     $pun_rol = $this->config->item('puntos_rol');
-    $pun_tc = $this->config->item('puntos_tipo_curso_id');
+    $pun_tc = $this->config->item('puntos_tipo_curso');
     $pun_hor = $this->config->item('puntos_horas');
 
-//    pr($empleados);
+
     ?>
 
     <div class="row">
@@ -19,7 +19,6 @@
                     <th>Clave curso</th>
                     <th>Curso</th>
                     <th>Fecha inicio</th>
-                    <th>Año</th>
                     <th>Tutorizado</th>
                     <th>Rol del docente evaluado</th>
                     <th>Puntos rol</th>
@@ -35,43 +34,35 @@
                 
                 foreach ($empleados as $key => $val) {
                     //rol_id
-//                    $puntos_horas=0;
-//                    if(isset($val['horascur'])){
-//                        if($val['horascur']>=120){
-//                            $puntos_horas=$pun_hor['>120']['PUN'];
-//                        }elseif($val['horascur']<120 && $val['horascur']>=80){
-//                            $puntos_horas=$pun_hor['>80']['PUN'];
-//                        }elseif($val['horascur']<80 && $val['horascur']>=40){
-//                            $puntos_horas=$pun_hor['>40']['PUN'];
-//                        }elseif($val['horascur']<40 && $val['horascur']>1){
-//                            $puntos_horas=$pun_hor['<40']['PUN'];
-//                        }else{
-//                            $puntos_horas=$pun_hor['=0']['PUN'];
-//                        }
-//                    }
-                    $total_puntos = 0;
-                    $puntos_rol = intval($pun_rol[$val['rol_id']]);
-                    $total_puntos += $puntos_rol;
-                    $puntos_tp_curso = intval($pun_tc[$val['tipo_curso_id']]);
-                    $total_puntos += $puntos_tp_curso;
-                    $puntos_duracion = intval($val['puntaje_duracion']);
-                    $total_puntos += $puntos_duracion;
-//                    $total_puntos = intval($pun_rol) + intval($puntos_tp_curso) + intval($puntos_duracion);
+                    $puntos_horas=0;
+                    if(isset($val['horascur'])){
+                        if($val['horascur']>=120){
+                            $puntos_horas=$pun_hor['>120']['PUN'];
+                        }elseif($val['horascur']<120 && $val['horascur']>=80){
+                            $puntos_horas=$pun_hor['>80']['PUN'];
+                        }elseif($val['horascur']<80 && $val['horascur']>=40){
+                            $puntos_horas=$pun_hor['>40']['PUN'];
+                        }elseif($val['horascur']<40 && $val['horascur']>1){
+                            $puntos_horas=$pun_hor['<40']['PUN'];
+                        }else{
+                            $puntos_horas=$pun_hor['=0']['PUN'];
+                        }
+                    }
+
                     echo '
                     <td>' . $val['emp_matricula'] . '</td>
-                    <td>' . $val['emp_nombre'] .'</td > 
+                    <td>' . $val['emp_nombre']. ' '. $val['emp_paterno']. ' '. $val['emp_materno'].'</td > 
                     <td>' . $val['cur_clave'] . '</td>
                     <td>' . $val['cur_nom_completo']. '</td>
                     <td>' . $val['fecha_inicio'] . '</td>                   
-                    <td>' . $val['anio'] . '</td>                   
-                    <td>' . $val['tex_tutorizado'] . '</td>
+                    <td>' . $val['tutorizado'] . '</td>
                     <td>' . $val['rol_nom'] . '</td>
-                    <td>'.$puntos_rol.'</td>
+                    <td>'.$pun_rol[$val['rol_id']].'</td>
                     <td>' . $val['tipo_curso']. '</td>
-                    <td>'.$puntos_tp_curso.'</td>
+                    <td>'.$pun_tc[$val['tipo_curso']].'</td>
                     <td>' . $val['horascur'] . '</td>
-                    <td>'.$puntos_duracion.'</td>
-                    <td class="success">'. $total_puntos .'</td>
+                    <td>'.$puntos_horas.'</td>
+                    <td class="success">'.($puntos_horas+$pun_tc[$val['tipo_curso']]+$pun_rol[$val['rol_id']]).'</td>
                     ';
                     echo '</tr>';
                 }

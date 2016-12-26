@@ -214,7 +214,8 @@ $config['ENCUESTAS_ROL_EVALUADOR'] = array(
     'TUTOR_ADJUNTO' => 33
 );
 
-$config['puntos_rol'] = array(14 => 3, //'Coordinador de curso'
+$config['puntos_rol'] = array(
+    14 => 3, //'Coordinador de curso'
     18 => 4, //Coordinador de tutores
     32 => 6, //Tutor titular
     33 => 4, //Tutor adjunto
@@ -223,6 +224,7 @@ $config['puntos_rol'] = array(14 => 3, //'Coordinador de curso'
 
 $config['tipo_curso_DCG'] = array(1 => 'Diplomado', 2 => 'Curso', 3 => 'Curso basado en GPC');
 $config['puntos_tipo_curso'] = array('CURSO' => 1, 'DIPLOMADO' => 3, 'CURSO BASADO EN GPC' => 1);
+$config['puntos_tipo_curso_id'] = array(2 => 1, 1 => 3, 3 => 1);//curso =2 ; diplomado=1; GPC=3;
 $config['puntos_horas'] = array(
     '=0' => array('PUN' => 0, 'DESC' => 'Default'),
     '<40' => array('PUN' => 1, 'DESC' => 'Menor que 40 y mayor a 1'),

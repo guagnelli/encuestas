@@ -201,13 +201,6 @@ class FiltrosReportes_Tpl extends Template {
             $this->CI->load->model('Reporte_model', 'rep_mod'); // modelo de reporte
             //Obtiene datos de los filtros
             $data_info = $this->CI->rep_mod->get_filtros_grupo($grupos_filtro_vista); //Carga datos para ver en grupo
-            if ($tipo_reporte == FiltrosReportes_Tpl::RB_RESUMEN_PUNTOS) {
-                $data_info['ordenar_por'] = array(
-                    'emp_matricula' => 'Matrícula', 'emp_nombre' => 'Nombre del evaluado',
-                    'cur_clave' => 'Clave curso', 'cur_nom_completo' => 'Nombre curso',
-                    'fecha_inicio' => 'Fecha inicio', 'rol_nom' => 'Rol evaluado', 'rol_nom' => 'Rol evaluado',
-                    'rol_nom_edor' => 'Rol evaluador');
-            }
             $data_info['controlador'] = $prop[FiltrosReportes_Tpl::C_CONTROL_FILTRO];
             $data_info['subtitulo'] = $prop[FiltrosReportes_Tpl::C_SUBTITULO];
             if (!is_null($data_extra) && (isset($data_extra['curso_url']) || isset($data_extra['texto_titulo']) || isset($data_extra['curso']))) {
