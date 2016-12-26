@@ -239,32 +239,35 @@ class Curso_model extends CI_Model {
      * $result['max_boque'] = 5;
      */
     function getGruposBloques($param) {
-//        $ind_ct = "(select max(concat(u.firstname,' ', u.lastname,' (',u.username,')')) 
-//                    FROM public.mdl_user u 
-//                    JOIN public.mdl_role_assignments ra ON ra.userid = u.id 
-//                    JOIN public.mdl_context ct ON ct.id = ra.contextid 
-//                    JOIN public.mdl_course c ON c.id = ct.instanceid 
-//                    JOIN public.mdl_role r ON r.id = ra.roleid 
-//                    RIGHT JOIN public.mdl_groups g ON g.courseid = c.id 
-//                    RIGHT JOIN public.mdl_groups_members gm ON gm.userid = u.id AND gm.groupid = g.id 
-//                    JOIN public.mdl_enrol en ON en.courseid = c.id 
-//                    JOIN public.mdl_user_enrolments ue ON ue.enrolid = en.id AND ue.userid = u.id 
-//                    where c.id = vdc.idc and r.id=18 and g.id=mdlg.id) as ct_bloque 
-//                 ";
-        $ind_ct = "(SELECT concat(muser.firstname,' ', muser.lastname,' (',muser.username,')')
-                        FROM tutorias.mdl_userexp expe
-                        JOIN public.mdl_user muser ON muser.id= expe.userid 
-                        JOIN public.mdl_role mr ON mr.id= expe.role and mr.id IN(18)
-                        JOIN public.mdl_groups mg ON mg.id=expe.grupoid 
-                        JOIN public.mdl_course c ON c.id=expe.cursoid
-                        WHERE 
-                        expe.cursoid = vdc.idc
-                        and mg.id = mdlg.id
-                    ) as ct_bloque";
+        //Obtiene información del coordinador de tutores 
+        $select_ct = array("concat(muser.firstname,' ', muser.lastname,' (',muser.username,')') as name_ct",
+            "mg.id as grupoid", "cursoid", "expe.id userid"
+        );
+        $this->db->join('public.mdl_user muser', 'muser.id= expe.userid');
+        $this->db->join('public.mdl_role mr', 'mr.id= expe.role and mr.id IN(18)');
+        $this->db->join('public.mdl_course c', 'c.id=expe.cursoid ');
+        $this->db->join('public.mdl_groups mg', 'mg.id=expe.grupoid and c.id = mg.courseid');
+        $this->db->select($select_ct);
+        $this->db->where('expe.cursoid', $param['vdc.idc']);
+        $this->db->order_by('grupoid');
+        $expediente = $this->db->get('tutorias.mdl_userexp expe');
+        $this->db->reset_query();
+        $expe_p = array();
+        foreach ($expediente->result_array() as $value) {
+            if (isset($expe_p[$value['grupoid']])) {
+                $tmp = $expe_p[$value['grupoid']];
+                $tmp_cts = $tmp . ', ' . $value['name_ct'];
+                $expe_p[$value['grupoid']] = $tmp_cts;
+            } else {
+                $expe_p[$value['grupoid']] = $value['name_ct'];
+            }
+        }
+
+
 
         $select = array(
             'vdc.idc', 'vdc.clave',
-            'cbg.bloque', 'mdlg.id', 'mdlg."name"', $ind_ct
+            'cbg.bloque', 'mdlg.id', 'mdlg."name"'
         );
         $group_by = array(
             'vdc.idc, vdc.clave',
@@ -294,6 +297,7 @@ class Curso_model extends CI_Model {
         $this->db->select($select);
         $query = $this->db->get('encuestas.view_datos_curso vdc');
         $result['grupos'] = $query->result_array();
+        $result['cts'] = $expe_p;
         $result['total_grupos'] = $num_rows[0]['total'];
         $result['max_boque'] = (!empty($max_bloque[0]['max_bloque'])) ? $max_bloque[0]['max_bloque'] : 0;
         return $result;

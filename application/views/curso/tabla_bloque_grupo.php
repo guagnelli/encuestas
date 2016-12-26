@@ -1,4 +1,7 @@
-<?php ?>
+<?php
+//pr($cts);
+//pr($grupos);
+?>
 <?php if (isset($grupos)) { ?>
     <div class="panel-body  input-group input-group-sm">
         <label for="lab_max_bloques">Cantidad de bloques</label>
@@ -16,8 +19,11 @@
             <tr>
                 <?php
                 foreach ($grupos as $key_g => $grupo) {
+                    $idgrupo = trim($grupo['id']);
+                    $ct = (isset($cts[$idgrupo])) ? $cts[$idgrupo] : '--';
                     echo '<tr>';
-                    echo '<td>' . $grupo['ct_bloque'] . '</td>';
+//                    echo '<td>' . $grupo['ct_bloque'] . '</td>';
+                    echo '<td>' . $ct . '</td>';
                     echo '<td>' . $grupo['name'] . '</td>';
                     echo '<td>';
                     echo $this->form_complete->create_element(array('id' => 'b_' . $grupo['id'],
