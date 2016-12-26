@@ -27,7 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //$config['base_url'] = 'http://11.32.41.238:9000/2016/ristfeb16/';
 //$config['base_url'] = 'http://127.0.0.1:8080/encuestas/';
 
-$config['base_url'] = 'http://localhost/encuestasrep/encuestasmod/';
+$config['base_url'] = 'http://localhost/encuestas_mod/';
 
 /*
 |--------------------------------------------------------------------------
