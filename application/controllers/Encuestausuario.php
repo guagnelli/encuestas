@@ -530,6 +530,7 @@ class Encuestausuario extends CI_Controller {
                             'encuesta_cve' => $valuer['encuesta_cve'],
                             'eva_tipo' => $valuer['eva_tipo'],
                             'is_bono' => $valuer['is_bono'],
+                            'rol_evaluador_cve' => $value,
                         );
                     }
 
@@ -626,9 +627,10 @@ class Encuestausuario extends CI_Controller {
                             } else {
                                 //echo "entra3";      
                                 //echo $valuer['encuesta_cve'];   //por usuario
+                                //echo $value;
                                 $datos_user_aeva[] = $this->enc_mod->listado_eval(array('role_evaluado' => $valuerg['rol_evaluado_cve'],
                                     'cur_id' => $idcurso, 'encuesta_cve' => $valuerg['encuesta_cve'],
-                                    'evaluador_user_cve' => $idusuario, 'role_evaluador' => $value));
+                                    'evaluador_user_cve' => $idusuario, 'role_evaluador' => $valuerg['rol_evaluador_cve']));
                             }
 
 
@@ -652,14 +654,19 @@ class Encuestausuario extends CI_Controller {
 
 
 
-
-
-
+                
+                
                 # code...
             } else {//Muestra mensaje que no hay permisos
                 $datos['coment_general'] = 'El usuario actual no cuenta con permisos para ver el curso actual. '
                         . '<br><br>Por favor verifique la ruta o inicie sesión nuevamente ';
             }
+
+            $datos_usuario_evaluador=$this->enc_mod->get_datos_usuarios_gral(array('user_id' => $idusuario));
+           
+            $nombreevaluador=$datos_usuario_evaluador[0]['nombres'].' '.$datos_usuario_evaluador[0]['apellidos'];
+            $datos['nombreevaluador']=$nombreevaluador;
+
             $main_contet = $this->load->view('encuesta/lista_usuarios', $datos, true);
             $this->template->setMainContent($main_contet);
             $this->template->getTemplate();

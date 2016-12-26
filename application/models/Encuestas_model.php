@@ -2992,6 +2992,34 @@ order by cbg.bloque*/
 
     }
 
+    public function get_datos_usuarios_gral($params=null){
+    $resultado = array();
+    $arrol=array();
+
+            if(isset($params['user_id']) && !empty($params['user_id']))
+            {
+                 $this->db->where('public.mdl_user.id',$params['user_id']);
+            } 
+      
+
+            //$this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
+            
+            $busqueda = array(
+                    
+                    'public.mdl_user.firstname as nombres', 
+                    'public.mdl_user.lastname as apellidos');
+            $this->db->select($busqueda);
+            $query = $this->db->get('public.mdl_user'); //Obtener conjunto de encuestas
+        
+       
+        $resultado = $query->result_array();
+        
+        $query->free_result(); //Libera la memoria
+
+        return $resultado;
+
+    }
+
 
 
 
