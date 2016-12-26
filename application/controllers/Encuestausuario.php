@@ -534,6 +534,7 @@ class Encuestausuario extends CI_Controller {
                     }
 
                 }
+                
 
                     //pr($reglasgral);
                     if (isset($reglasgral)) {
