@@ -90,7 +90,7 @@ class Curso extends CI_Controller {
         } else {
 
             $data['datos_curso'] = $this->cur_mod->detalle_curso(array('vdc.idc ' => $curso));
-            $result = $this->cur_mod->getGruposBloques(array('vdc.idc ' => $curso));
+            $result = $this->cur_mod->getGruposBloques(array('vdc.idc' => $curso));
 //            pr($result);
             $data_tabla = $result;
             $num_max = ($result['max_boque'] > 0) ? $result['max_boque'] : 5;

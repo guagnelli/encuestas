@@ -176,7 +176,7 @@
                                 <?php
                                 foreach ($grupos as $row) {
                                     $bloquespr = (!empty($row['bloque'])) ? $row['bloque'] : '--';
-                                    $ct = (!empty($row['ct_bloque'])) ? $row['ct_bloque'] : '--';
+                                    $ct = (isset($cts[$row['id']]) and !empty($cts[$row['id']])) ? $cts[$row['id']] : '--';
                                     echo '<tr>';
                                     echo '<td>' . $bloquespr . '</td>';
                                     echo '<td data-groupId="' . $row['id'] . '">' . $row['name'] . '</td>';
