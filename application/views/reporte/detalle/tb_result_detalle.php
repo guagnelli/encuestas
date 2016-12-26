@@ -18,11 +18,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Fecha fin</th>
                 <th>Bloque</th>
                 <th>CT</th>
-                <th>Grupo</th>
                 <th>Regla evaluación</th>
                 <th>Matrícula evaluado</th>
                 <th>Nombre evaluado</th>
                 <th>Rol evaluado</th>
+                <th>Grupo evaluado</th>
                 <th>Región evaluado</th>
                 <th>Delegación evaluado</th>
                 <th>Adscripción evaluado</th>
@@ -30,6 +30,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th>Matrícula evaluador</th>
                 <th>Nombre evaluador</th>
                 <th>Rol evaluador</th>
+                <th>Grupo evaluador</th>
                 <th>Región evaluador</th>
                 <th>Delegación evaluador</th>
                 <th>Categoría evaluador</th>
@@ -51,15 +52,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 foreach ($datos as $key_d => $dato) {
                     //$depto_evaluado = ((!empty($dato['depto_tut_nombre'])) ? $dato['depto_tut_nombre'] : $dato['depto_user_nombre']);
                     //$depto_rama_evaluado = ((!empty($dato['rama_tut_evaluador'])) ? $dato['rama_tut_evaluador'] : $dato['rama_uder_evaluador']);
-                    if(isset($dato['rama_tut_evaluador']) && !empty($dato['rama_tut_evaluador'])){
-                        $a_depto_rama_evaluado = explode(":", $dato['rama_tut_evaluador']);
+                    if(isset($dato['rama_tut_evaluado']) && !empty($dato['rama_tut_evaluado'])){
+                        $a_depto_rama_evaluado = explode(":", $dato['rama_tut_evaluado']);
                         //pr($a_depto_rama_evaluado);
-                        $rama_evaluador = (isset($a_depto_rama_evaluado[2])) ? explode("&", $a_depto_rama_evaluado[2]) : array('');
+                        $rama_evaluado = (isset($a_depto_rama_evaluado[2])) ? explode("&", $a_depto_rama_evaluado[2]) : array('');
+                    } else {
+                        $rama_evaluado[0] = '';
+                    }
+                    $rama = (isset($dato['rama_tut_evaluador']) && !empty($dato['rama_tut_evaluador'])) ? $dato['rama_tut_evaluador'] : ((isset($dato['rama_pre_evaluador']) && !empty($dato['rama_pre_evaluador'])) ? $dato['rama_pre_evaluador'] : '' );
+                    if($rama != ''){
+                        $a_depto_rama_evaluador = explode(":", $rama);
+                        //pr($a_depto_rama_evaluado);
+                        $rama_evaluador = (isset($a_depto_rama_evaluador[2])) ? explode("&", $a_depto_rama_evaluador[2]) : array('');
                     } else {
                         $rama_evaluador[0] = '';
                     }
                     //$grupo_nombre = (!empty($dato['grupo_nombre'])) ? str_replace("\",\"", ', ', trim($dato['grupo_nombre'], '{"}')) : '';
-                    $grupo_nombre = (!empty($dato['grupo_nombre'])) ? implode(str_getcsv(trim($dato['grupo_nombre'], '{}')), ', ') : '';
+                    $grupo_nombre = (!empty($dato['grupo_nombre'])) ? implode(str_getcsv(trim($dato['grupo_nombre'], '{}')), ', ') :  ((!empty($dato['grupo_nombre1'])) ? $dato['grupo_nombre1'] : '');
+                    $grupo_nombre_evaluado = (!empty($dato['grupo_evaluado'])) ? implode(str_getcsv(trim($dato['grupo_evaluado'], '{}')), ', ') : '';
                     echo '<tr>
                             <td>'.$dato['descripcion_encuestas'].'</td>
                             <td>'.($this->config->item('TIPO_INSTRUMENTOV')[$dato['tipo_encuesta']]).'</td>
@@ -72,18 +82,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <td>'.$dato['fecha_fin'].'</td>
                             <td>'.$dato['bloque'].'</td>
                             <td>'.$dato['ct_bloque'].'</td>
-                            <td>'.$grupo_nombre.'</td>
                             <td>'.$dato['evaluador_rol_nombre'].' a '.$dato['evaluado_rol_nombre'].' - '.$dato['tex_tutorizado'].'</td>
                             <td>'.$dato['evaluado_matricula'].'</td>
                             <td>'.$dato['evaluado_nombre'].' '.$dato['evaluado_apellido'].'</td>
                             <td>'.$dato['evaluado_rol_nombre'].'</td>
+                            <td>'.$grupo_nombre_evaluado.'</td>
                             <td>'.$dato['reg_tut_nombre'].'</td>
                             <td>'.((!empty($dato['depto_tut_nom_del'])) ? $dato['depto_tut_nom_del'] : '').'</td>
-                            <td>'.$rama_evaluador[0].'</td>
+                            <td>'.$rama_evaluado[0].'</td>
                             <td>'.((!empty($dato['evaluado_cat_tut_nom'])) ? $dato['evaluado_cat_tut_nom'] : '').'</td>
                             <td>'.$dato['evaluador_matricula'].'</td>
                             <td>'.$dato['evaluador_nombre'].' '.$dato['evaluador_apellido'].'</td>
-                            <td>'.$dato['evaluador_rol_nombre'].'</td>';
+                            <td>'.$dato['evaluador_rol_nombre'].'</td>
+                            <td>'.$grupo_nombre.'</td>';
                     if($dato['evaluador_rol_id']==$this->config->item('ENCUESTAS_ROL_EVALUADOR')['ALUMNO']){
                         echo '<td>'.((!empty($dato['reg_pre_eva_nombre'])) ? $dato['reg_pre_eva_nombre'] : '').'</td>
                             <td>'.((!empty($dato['depto_e_pre_nom_del'])) ? $dato['depto_e_pre_nom_del'] : '').'</td>

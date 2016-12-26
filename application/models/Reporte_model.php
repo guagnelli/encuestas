@@ -112,11 +112,17 @@ class Reporte_model extends CI_Model {
         $this->db->start_cache();
         $this->db->select('mdl_user.id');
 
-        if (isset($params['rol']) && !empty($params['rol'])) {
-            //$guarda_busqueda = true;
-            $this->db->where('mdl_role.id', $params['rol']);
+        if (isset($params['text_buscar_docente_evaluado']) && !empty($params['text_buscar_docente_evaluado'])) {
+            if(isset($params['tipo_buscar_docente_evaluado']) && $params['tipo_buscar_docente_evaluado']=='matriculado'){
+                $this->db->where("mdl_user.username like '%".$params['text_buscar_docente_evaluado']."%'");
+            } else {
+                $this->db->where("lower(mdl_user.nom) like lower('%".$params['text_buscar_docente_evaluado']."%') OR lower(mdl_user.pat) like lower('%".$params['text_buscar_docente_evaluado']."%') OR lower(mdl_user.mat) like lower('%".$params['text_buscar_docente_evaluado']."%')");
+            }
         }
-
+        if (isset($params['rol_evaluado']) && !empty($params['rol_evaluado'])) {
+            //$guarda_busqueda = true;
+            $this->db->where('mdl_role.id', $params['rol_evaluado']);
+        }
         if (isset($params['anio']) && !empty($params['anio'])) {
             //$guarda_busqueda = true;
             $this->db->where("TO_CHAR(TO_TIMESTAMP(mdl_course.startdate),'YYYY')='" . $params['anio'] . "'");
