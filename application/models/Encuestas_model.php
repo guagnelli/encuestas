@@ -1635,6 +1635,10 @@ class Encuestas_model extends CI_Model {
         $this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
 
 
+        $this->db->where_not_in('tutorias.mdl_userexp.userid', $params['evaluador_user_cve']);
+
+
+
         if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {
 
 
