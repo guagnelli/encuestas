@@ -1639,6 +1639,7 @@ class Encuestas_model extends CI_Model {
 
 
 
+
         if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {
 
 
