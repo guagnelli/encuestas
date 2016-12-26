@@ -1,6 +1,7 @@
 <?php if (isset($datos_user_aeva) && !empty($datos_user_aeva)) { ?>
     <div class="list-group-item">
-       <div style="text-align:right"><small><?php echo $nombreevaluador?> </small></div>
+       <div style="text-align:right"><small><?php echo $nombreevaluador?>
+        </small></div>
         <?php
         if (isset($error) AND ! is_null($error) AND ! empty($error)) {
             echo '<div class="row">

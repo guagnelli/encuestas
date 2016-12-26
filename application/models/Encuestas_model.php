@@ -2995,6 +2995,7 @@ order by cbg.bloque*/
     public function get_datos_usuarios_gral($params=null){
     $resultado = array();
     $arrol=array();
+    
 
             if(isset($params['user_id']) && !empty($params['user_id']))
             {

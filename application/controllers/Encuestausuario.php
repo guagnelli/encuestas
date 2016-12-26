@@ -663,7 +663,7 @@ class Encuestausuario extends CI_Controller {
             }
 
             $datos_usuario_evaluador=$this->enc_mod->get_datos_usuarios_gral(array('user_id' => $idusuario));
-           
+            
             $nombreevaluador=$datos_usuario_evaluador[0]['nombres'].' '.$datos_usuario_evaluador[0]['apellidos'];
             $datos['nombreevaluador']=$nombreevaluador;
 
