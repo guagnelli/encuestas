@@ -1894,7 +1894,8 @@ class Encuestas_model extends CI_Model {
         $evaluador_user_cve = $params['evaluador_user_cve'];
         $evaluado_rol_cve = $params['evaluado_rol_id'];
         $evaluador_rol_cve = $params['evaluador_rol_id'];
-        $is_bono = $params['is_bono'];
+//        $is_bono = $params['is_bono'];
+        $is_bono = 1;
 
         $data = array(
             'encuesta_cve' => $encuesta_cve,
@@ -1980,16 +1981,28 @@ class Encuestas_model extends CI_Model {
                     'base' => $promedio[0]['base_reg'],
                     'calif_emitida' => $promedio[0]['porcentaje']
                 );
-                $this->db->insert('encuestas.sse_result_evaluacion_encuesta_curso', $datares);
-            }else{
-                pr('No seencontro información para gardar un promedio');
+            } else {
+                $datares = array(
+                    'encuesta_cve' => $encuesta_cve,
+                    'course_cve' => $course_cve,
+                    'group_id' => $group_id,
+                    'evaluado_user_cve' => $evaluado_user_cve,
+                    'evaluador_user_cve' => $evaluador_user_cve,
+                    'total_puntua_si' => 0,
+                    'total_nos' => 0,
+                    'total_no_puntua_napv' => 0,
+                    'total_reactivos_bono' => 0,
+                    'base' => 0,
+                    'calif_emitida' => 0
+                );
+//s                pr('No seencontro información para gardar un promedio');
             }
+            $this->db->insert('encuestas.sse_result_evaluacion_encuesta_curso', $datares);
         }
 
         $this->db->trans_complete();
         if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
             $this->db->trans_rollback(); // si la transacción no es correcta retornar FALSE
-
             return false;
         } else {
 
