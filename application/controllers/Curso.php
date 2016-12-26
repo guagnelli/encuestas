@@ -145,7 +145,7 @@ class Curso extends CI_Controller {
                 }
             }
 
-            $result = $this->cur_mod->getGruposBloques(array('vdc.idc ' => $data_post['curso']));
+            $result = $this->cur_mod->getGruposBloques(array('vdc.idc' => $data_post['curso']));
             $data_tabla = $result;
             $num_max = ($result['max_boque'] > $data_post['max_bloques']) ? $result['max_boque'] : $data_post['max_bloques'];
             for ($i = 1; $i <= $num_max; $i++) {
