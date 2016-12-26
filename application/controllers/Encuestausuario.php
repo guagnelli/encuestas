@@ -605,7 +605,7 @@ class Encuestausuario extends CI_Controller {
                                               } */
                                         }
                                     }
-                                    //$this->session->set_userdata(array('datos_encuesta_usuario' => $datos_user_aeva));
+                                    $this->session->set_userdata(array('datos_encuesta_usuario' => $datos_user_aeva));
                                     //pr($this->session->userdata());
                                     /* foreach ($datos_usuario_bloque as $keyb => $valueb) {
 

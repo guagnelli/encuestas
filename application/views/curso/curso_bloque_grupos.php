@@ -4,7 +4,7 @@ echo form_open('curso/curso_bloque_grupos/' . $curso, array('id' => 'form_curso_
 $visible_msj = (isset($mensaje)) ? 'hidden' : 'none';
 $tipo_alert = (isset($tipo_alert)) ? 'alert alert-' . $tipo_alert : '';
 ?>
-'<div class="row">
+<div class="row">
     <div class="col-md-1 col-sm-1 col-xs-1" id="div_mensaje_visible" style='display:<?php echo $visible_msj; ?>'></div>
     <div id="div_mensaje_texto" class="col-md-10 col-sm-10 col-xs-10 <?php echo $tipo_alert; ?>">
         <?php if (isset($mensaje)) { ?>
@@ -12,7 +12,7 @@ $tipo_alert = (isset($tipo_alert)) ? 'alert alert-' . $tipo_alert : '';
         <?php } ?>
     </div>
     <div class="col-md-1 col-sm-1 col-xs-1"></div>
-</div>'
+</div>
 
 <?php if (isset($datos_curso)) { ?>
     <div class="panel-heading clearfix breadcrumbs6">
