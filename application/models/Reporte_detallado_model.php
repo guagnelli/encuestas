@@ -195,7 +195,7 @@ class Reporte_detallado_model extends CI_Model {
                 "(select * from departments.get_rama_completa(prereg_evaluador.cve_departamental, 7)) as rama_pre_evaluador",
             "tut_evaluador.cve_categoria as evaluador_cat_tut_id", "cat_tut_evaluador.nom_nombre as evaluador_cat_tut_nom", "prereg_evaluador.cve_cat as evaluador_cat_pre_id", "cat_pre_evaluador.nom_nombre as evaluador_cat_pre_nom", 
             "evaluado.username as evaluado_matricula", "evaluado.firstname as evaluado_nombre", "evaluado.lastname as evaluado_apellido", "evaluador.username as evaluador_matricula", "evaluador.firstname as evaluador_nombre", "evaluador.lastname as evaluador_apellido",
-            "enc.reglas_evaluacion_cve", "res_eva_enc.calif_emitida", "(select u.firstname||' '||u.lastname||' ('||u.username||')'
+            "enc.reglas_evaluacion_cve", "res_eva_enc.calif_emitida", "(select array_agg(DISTINCT(u.firstname||' '||u.lastname||' ('||u.username||')'))
                 FROM tutorias.mdl_userexp ue
                 JOIN public.mdl_user u ON u.id=ue.userid 
                 JOIN public.mdl_role r ON r.id=ue.role 
@@ -205,8 +205,9 @@ class Reporte_detallado_model extends CI_Model {
                 WHERE ue.role=18 
                 AND ue.grupoid=eva.group_id
                 AND ue.cursoid = eva.course_cve
-                GROUP BY u.firstname, u.lastname, u.username) AS ct_bloque",
-            "(SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id =ANY(regexp_split_to_array(eva.grupos_ids_text, ',')::bigint[])) AS grupo_nombre",
+                ) AS ct_bloque", //GROUP BY u.firstname, u.lastname, u.username
+            //"(SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id =ANY(regexp_split_to_array(eva.grupos_ids_text, ',')::bigint[])) AS grupo_nombre",
+            "CASE WHEN eva.grupos_ids_text <> '' AND eva.grupos_ids_text IS NOT NULL THEN (SELECT array_agg(g.name)::varchar FROM public.mdl_groups g WHERE g.id =ANY(regexp_split_to_array(eva.grupos_ids_text, ',')::bigint[])) ELSE null END AS grupo_nombre",
             "(SELECT array_agg(g.name)::varchar
                 FROM tutorias.mdl_userexp ue
                 JOIN public.mdl_user u ON u.id=ue.userid 
@@ -215,7 +216,7 @@ class Reporte_detallado_model extends CI_Model {
                 JOIN public.mdl_course c ON c.id=ue.cursoid
                 JOIN encuestas.sse_curso_bloque_grupo cbg ON cbg.mdl_groups_cve=g.id
                 WHERE ue.cursoid = eva.course_cve AND eva.evaluado_user_cve=ue.userid AND eva.evaluado_rol_id=ue.role
-                GROUP BY eva.evaluado_user_cve=ue.userid) as grupo_evaluado"
+                GROUP BY eva.evaluado_user_cve=ue.userid) as grupo_evaluado" //
         ); //"grupo.name as grupo_nombre"
         /* FROM public.mdl_user u
                 JOIN public.mdl_role_assignments ra ON ra.userid = u.id
