@@ -27,7 +27,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //$config['base_url'] = 'http://11.32.41.238:9000/2016/ristfeb16/';
 //$config['base_url'] = 'http://127.0.0.1:8080/encuestas/';
 
-$config['base_url'] = 'http://localhost/encuestas_mod/';
+//$config['base_url'] = 'http://localhost/encuestas_mod/';
+//$config['base_url'] = 'http://localhost/encuestas/';
+
+//$config['base_url'] = 'http://172.22.159.26/encuestas/';//Base de datos 
+//$config['base_url'] = 'http://172.22.235.18/encuestas/';//producción 
+$config['base_url'] = 'http://11.32.41.92/kio/encuestas/';//host 92
 
 /*
 |--------------------------------------------------------------------------
@@ -374,7 +379,8 @@ $config['encryption_key'] = '';
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'ci_session';
 $config['sess_expiration'] = 7200;
-$config['sess_save_path'] = NULL;
+//$config['sess_save_path'] = NULL;
+$config['sess_save_path'] = sys_get_temp_dir(); // se modficico esta linea el 31082016 20:18:00;
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = FALSE;
