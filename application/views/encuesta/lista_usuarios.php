@@ -1,4 +1,7 @@
-<?php if (isset($datos_user_aeva) && !empty($datos_user_aeva)) { ?>
+<?php if (isset($datos_user_aeva) && !empty($datos_user_aeva)) { 
+   //pr($datos_user_aeva);
+
+    ?>
     <div class="list-group-item">
        <div style="text-align:right"><small><?php echo $nombreevaluador?>
         </small></div>
@@ -48,33 +51,40 @@
             </thead>
             <tbody>
                 <?php
+                  //pr($datos_user_aeva);
                 foreach ($datos_user_aeva as $val) {
                     //pr($val);
-                    if (isset($val[0])) {
-                        if (isset($val[0]['ngpo']) && $val[0]['ngpo'] != '0') {
+                    foreach ($val as $keyl => $valuel) {
+
+                        //pr($valuel);# code...
+                    //}
+                    
+
+                    if (isset($valuel)) {
+                        if (isset($valuel['ngpo']) && $valuel['ngpo'] != '0') {
                             //$grupo = $val[0]['ngpo'];
-                            $grupo = (!empty($val[0]['ngpo'])) ? implode(str_getcsv(trim($val[0]['ngpo'], '{}')), ', ') : '';
+                            $grupo = (!empty($valuel['ngpo'])) ? implode(str_getcsv(trim($valuel['ngpo'], '{}')), ', ') : '';
                         } else {
                             $grupo = '--';
                         }
 
                         echo '<tr>
-                        <td >' . $val[0]['regla'] . '</td >
-                        <td >' . $val[0]['evaluador'] . '</td >
-                        <td >' . $val[0]['role'] . '</td > 
-                         <td >' . $val[0]['firstname'] . ' ' . $val[0]['lastname'] . '</td>
+                        <td >' . $valuel['regla'] . '</td >
+                        <td >' . $valuel['evaluador'] . '</td >
+                        <td >' . $valuel['role'] . '</td > 
+                         <td >' . $valuel['firstname'] . ' ' . $valuel['lastname'] . '</td>
                         <td > ' . $grupo . '</td >';
                         //<td >' . $val[0]['regla'] . '</td>
 
                         echo '<td>';
                         echo form_open('encuestausuario/instrumento_asignado', array('id' => 'form_curso'));
                         ?>
-                    <input type="hidden" id="idencuesta" name="idencuesta" value="<?php echo $val[0]['regla'] ?>">
-                    <input type="hidden" id="iduevaluado" name="iduevaluado" value="<?php echo $val[0]['userid'] ?>">
-                    <input type="hidden" id="idcurso" name="idcurso" value="<?php echo $val[0]['cursoid'] ?>">
+                    <input type="hidden" id="idencuesta" name="idencuesta" value="<?php echo $valuel['regla'] ?>">
+                    <input type="hidden" id="iduevaluado" name="iduevaluado" value="<?php echo $valuel['userid'] ?>">
+                    <input type="hidden" id="idcurso" name="idcurso" value="<?php echo $valuel['cursoid'] ?>">
                     <input type="hidden" id="idgrupo" name="idgrupo" value="<?php
-                    if (isset($val[0]['gpoid']) && $val[0]['gpoid'] > 0) {
-                        echo $val[0]['gpoid'];
+                    if (isset($valuel['gpoid']) && $valuel['gpoid'] > 0) {
+                        echo $valuel['gpoid'];
                     } else {
                         echo '0';
                     }
@@ -83,7 +93,7 @@
 
 
                     <?php
-                    if (isset($val[0]['realizado']) || !empty($val[0]['realizado'])) {
+                    if (isset($valuel['realizado']) || !empty($valuel['realizado'])) {
                         echo "Realizada";
                     } else {
                         ?>
@@ -105,6 +115,7 @@
                     echo '</tr>';
                     # code...
                 }
+              }  
             }
             ?>
             </tbody>
