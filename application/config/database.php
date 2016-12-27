@@ -18,7 +18,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   |	['dsn']      The full DSN string describe a connection to the database.
   |	['hostname'] The hostname of your database server.
   |	['username'] The username used to connect to the database
- * 
   |	['password'] The password used to connect to the database
   |	['database'] The name of the database you want to connect to
   |	['dbdriver'] The database driver. e.g.: mysqli.
@@ -75,40 +74,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
-$db['default1'] = array(
-    //'dsn' => '',
-    'dsn' => 'pgsql:host=localhost;port=5432;dbname=sied_2016',
-    //'hostname' => 'pgsql:host=localhost;dbname=my_db_test',
-    'hostname' => 'localhost',
+$db['default'] = array(
+'dsn' => 'pgsql:host=11.32.41.30;dbname=sied30_2016',// se agrego la base de datos correctamente kio_prod201 -> kio_prod2016
+    'hostname' => '11.32.41.30',
     'username' => 'postgres',
-    'password' => 'postgresql',
-    'database' => 'sied_2016',
-    //'dbdriver' => 'postgre',
-    'dbdriver' => 'pdo',
-    'port' => '5432',
-    'dbprefix' => '',
-    'pconnect' => FALSE,
-    'db_debug' => (ENVIRONMENT !== 'production'),
-    'cache_on' => FALSE,
-    'cachedir' => '',
-    'char_set' => 'utf8',
-    //'dbcollat' => 'utf8_general_ci',
-    'swap_pre' => '',
-    //'schema' => '',
-    'encrypt' => FALSE,
-    'compress' => FALSE,
-    'stricton' => FALSE,
-    'failover' => array(),
-    'save_queries' => TRUE
-);
-
-
-$db['default1'] = array(
-    'dsn' => 'pgsql:host=11.32.41.92;dbname=kio_prod2016',// se agrego la base de datos correctamente kio_prod201 -> kio_prod2016
-    'hostname' => '11.32.41.92',
-    'username' => 'innovaedu',
-    'password' => '1n_n0v43d.u',
-    'database' => 'kio_prod2016',
+    'password' => 'postgres',
+    'database' => 'sied30_2016',
     'dbdriver' => 'pdo',
     'port' => '5432',
     'dbprefix' => '',
@@ -127,12 +98,15 @@ $db['default1'] = array(
     'failover' => array(),
     'save_queries' => TRUE
 );
-$db['default'] = array(
-    'dsn' => 'pgsql:host=11.32.41.30;dbname=sied30_2016',// se agrego la base de datos correctamente kio_prod201 -> kio_prod2016
-    'hostname' => '11.32.41.30',
-    'username' => 'postgres',
-    'password' => 'postgres',
-    'database' => 'sied30_2016',
+
+
+
+$db['default1'] = array(
+    'dsn' => 'pgsql:host=11.32.41.92;dbname=kio_prod2016',// se agrego la base de datos correctamente kio_prod201 -> kio_prod2016
+    'hostname' => '11.32.41.92',
+    'username' => 'innovaedu',
+    'password' => '1n_n0v43d.u',
+    'database' => 'kio_prod2016',
     'dbdriver' => 'pdo',
     'port' => '5432',
     'dbprefix' => '',
