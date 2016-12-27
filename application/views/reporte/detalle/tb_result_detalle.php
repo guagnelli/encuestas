@@ -70,6 +70,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     //$grupo_nombre = (!empty($dato['grupo_nombre'])) ? str_replace("\",\"", ', ', trim($dato['grupo_nombre'], '{"}')) : '';
                     $grupo_nombre = (!empty($dato['grupo_nombre'])) ? implode(str_getcsv(trim($dato['grupo_nombre'], '{}')), ', ') :  ((!empty($dato['grupo_nombre1'])) ? $dato['grupo_nombre1'] : '');
                     $grupo_nombre_evaluado = (!empty($dato['grupo_evaluado'])) ? implode(str_getcsv(trim($dato['grupo_evaluado'], '{}')), ', ') : '';
+                    $ct_bloque = (!empty($dato['ct_bloque'])) ? implode(str_getcsv(trim($dato['ct_bloque'], '{}')), ', ') : '';
                     echo '<tr>
                             <td>'.$dato['descripcion_encuestas'].'</td>
                             <td>'.($this->config->item('TIPO_INSTRUMENTOV')[$dato['tipo_encuesta']]).'</td>
@@ -81,7 +82,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <td>'.$dato['fecha_inicio'].'</td>
                             <td>'.$dato['fecha_fin'].'</td>
                             <td>'.$dato['bloque'].'</td>
-                            <td>'.$dato['ct_bloque'].'</td>
+                            <td>'.$ct_bloque.'</td>
                             <td>'.$dato['evaluador_rol_nombre'].' a '.$dato['evaluado_rol_nombre'].' - '.$dato['tex_tutorizado'].'</td>
                             <td>'.$dato['evaluado_matricula'].'</td>
                             <td>'.$dato['evaluado_nombre'].' '.$dato['evaluado_apellido'].'</td>
