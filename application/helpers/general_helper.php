@@ -476,7 +476,7 @@ if (!function_exists('valida_sesion_activa')) {
         }
         $user_valido = (intval($user_id) == intval($id_user_actual)) ? 1 : 0;
         $valida_session = ($is_logeado == 1 and $user_valido); //Valida que el id del usuario que se logueo, sea igual al que desea consultar las encuestas
-        pr($valida_session);
+//        pr($valida_session);
         return $valida_session;
     }
 }

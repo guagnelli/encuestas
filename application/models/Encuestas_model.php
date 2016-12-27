@@ -1591,7 +1591,7 @@ class Encuestas_model extends CI_Model {
         $this->db->where($params['conditions']);
 
         $this->db->update('encuestas.sse_evaluacion', $params['fields']);
-        pr($this->db->last_query());
+//        pr($this->db->last_query());
         $this->db->trans_complete();
 
         if ($this->db->trans_status() === FALSE) { // condición para ver si la transaccion se efectuara correctamente
