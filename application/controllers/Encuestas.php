@@ -594,7 +594,6 @@ class Encuestas extends CI_Controller
 
                 $datos=array();
 
-
                 $copiado = $this->enc_mod->duplica_instrumento($id_instrumento);
 
                 if(isset($copiado['success']) && $copiado['success']==TRUE){
