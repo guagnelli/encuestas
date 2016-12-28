@@ -15,8 +15,7 @@
                             </div>';
         }
         ?>
-        
-    </div>
+            </div>
     <div class="panel-heading">  
             <table>
             <tr>

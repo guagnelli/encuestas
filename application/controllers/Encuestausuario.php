@@ -536,7 +536,6 @@ class Encuestausuario extends CI_Controller {
 
                 }
                 
-
                     //pr($reglasgral);
                     if (isset($reglasgral)) {
                         foreach ($reglasgral as $keyrg => $valuerg) {
