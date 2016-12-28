@@ -23,15 +23,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-//$config['base_url'] = 'http://11.32.41.242/~solucionesweb/rist/';
-//$config['base_url'] = 'http://11.32.41.238:9000/2016/ristfeb16/';
-//$config['base_url'] = 'http://127.0.0.1:8080/encuestas/';
-
-//$config['base_url'] = 'http://localhost/encuestas_mod/';
-//$config['base_url'] = 'http://localhost/encuestas/';
 
 //$config['base_url'] = 'http://172.22.159.26/encuestas/';//Base de datos 
 //$config['base_url'] = 'http://172.22.235.18/encuestas/';//producción 
+//$config['base_url'] = 'http://innovaedu.imss.gob.mx/encuestas/';//producción 
 $config['base_url'] = 'http://11.32.41.92/kio/encuestas/';//host 92
 
 /*
