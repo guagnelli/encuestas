@@ -594,7 +594,8 @@ class Encuestas extends CI_Controller
 
                 $datos=array();
 
-                $copiado = $this->enc_mod->duplica_intrumento($id_instrumento);
+
+                $copiado = $this->enc_mod->duplica_instrumento($id_instrumento);
 
                 if(isset($copiado['success']) && $copiado['success']==TRUE){
                         //$this->session->set_flashdata('success', 'El instrumento ha sido duplicado correctamente'); // devuelve mensaje flash
