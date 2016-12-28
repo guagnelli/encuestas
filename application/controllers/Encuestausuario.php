@@ -548,7 +548,8 @@ class Encuestausuario extends CI_Controller {
                             if ($valuerg['eva_tipo'] == 1) {
                                 //echo "entra";
                                 //por grupo
-                                $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario, 'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuerg['rol_evaluado_cve']));
+                                $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario, 
+                                    'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuerg['rol_evaluado_cve']));
 
 //                                pr($datos_usuario);
                                 if (isset($datos_usuario) || isset($datos_curso) || !empty($datos_usuario) || !empty($datos_curso)) {
@@ -575,7 +576,11 @@ class Encuestausuario extends CI_Controller {
                             } elseif ($valuerg['eva_tipo'] == 2) {
 
                                 //echo "entra2";//por bloque   # code...
-                                $datos_usuario_bloque = $this->enc_mod->get_datos_usuarios_bloque(array('user_id' => $idusuario, 'cur_id' => $idcurso, 'rol_evaluado_cve' => $valuerg['rol_evaluado_cve']));
+                                $datos_usuario_bloque = $this->enc_mod->get_datos_usuarios_bloque(array('user_id' => $idusuario, 
+                                    'cur_id' => $idcurso, 
+                                    'rol_evaluado_cve' => $valuerg['rol_evaluado_cve'],
+                                    'rol_evaluador_cve' => $valuerg['rol_evaluador_cve'],
+                                    ));
                                 //pr($datos_usuario_bloque);
 
                                 if (isset($datos_usuario_bloque) || isset($datos_curso) || !empty($datos_usuario_bloque) || !empty($datos_curso)) 
@@ -595,6 +600,8 @@ class Encuestausuario extends CI_Controller {
                                             foreach ($valueb_b as $key_data => $value_data) {
                                                 $grupos_ids .= $value_data['cve_grupo'] . ',';
                                             }
+
+
                                             $datos_user_aeva[] = $this->enc_mod->listado_eval(array('bloque_evaluador' => $bloque_evaluador,
                                                 'role_evaluado' => $valuerg['rol_evaluado_cve'],
                                                 'cur_id' => $idcurso, 'encuesta_cve' => $valuerg['encuesta_cve'],

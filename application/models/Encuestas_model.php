@@ -1430,6 +1430,11 @@ class Encuestas_model extends CI_Model {
                 $this->db->where_not_in('public.mdl_role.id', $params['rol_evaluado_cve']);
             }
 
+            if (isset($params['rol_evaluador_cve']) && !empty($params['rol_evaluador_cve'])) {
+            $this->db->where('public.mdl_role.id', $params['rol_evaluador_cve']);
+            }
+
+
             if (isset($params['user_id']) && !empty($params['user_id'])) {
                 $this->db->where('public.mdl_user.id', $params['user_id']);
             }
@@ -1632,6 +1637,7 @@ class Encuestas_model extends CI_Model {
           $realizado=0;
           }  pr($params); */
         $this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
+        $this->db->where('tutorias.mdl_userexp.ind_status', '1');
 
 
         $this->db->where_not_in('tutorias.mdl_userexp.userid', $params['evaluador_user_cve']);
@@ -1683,13 +1689,20 @@ class Encuestas_model extends CI_Model {
                 $grupo_condition = "public.mdl_groups.name as ngpo, \'\' AS grupos_ids_text";
             }
 
-
-            $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
+            
+            $consulta ='public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
+                (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
+                    $params['encuesta_cve'] . ' as regla,  tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
+                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
+                    and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado';
+            $this->db->distinct($consulta);
+            $this->db->select($consulta);
+           /* $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                 (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
                     and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
-
+            */
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
             $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
             $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
@@ -2956,6 +2969,9 @@ class Encuestas_model extends CI_Model {
         if (isset($params['rol_evaluado_cve']) && !empty($params['rol_evaluado_cve'])) {
             $this->db->where_not_in('public.mdl_role.id', $params['rol_evaluado_cve']);
         }
+        if (isset($params['rol_evaluador_cve']) && !empty($params['rol_evaluador_cve'])) {
+            $this->db->where('public.mdl_role.id', $params['rol_evaluador_cve']);
+        }
 
         if (isset($params['user_id']) && !empty($params['user_id'])) {
             $this->db->where('public.mdl_user.id', $params['user_id']);
@@ -2986,6 +3002,7 @@ class Encuestas_model extends CI_Model {
 
 
         $resultado = $query->result_array();
+        //pr($this->db->last_query());
 
         $query->free_result(); //Libera la memoria
 
