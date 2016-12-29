@@ -42,6 +42,35 @@ class Resultadocursoencuesta extends CI_Controller {
         $this->template->getTemplate();
     }
 
+    public function exportar_enc_contestadas() {
+        if ($this->input->post()) {
+            $data_post = $this->input->post();
+//                pr($data_post);
+//                exit();
+            $data_post['current_row'] = 0;
+            unset($data_post['per_page']);
+
+            $resultado = $this->encur_mod->listado_evaluados($data_post); //Datos del formulario se envían para generar la consulta segun los filtros
+
+            $data['total_empleados'] = $resultado['total'];
+            $data['empleados'] = $resultado['data'];
+
+            $filename = "ExpEncuestasContestadas_" . date("d-m-Y_H-i-s") . ".xls";
+            header("Content-Type: application/vnd.ms-excel; charset=UTF-8;");
+//            header("Content-Type: application/octet-stream; charset=UTF-8;");
+            header("Content-Encoding: UTF-8");
+            header("Content-Disposition: attachment; filename=$filename");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            echo "\xEF\xBB\xBF"; // UTF-8 BOM
+            echo $this->load->view('curso/listado_evaluados', $data, TRUE);
+//            $this->load->view('reporte/listado_usuariosrep_xsl', $data);
+            //Mostrar resultados
+        } else {
+            echo data_not_exist('No han sido encontrados datos con los criterios seleccionados. <script> $("#btn_export").hide(); </script>'); //Mostrar mensaje de datos no existentes
+        }
+    }
+
     public function get_data_ajax($curso = null, $current_row = null) {
         if ($this->input->is_ajax_request()) { //Sólo se accede al método a través de una petición ajax
             if (isset($curso) && !empty($curso)) {
@@ -63,10 +92,10 @@ class Resultadocursoencuesta extends CI_Controller {
                     $data['error'] = $error;
 
                     //Checar el tipo de curso
-                    $datos_curso = $this->cur_mod->listado_cursos(array('cur_id' => $curso));
+//                    $datos_curso = $this->cur_mod->listado_cursos(array('cur_id' => $curso));
 
                     $resultado = $this->encur_mod->listado_evaluados($filtros); //Datos del formulario se envían para generar la consulta segun los filtros
-                    //pr($resultado);
+//                    pr($resultado);
 
                     $data['total_empleados'] = $resultado['total'];
                     $data['empleados'] = $resultado['data'];
@@ -136,7 +165,7 @@ class Resultadocursoencuesta extends CI_Controller {
 
         $this->load->model('Reporte_model', 'rep_mod'); // modelo de cursos
         $data += $this->rep_mod->get_filtros_generales_reportes();
-        
+
 //        pr($datos);
 //        $datos['order_columns'] += array('nombre' => 'Nombre', 'nrolevaluador' => 'Rol evaluador', 'nrolevaluado' => 'Rol evaluado', 'ngrupo' => 'Grupo');
         $data['curso'] = $curso;

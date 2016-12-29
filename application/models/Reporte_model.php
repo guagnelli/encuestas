@@ -16,7 +16,8 @@ class Reporte_model extends CI_Model {
             GF_ENCUESTA_DETALLE = 'encuesta_detalle',
             GF_CURSO = 'curso',
             GF_CURSO_DETALLE = 'curso_detalle',
-            GF_GENERAL = 'general'
+            GF_GENERAL = 'general',
+            GF_GENERAL_CNCE = 'general_enc_connoc'
 
     ;
 
@@ -504,6 +505,7 @@ class Reporte_model extends CI_Model {
         foreach ($key_datos as $value) {
             $result[$value] = $this->getCatalogoInfoReportes($value); //Obtiene el valor de los datos
         }
+//        pr($result);
         return $result;
     }
 
@@ -591,6 +593,7 @@ class Reporte_model extends CI_Model {
             Reporte_model::GF_CURSO => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'is_bono_p', 'ordenar_por', 'order_by'),
             Reporte_model::GF_CURSO_DETALLE => array('buscar_instrumento', 'anios', 'tipo_implementacion', 'order_by'),
             Reporte_model::GF_GENERAL => array('ordenar_detalle_por'),
+            Reporte_model::GF_GENERAL_CNCE => array('ordenar_por', 'order_by'),
         );
         return $array;
     }

@@ -135,11 +135,11 @@
                                     <h3>Reportes:</h3>
                                 </th>
                             </tr>
-                            <tr>                
+<!--                            <tr>                
                                 <td>
-                                    <a href="<?php echo site_url('resultadocurenrealizada/curso_encuesta_general/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Concentrado de encuestas (Estatus)</a>
+                                    <a href="<?php // echo site_url('resultadocurenrealizada/curso_encuesta_general/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Concentrado de encuestas (Estatus)</a>
                                 </td>
-                            </tr>
+                            </tr>-->
                             <tr>                
                                 <td>
                                     <a href="<?php echo site_url('resultadocursoencuesta/curso_encuesta_resultado/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Encuestas contestadas </a>
@@ -147,7 +147,7 @@
                             </tr>
                             <!-- <tr>                
                                 <td>
-                                    <a href="<?php echo site_url('resultadocursoencuesta/curso_encuesta_resultado_detalle/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Detalle de encuestas contestadas</a>
+                                    <a href="<?php // echo site_url('resultadocursoencuesta/curso_encuesta_resultado_detalle/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Detalle de encuestas contestadas</a>
                                 </td>
                             </tr> -->
                             <tr>                

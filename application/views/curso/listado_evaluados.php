@@ -28,7 +28,7 @@
                     <td >' .htmlentities($val['nombre']) . ' '. htmlentities($val['apellidos']). '</td>
                     <td > ' . $val['nrolevaluado'] . '</td >
                     <td > ' . $val['ngrupo'] . '</td >
-                    <td > ' . rand (1, 10) . '</td >
+                    <td > ' . $val['bloque'] . '</td >
                     <td > ' . $val['calif_emitida'] . '</td >'; 
                     
 

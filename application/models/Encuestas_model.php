@@ -2117,6 +2117,7 @@ class Encuestas_model extends CI_Model {
         $this->db->join('public.mdl_course', 'public.mdl_course.id=encuestas.sse_result_evaluacion_encuesta_curso.course_cve', 'left');
         $this->db->join('encuestas.sse_encuestas', 'encuestas.sse_encuestas.encuesta_cve=encuestas.sse_result_evaluacion_encuesta_curso.encuesta_cve');
         $this->db->join('encuestas.sse_reglas_evaluacion', 'encuestas.sse_reglas_evaluacion.reglas_evaluacion_cve=encuestas.sse_encuestas.reglas_evaluacion_cve');
+        $this->db->join('encuestas.sse_curso_bloque_grupo cbg', 'cbg.course_cve = encuestas.sse_result_evaluacion_encuesta_curso.course_cve and cbg.mdl_groups_cve = encuestas.sse_result_evaluacion_encuesta_curso.group_id');
 
         $this->db->stop_cache();
         /////////////////////// Fin almacenado de parámetros en cache ///////////////////////////
@@ -2141,8 +2142,9 @@ class Encuestas_model extends CI_Model {
             '(select name from public.mdl_groups where id=encuestas.sse_result_evaluacion_encuesta_curso.group_id) as ngrupo',
             '(select public.mdl_user.firstname ||  \'  \'  || public.mdl_user.lastname from public.mdl_user where id=sse_result_evaluacion_encuesta_curso.evaluador_user_cve) as nombreevaluador',
             '(select * from departments.get_rama_completa((select cve_departamental from public.mdl_user where id=evaluado_user_cve), 7)) as ramaevaluado',
-            '(select * from departments.get_rama_completa((select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=course_cve), 7)) as ramaevaluador',
-            '(select username from public.mdl_user where id=evaluador_user_cve) as matricula_evaluador'
+            '(select * from departments.get_rama_completa((select cve_departamental from gestion.sgp_tab_preregistro_al where nom_usuario like (select username from public.mdl_user where id=evaluador_user_cve) and cve_curso=encuestas.sse_result_evaluacion_encuesta_curso.course_cve), 7)) as ramaevaluador',
+            '(select username from public.mdl_user where id=evaluador_user_cve) as matricula_evaluador',
+            'cbg.bloque',
         );
 
         $this->db->select($busqueda);
@@ -2155,7 +2157,7 @@ class Encuestas_model extends CI_Model {
         }
 
         $this->db->group_by('sse_result_evaluacion_encuesta_curso.evaluacion_resul_cve,mdl_user.username, mdl_user.firstname,mdl_user.lastname,mdl_course.shortname,mdl_course.fullname,
-            sse_reglas_evaluacion.rol_evaluado_cve,sse_reglas_evaluacion.rol_evaluador_cve');
+            sse_reglas_evaluacion.rol_evaluado_cve,sse_reglas_evaluacion.rol_evaluador_cve, cbg.bloque');
 
         $query = $this->db->get('encuestas.sse_result_evaluacion_encuesta_curso'); //Obtener conjunto de registros
 //        pr($this->db->last_query());                                  

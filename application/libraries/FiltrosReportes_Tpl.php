@@ -79,6 +79,20 @@ class FiltrosReportes_Tpl extends Template {
                 FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "#listado_resultado_empleado",
                 FiltrosReportes_Tpl::C_LINK_EXPORTAR => "reporte_bonos/exportar_implementacion",
             ),
+            FiltrosReportes_Tpl::RE_CONTESTADAS_NO_CONTESTADAS_PROMEDIO => array(
+                FiltrosReportes_Tpl::C_VIEW_FILTRO => 'curso/cur_enc_resultado',
+                FiltrosReportes_Tpl::C_VIEW_RESULT => 'reporte/',
+                FiltrosReportes_Tpl::C_CONTROL_FILTRO => 'resultadocursoencuesta/curso_encuesta_resultado/',
+                FiltrosReportes_Tpl::C_CONTROL_RESULT => '',
+                FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(Reporte_model::GF_GENERAL_CNCE),
+//                FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(),
+                FiltrosReportes_Tpl::C_TITULO => 'Encuestas contestadas',
+                FiltrosReportes_Tpl::C_SUBTITULO => 'Listado de encuestas realizadas por curso',
+                FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/resultadocursoencuesta/get_data_ajax', '#form_curso', '#listado_resultado'",
+                FiltrosReportes_Tpl::C_NAME_FORMULARIO => "#form_curso",
+                FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "#listado_resultado",
+                FiltrosReportes_Tpl::C_LINK_EXPORTAR => "resultadocursoencuesta/exportar_enc_contestadas/",
+            ),
             FiltrosReportes_Tpl::RB_ENCUESTAS_DETALLE => array(
                 FiltrosReportes_Tpl::C_VIEW_FILTRO => 'reporte/detalle/detalle',
                 FiltrosReportes_Tpl::C_VIEW_RESULT => 'reporte/detalle/tb_result_detalle',
@@ -100,20 +114,6 @@ class FiltrosReportes_Tpl extends Template {
                 FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(),
                 FiltrosReportes_Tpl::C_TITULO => 'Reporte de indicadores',
                 FiltrosReportes_Tpl::C_SUBTITULO => '',
-                FiltrosReportes_Tpl::C_NAME_FORMULARIO => "",
-                FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "",
-                FiltrosReportes_Tpl::C_LINK_EXPORTAR => "",
-            ),
-            FiltrosReportes_Tpl::RE_CONTESTADAS_NO_CONTESTADAS_PROMEDIO => array(
-                FiltrosReportes_Tpl::C_VIEW_FILTRO => 'curso/cur_enc_resultado',
-                FiltrosReportes_Tpl::C_VIEW_RESULT => 'reporte/',
-                FiltrosReportes_Tpl::C_CONTROL_FILTRO => '',
-                FiltrosReportes_Tpl::C_CONTROL_RESULT => '',
-                FiltrosReportes_Tpl::C_CONTROL_FILTRO => 'reporte_detallado/index',
-                FiltrosReportes_Tpl::C_GRUPO_DATOS_ARRAY => array(Reporte_model::GF_ENCUESTA, Reporte_model::GF_EVALUADO, Reporte_model::GF_EVALUADOR),
-                FiltrosReportes_Tpl::C_TITULO => 'Encuestas contestadas',
-                FiltrosReportes_Tpl::C_SUBTITULO => 'Listado de encuestas realizadas por curso',
-                FiltrosReportes_Tpl::C_URL_CONTROL => "site_url+'/resultadocursoencuesta/get_data_ajax', '#form_curso', '#listado_resultado'",
                 FiltrosReportes_Tpl::C_NAME_FORMULARIO => "",
                 FiltrosReportes_Tpl::C_NAME_DIV_RESULTADO => "",
                 FiltrosReportes_Tpl::C_LINK_EXPORTAR => "",
@@ -202,6 +202,7 @@ class FiltrosReportes_Tpl extends Template {
             //Obtiene datos de los filtros
             $data_info = $this->CI->rep_mod->get_filtros_grupo($grupos_filtro_vista); //Carga datos para ver en grupo
             $data_info['controlador'] = $prop[FiltrosReportes_Tpl::C_CONTROL_FILTRO];
+//            pr($data_info);
             $data_info['subtitulo'] = $prop[FiltrosReportes_Tpl::C_SUBTITULO];
             if (!is_null($data_extra) && (isset($data_extra['curso_url']) || isset($data_extra['texto_titulo']) || isset($data_extra['curso']))) {
                 $data_info['url_control'] = $data_extra['curso_url'];

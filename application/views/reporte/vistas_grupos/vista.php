@@ -146,6 +146,7 @@ foreach ($js as $file_js) {
     });
     $(window).load(function () {
 //        $( "#btn_buscar_b" ).trigger( "click" );
+<?php // $extrac = (isset($curso))? $curso:''?>
 <?php if (!empty($exportar)) { ?>
             $("#btn_export").click(function (event) {
                 event.preventDefault();
