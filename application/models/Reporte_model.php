@@ -536,7 +536,7 @@ class Reporte_model extends CI_Model {
             case 'ordenar_por_puntos': return array(
                     'muser.username' => 'Matrícula', 'muser.nom' => 'Nombre del evaluado',
                     'vdc.clave' => 'Clave curso', 'vdc.namec' => 'Nombre curso',
-                    'vdc.fecha_inicio' => 'Añio', 'mr.id' => 'Rol evaluado',
+                    'vdc.fecha_inicio' => 'Año', 'mr.id' => 'Rol evaluado',
                     );
             case 'ordenar_detalle_por': return array(
                     'descripcion_encuestas' => 'Encuesta',

@@ -50,7 +50,7 @@
 //                        }
 //                    }
                     $total_puntos = 0;
-                    $puntos_rol = intval($pun_rol[$val['rol_id']]);
+                    $puntos_rol = intval($pun_rol[$val['rol_id'].'_'.$val['tutorizado']]);
                     $total_puntos += $puntos_rol;
                     $puntos_tp_curso = intval($pun_tc[$val['tipo_curso_id']]);
                     $total_puntos += $puntos_tp_curso;

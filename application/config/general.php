@@ -215,11 +215,17 @@ $config['ENCUESTAS_ROL_EVALUADOR'] = array(
 );
 
 $config['puntos_rol'] = array(
-    14 => 3, //'Coordinador de curso'
-    18 => 4, //Coordinador de tutores
-    32 => 6, //Tutor titular
-    33 => 4, //Tutor adjunto
-    30 => 0// coordinador normativo
+    '14_0' => 2, //'Coordinador de curso no tutorizado'
+    '14_1' => 3, //'Coordinador de curso tutorizado'
+    '18_1' => 4, //Coordinador de tutores tutorizado
+    '32_1' => 6, //Tutor titular
+    '33_1' => 4, //Tutor adjunto
+    '30_1' => 0,// coordinador normativo
+    //No pasa en el negocio, pero en programacion es importante para evitar errores
+    '18_0' => 4, //Coordinador de tutores tutorizado
+    '32_0' => 6, //Tutor titular
+    '33_0' => 4, //Tutor adjunto
+    '30_0' => 0// coordinador normativo
 );
 
 $config['tipo_curso_DCG'] = array(1 => 'Diplomado', 2 => 'Curso', 3 => 'Curso basado en GPC');
