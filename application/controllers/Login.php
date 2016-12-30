@@ -27,38 +27,38 @@ class Login extends CI_Controller {
         $this->config->load('general');
     }
 
-    public function logeo($id=NULL) {
+    public function logeo($id = NULL) {
 
-         $url_sied = $this->config->item('url_sied');
-        if(isset($id))
-        {
-       
-            $usuario = $this->enc_mod->usuario_existe($id);
-            if (isset($usuario)) 
-            {
-                $token=md5(uniqid(rand(),TRUE));
-                $usuario_data = array(
-                    'id' => $usuario->id,
-                    'nombre' => $usuario->nombre.' '.$usuario->apellidos,
-                    'logueado' => TRUE,
-                    'token' => $token
-               
-                );
-                //pr($usuario_data);
-                $this->session->set_userdata($usuario_data);
-                redirect('encuestas/index');
-            }else{
+        $url_sied = $this->config->item('url_sied');
+        if (is_numeric($id)) {
+            $sesion_valida = valida_sesion_activa($id);
+            if ($sesion_valida) {
+//                if (isset($id)) {
+                $usuario = $this->enc_mod->usuario_existe($id);
+                if (isset($usuario)) {
+                    $token = md5(uniqid(rand(), TRUE));
+                    $usuario_data = array(
+                        'id' => $usuario->id,
+                        'nombre' => $usuario->nombre . ' ' . $usuario->apellidos,
+                        'logueado' => TRUE,
+                        'token' => $token
+                    );
+                    //pr($usuario_data);
+                    $this->session->set_userdata($usuario_data);
+                    redirect('encuestas/index');
+                } else {
+                    redirect($url_sied);
+                    //redirect('http://11.32.41.13/kio/sied');
+                }
+            } else {
+                //echo 'entra';
                 redirect($url_sied);
                 //redirect('http://11.32.41.13/kio/sied');
-         
             }
+        } else {
 
-        }else{
-            //echo 'entra';
             redirect($url_sied);
-            //redirect('http://11.32.41.13/kio/sied');
         }
-
     }
 
     private function checkbrute($matricula) {

@@ -15,8 +15,8 @@ class Iniciar_sesion
         $logueado = $CI->session->userdata('logueado'); ///Obtener datos de sesión
         $usuario_id = $CI->session->userdata('id');
         $sesion_id = $CI->session->userdata('token');
-
-        if($logueado == TRUE){
+//        pr($logueado);
+        if($logueado){
 
             $modulos_permitidos = $CI->config->item('menu_super_admin');
 

@@ -487,6 +487,8 @@ class Encuestausuario extends CI_Controller {
 //                pr($data_get);
             $idusuario = $data_get['iduser'];
             $idcurso = $data_get['idcurso'];
+//            pr($this->session->userdata('logueado'));
+//            pr($this->session->userdata('id'));
             $sesion_valida = valida_sesion_activa($idusuario);
             //$sesion_valida = 1;
             if ($sesion_valida) {
