@@ -1431,7 +1431,7 @@ class Encuestas_model extends CI_Model {
             }
 
             if (isset($params['rol_evaluador_cve']) && !empty($params['rol_evaluador_cve'])) {
-            $this->db->where('public.mdl_role.id', $params['rol_evaluador_cve']);
+                $this->db->where('public.mdl_role.id', $params['rol_evaluador_cve']);
             }
 
 
@@ -1689,20 +1689,20 @@ class Encuestas_model extends CI_Model {
                 $grupo_condition = "public.mdl_groups.name as ngpo, \'\' AS grupos_ids_text";
             }
 
-            
-            $consulta ='public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
+
+            $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla,  tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
                 (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
                     and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado';
             $this->db->distinct($consulta);
             $this->db->select($consulta);
-           /* $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
-                (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
-                    $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
-                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
-                    and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
-            */
+            /* $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
+              (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
+              $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
+              (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . '
+              and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
+             */
 
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
             $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
@@ -1921,15 +1921,18 @@ class Encuestas_model extends CI_Model {
             'evaluador_rol_id' => $evaluador_rol_cve,
         );
         $datos_encuesta_usuario = $this->session->userdata('datos_encuesta_usuario');
+//        pr($datos_encuesta_usuario);
         if (!is_null($datos_encuesta_usuario)) { //Guardar grupos, para el caso de que el tipo sea por bloques
             foreach ($datos_encuesta_usuario as $key_du => $value_du) {
                 foreach ($value_du as $key_gr => $value_gr) {
-                    if ($value_gr['rol_id'] == $evaluado_rol_cve && $value_gr['cursoid'] == $course_cve && $value_gr['gpoid'] == $group_id && $value_gr['userid'] == $evaluado_user_cve) {
+
+                    if (isset($value_gr['gpoid']) && $value_gr['rol_id'] == $evaluado_rol_cve && $value_gr['cursoid'] == $course_cve && $value_gr['gpoid'] == $group_id && $value_gr['userid'] == $evaluado_user_cve) {
                         $data['grupos_ids_text'] = $value_gr['grupos_ids_text'];
                     }
                 }
             }
         }
+        exit();
         //pr($_SESSION);
         //pr($datos_encuesta_usuario);
         //pr($data);
@@ -1975,10 +1978,12 @@ class Encuestas_model extends CI_Model {
                 'evaluador_rol_id' => $evaluador_rol_cve,
                 'evaluador_user_cve' => $evaluador_user_cve,
                 'encuesta_cve' => $encuesta_cve,
-                'is_bono' => $is_bono)
+                'is_bono' => $is_bono
+                    )
             ;
 
             $promedio = $this->get_promedio_encuesta_encuesta($parametrosp);
+            $grupos_text = (isset($data['grupos_ids_text'])) ? $data['grupos_ids_text'] : '';
 //            pr($promedio);
             if (!empty($promedio)) {//No encontro información guardada
                 //GUARDAR EN RESUL_ENCUESTA
@@ -1993,7 +1998,8 @@ class Encuestas_model extends CI_Model {
                     'total_no_puntua_napv' => $promedio[0]['total_no_aplica_cuenta_promedio'],
                     'total_reactivos_bono' => $promedio[0]['total'],
                     'base' => $promedio[0]['base_reg'],
-                    'calif_emitida' => $promedio[0]['porcentaje']
+                    'calif_emitida' => $promedio[0]['porcentaje'],
+                    'grupos_ids_text' => $grupos_text
                 );
             } else {
                 $datares = array(
@@ -2007,7 +2013,8 @@ class Encuestas_model extends CI_Model {
                     'total_no_puntua_napv' => 0,
                     'total_reactivos_bono' => 0,
                     'base' => 0,
-                    'calif_emitida' => 0
+                    'calif_emitida' => 0,
+                    'grupos_ids_text' => $grupos_text
                 );
 //s                pr('No seencontro información para gardar un promedio');
             }

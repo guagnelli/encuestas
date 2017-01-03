@@ -481,6 +481,25 @@ if (!function_exists('valida_sesion_activa')) {
     }
 }
 
+if (!function_exists('sesion_iniciada')) {
+    
+/**
+     * 
+     * @author LEAS
+     * @fecha 18112016
+     * @param type $user_id
+     * @return type
+     */
+    function sesion_iniciada() {
+        $CI = & get_instance();
+        if (!is_null($CI->session->userdata('logueado')) AND $CI->session->userdata('logueado')) {
+            return 1;
+        }
+        return 0;
+    }
+}
+
+
 
     /* End of file general_helper.php */
     

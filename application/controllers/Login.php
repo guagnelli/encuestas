@@ -27,13 +27,24 @@ class Login extends CI_Controller {
         $this->config->load('general');
     }
 
-    public function logeo($id = NULL) {
-
+    public function logeo($id = NULL, $curseid = NULL) {
+//        pr($this->session->userdata());
+        //     exit();
         $url_sied = $this->config->item('url_sied');
         if (is_numeric($id)) {
-            $sesion_valida = valida_sesion_activa($id);
-            if ($sesion_valida) {
-//                if (isset($id)) {
+            $existe_session = sesion_iniciada();
+//                pr('sses ' . $existe_session);
+//                exit();
+            if ($existe_session) {//Pregunta si existe alguna sección activa
+                $sesion_valida = valida_sesion_activa($id);
+                if ($sesion_valida) {
+                    redirect('encuestas/index');
+                } else {
+                    //echo 'entra';
+                    redirect($url_sied);
+                    //redirect('http://11.32.41.13/kio/sied');
+                }
+            } else {
                 $usuario = $this->enc_mod->usuario_existe($id);
                 if (isset($usuario)) {
                     $token = md5(uniqid(rand(), TRUE));
@@ -45,18 +56,17 @@ class Login extends CI_Controller {
                     );
                     //pr($usuario_data);
                     $this->session->set_userdata($usuario_data);
-                    redirect('encuestas/index');
+                    if (is_null($curseid)) {
+                        redirect('encuestas/index');
+                    } else {
+                        redirect('encuestausuario/lista_encuesta_usuario?iduser=' . $id . '&idcurso=' . $curseid . '&token=550');
+                    }
                 } else {
                     redirect($url_sied);
                     //redirect('http://11.32.41.13/kio/sied');
                 }
-            } else {
-                //echo 'entra';
-                redirect($url_sied);
-                //redirect('http://11.32.41.13/kio/sied');
             }
         } else {
-
             redirect($url_sied);
         }
     }
