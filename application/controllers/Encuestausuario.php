@@ -273,6 +273,9 @@ class Encuestausuario extends CI_Controller {
         $campos_evaluacion['evaluado_user_cve'] = $this->input->post('iduevaluado', true);
         $campos_evaluacion['evaluador_user_cve'] = $this->input->post('iduevaluador', true);
         $campos_evaluacion['is_bono'] = $this->input->post('is_bono', true);
+        if (is_null($this->input->post('grupos_ids_text', true))) {
+            $campos_evaluacion['grupos_ids_text'] = $this->input->post('grupos_ids_text', true);
+        }
 
         //Buscar los roles con las reglas de evaluacion
         $reglas = $this->enc_mod->get_reglas_encuesta($this->input->post('idencuesta', true));
@@ -296,7 +299,7 @@ class Encuestausuario extends CI_Controller {
             $this->form_validation->set_rules('p_r[' . $value['preguntas_cve'] . ']', 'Pregunta', 'required', array('required' => 'Esta pregunta es requerida'));
         }
 
-        //pr($this->session->userdata('datos_encuesta_usuario'));
+//        pr($this->session->userdata('datos_encuesta_usuario'));
         //pr($this->input->post());
         if ($this->input->post('p_r')) { //Validar que la información se haya enviado por método POST para almacenado
             //Buscar los roles con las reglas de evaluacion
@@ -488,8 +491,9 @@ class Encuestausuario extends CI_Controller {
 //            pr($this->session->userdata('logueado'));
 //            pr($this->session->userdata('id'));
             $sesion_valida = valida_sesion_activa($idusuario);
-            //$sesion_valida = 1;
+            $sesion_valida = 1;
             if ($sesion_valida) {
+                $this->session->unset_userdata('datos_encuesta_usuario'); //Eliminar la variable ya que puedequedara cargada con datos de otro curso
 
                 $datos = array();
 
@@ -512,7 +516,6 @@ class Encuestausuario extends CI_Controller {
 //                $reglas_validas = $this->enc_mod->getReglasEvaluacionCurso($parametros);
 //                pr($reglas_validas);
                 //exit();
-
                 foreach ($rolescusercurso as $key => $value) {
 
                     //checar reglas validas con encuestas asignadas al curso
@@ -542,7 +545,7 @@ class Encuestausuario extends CI_Controller {
                         //echo $valuer['encuesta_cve'];
 
 
-                        if ($valuerg['eva_tipo'] == 1) {
+                        if ($valuerg['eva_tipo'] == 1) {//Desempeño
                             //echo "entra";
                             //por grupo
                             $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario,
@@ -570,8 +573,7 @@ class Encuestausuario extends CI_Controller {
                                     );
                                 }
                             }
-                        } elseif ($valuerg['eva_tipo'] == 2) {
-
+                        } elseif ($valuerg['eva_tipo'] == 2) {//Satisfaccion
                             //echo "entra2";//por bloque   # code...
                             $datos_usuario_bloque = $this->enc_mod->get_datos_usuarios_bloque(array('user_id' => $idusuario,
                                 'cur_id' => $idcurso,

@@ -1920,19 +1920,25 @@ class Encuestas_model extends CI_Model {
             'evaluador_user_cve' => $evaluador_user_cve,
             'evaluador_rol_id' => $evaluador_rol_cve,
         );
-        $datos_encuesta_usuario = $this->session->userdata('datos_encuesta_usuario');
-//        pr($datos_encuesta_usuario);
-        if (!is_null($datos_encuesta_usuario)) { //Guardar grupos, para el caso de que el tipo sea por bloques
-            foreach ($datos_encuesta_usuario as $key_du => $value_du) {
-                foreach ($value_du as $key_gr => $value_gr) {
-
-                    if (isset($value_gr['gpoid']) && $value_gr['rol_id'] == $evaluado_rol_cve && $value_gr['cursoid'] == $course_cve && $value_gr['gpoid'] == $group_id && $value_gr['userid'] == $evaluado_user_cve) {
-                        $data['grupos_ids_text'] = $value_gr['grupos_ids_text'];
-                    }
-                }
-            }
+//        $datos_encuesta_usuario = $this->session->userdata('datos_encuesta_usuario');
+////        pr($datos_encuesta_usuario);
+//        if (!is_null($datos_encuesta_usuario)) { //Guardar grupos, para el caso de que el tipo sea por bloques
+//            foreach ($datos_encuesta_usuario as $key_du => $value_du) {
+//                foreach ($value_du as $key_gr => $value_gr) {
+//
+//                    if (isset($value_gr['gpoid']) && $value_gr['rol_id'] == $evaluado_rol_cve && $value_gr['cursoid'] == $course_cve && $value_gr['gpoid'] == $group_id && $value_gr['userid'] == $evaluado_user_cve) {
+//                        $data['grupos_ids_text'] = $value_gr['grupos_ids_text'];
+//                    }
+//                }
+//            }
+//        }
+        
+        $grupos_text = 'NULL';//Pone como null el valor de grupos por default
+        if (isset($params['grupos_ids_text'])) {
+            $data['grupos_ids_text'] = $params['grupos_ids_text'];
+            $grupos_text = $params['grupos_ids_text'];//Asigna el valor de grupos 
         }
-        exit();
+//        exit();
         //pr($_SESSION);
         //pr($datos_encuesta_usuario);
         //pr($data);
