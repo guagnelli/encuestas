@@ -1636,6 +1636,7 @@ class Encuestas_model extends CI_Model {
           {
           $realizado=0;
           }  pr($params); */
+//        pr($params); 
         $this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
         $this->db->where('tutorias.mdl_userexp.ind_status', '1');
 
@@ -1645,7 +1646,7 @@ class Encuestas_model extends CI_Model {
 
 
 
-        if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {
+        if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {//El evaluador es parte de un grupo
 
 
             //$this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
@@ -1657,13 +1658,14 @@ class Encuestas_model extends CI_Model {
             $this->db->select('public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, public.mdl_groups.name as ngpo, \'\' AS grupos_ids_text,
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla, public.mdl_groups.id as gpoid, tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
-                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
+                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso 
+                where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' and group_id=' . $params['gpo_evaluador'] . ' 
                     and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado');
 
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
             $this->db->join('public.mdl_role', 'public.mdl_role.id= tutorias.mdl_userexp.role');
             $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
-        } elseif (isset($params['bloque_evaluador']) && !empty($params['bloque_evaluador'])) {
+        } elseif (isset($params['bloque_evaluador']) && !empty($params['bloque_evaluador'])) {//El evaluador se encuentra en varios bloques
             /* SELECT "public"."mdl_user"."firstname", "public"."mdl_user"."lastname", "public"."mdl_role"."name" as "role", "public"."mdl_groups"."name" as "ngpo", 
               (select public.mdl_role.name from public.mdl_role where id=32) as evaluador, 535 as "regla",
               "public"."mdl_groups"."id" as "gpoid", "tutorias"."mdl_userexp"."cursoid" as "cursoid",
@@ -1691,9 +1693,14 @@ class Encuestas_model extends CI_Model {
 
 
             $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $grupo_condition . ', 
+                encuestas.sse_curso_bloque_grupo.bloque,
                 (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
                     $params['encuesta_cve'] . ' as regla,  tutorias.mdl_userexp.cursoid as cursoid, public.mdl_user.id as userid,
-                (select evaluacion_resul_cve from encuestas.sse_result_evaluacion_encuesta_curso where encuesta_cve=' . $params['encuesta_cve'] . ' and course_cve=' . $params['cur_id'] . ' 
+                (select max(evaluacion_resul_cve) from encuestas.sse_result_evaluacion_encuesta_curso reec
+                join encuestas.sse_curso_bloque_grupo cbgp on cbgp.course_cve = reec.course_cve and cbgp.bloque = encuestas.sse_curso_bloque_grupo.bloque
+                and cbgp.mdl_groups_cve IN (' . $params['grupos'] . ')
+                and cbgp.mdl_groups_cve = ANY (string_to_array(reec.grupos_ids_text, \',\')::int[])
+                where encuesta_cve=' . $params['encuesta_cve'] . ' and reec.course_cve=' . $params['cur_id'] . ' 
                     and evaluado_user_cve=public.mdl_user.id and evaluador_user_cve=' . $params['evaluador_user_cve'] . ')  as realizado';
             $this->db->distinct($consulta);
             $this->db->select($consulta);
@@ -1709,8 +1716,6 @@ class Encuestas_model extends CI_Model {
             $this->db->join('public.mdl_groups', 'public.mdl_groups.id=tutorias.mdl_userexp.grupoid');
             $this->db->join('encuestas.sse_curso_bloque_grupo', 'encuestas.sse_curso_bloque_grupo.mdl_groups_cve = public.mdl_groups.id');
         } else {
-
-
             $params['gpo_evaluador'] = 0;
             $consulta = 'public.mdl_user.firstname,public.mdl_user.lastname,public.mdl_role.name as role, public.mdl_role.id as rol_id, ' . $params['gpo_evaluador'] . ' as ngpo, \'\' AS grupos_ids_text,
               (select public.mdl_role.name from public.mdl_role where id=' . $params['role_evaluador'] . ') as evaluador,' .
@@ -1724,7 +1729,7 @@ class Encuestas_model extends CI_Model {
             $this->db->distinct($consulta);
             $this->db->select($consulta);
 
-            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
+            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']  );
 
 
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
@@ -1743,7 +1748,7 @@ class Encuestas_model extends CI_Model {
           $resultado = $query->result_array();
 
           } */
-        //pr($this->db->last_query());
+//        pr($this->db->last_query());
         $resultado = $query->result_array();
         //$this->db->flush_cache();
         //$query->free_result(); //Libera la memoria                                
@@ -1921,7 +1926,7 @@ class Encuestas_model extends CI_Model {
             'evaluador_rol_id' => $evaluador_rol_cve,
         );
 //        $datos_encuesta_usuario = $this->session->userdata('datos_encuesta_usuario');
-////        pr($datos_encuesta_usuario);
+//        pr($datos_encuesta_usuario);
 //        if (!is_null($datos_encuesta_usuario)) { //Guardar grupos, para el caso de que el tipo sea por bloques
 //            foreach ($datos_encuesta_usuario as $key_du => $value_du) {
 //                foreach ($value_du as $key_gr => $value_gr) {
@@ -1989,7 +1994,7 @@ class Encuestas_model extends CI_Model {
             ;
 
             $promedio = $this->get_promedio_encuesta_encuesta($parametrosp);
-            $grupos_text = (isset($data['grupos_ids_text'])) ? $data['grupos_ids_text'] : '';
+//            $grupos_text = (isset($data['grupos_ids_text'])) ? $data['grupos_ids_text'] : '';
 //            pr($promedio);
             if (!empty($promedio)) {//No encontro información guardada
                 //GUARDAR EN RESUL_ENCUESTA

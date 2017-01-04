@@ -41,6 +41,7 @@ class Login extends CI_Controller {
                     redirect('encuestas/index');
                 } else {
                     //echo 'entra';
+                    $this->session->sess_destroy();
                     redirect($url_sied);
                     //redirect('http://11.32.41.13/kio/sied');
                 }
@@ -62,6 +63,7 @@ class Login extends CI_Controller {
                         redirect('encuestausuario/lista_encuesta_usuario?iduser=' . $id . '&idcurso=' . $curseid . '&token=550');
                     }
                 } else {
+                    $this->session->sess_destroy();
                     redirect($url_sied);
                     //redirect('http://11.32.41.13/kio/sied');
                 }

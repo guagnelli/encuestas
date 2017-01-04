@@ -1,6 +1,6 @@
 <?php
 if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
-    //pr($datos_user_aeva);
+//    pr($datos_user_aeva);
     ?>
     <div class="list-group-item">
         <div style="text-align:right"><small><?php echo $nombreevaluador ?>
@@ -58,7 +58,6 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
 
                         //pr($valuel);# code...
                         //}
-
                         $is_bloques_grupos = 0;
                         if (isset($valuel)) {
                             if (isset($valuel['ngpo']) && $valuel['ngpo'] != '0') {
@@ -81,27 +80,27 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
                             echo form_open('encuestausuario/instrumento_asignado', array('id' => 'form_curso'));
                             ?>
                         <input type="hidden" id="idencuesta" name="idencuesta" value="<?php echo $valuel['regla'] ?>">
-                            <?php if ($is_bloques_grupos) { ?>
+                        <?php if ($is_bloques_grupos) { ?>
                             <input type = "hidden" id = "grupos_ids_text" name = "grupos_ids_text" value = "<?php echo $valuel['grupos_ids_text'] ?>">
                         <?php } ?>
 
                         <input type="hidden" id="iduevaluado" name="iduevaluado" value="<?php echo $valuel['userid'] ?>">
                         <input type="hidden" id="idcurso" name="idcurso" value="<?php echo $valuel['cursoid'] ?>">
                         <input type="hidden" id="idgrupo" name="idgrupo" value="<?php
-                if (isset($valuel['gpoid']) && $valuel['gpoid'] > 0) {
-                    echo $valuel['gpoid'];
-                } else {
-                    echo '0';
-                }
+                        if (isset($valuel['gpoid']) && $valuel['gpoid'] > 0) {
+                            echo $valuel['gpoid'];
+                        } else {
+                            echo '0';
+                        }
                         ?>">
                         <input type="hidden" id="iduevaluador" name="iduevaluador" value="<?php echo $iduevaluador ?>">
 
 
-                <?php
-                if (isset($valuel['realizado']) || !empty($valuel['realizado'])) {
-                    echo "Realizada";
-                } else {
-                    ?>
+                        <?php
+                        if (isset($valuel['realizado']) || !empty($valuel['realizado'])) {
+                            echo "Realizada";
+                        } else {
+                            ?>
                             <input type="submit"  class="btn btn-info btn-block" value="Evaluar usuario">
                             <?php
                         }
@@ -111,18 +110,18 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
                           <a href="'.site_url('encuestausuario/instrumento_asignado/'.$val[0]['regla']).'" class="btn btn-info btn-block">
                               <span class="glyphicon glyphicon-search"></span>
                           </a>-->
-                <?php
-                echo form_close();
+                        <?php
+                        echo form_close();
 
-                echo '</td>
+                        echo '</td>
                         ';
 
-                echo '</tr>';
-                # code...
+                        echo '</tr>';
+                        # code...
+                    }
+                }
             }
-        }
-    }
-    ?>
+            ?>
             </tbody>
         </table>
 

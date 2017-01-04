@@ -71,7 +71,7 @@ class Encuestausuario extends CI_Controller {
             //pr(array_values($datos_roles_curso['data
             //roles por curso por usuario
             $rolescusercurso = $this->enc_mod->get_roles_usercurso(array('user_id' => $idusuario, 'cur_id' => $idcurso));
-            pr($rolescusercurso);
+//            pr($rolescusercurso);
 
             $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario, 'cur_id' => $idcurso));
             //pr($datos_usuario);
@@ -229,7 +229,8 @@ class Encuestausuario extends CI_Controller {
     public function instrumento_asignado() {
         if ($this->input->post()) {
             $id_instrumento = $this->input->post('idencuesta');
-            //if (isset($id_instrumento) && !empty($id_instrumento)) {
+//            pr($this->input->post());    
+//if (isset($id_instrumento) && !empty($id_instrumento)) {
             # code...
             $datos['instrumento'] = $this->enc_mod->get_instrumento_detalle($id_instrumento);
             $datos['preguntas'] = $this->enc_mod->preguntas_instrumento($id_instrumento);
@@ -240,6 +241,9 @@ class Encuestausuario extends CI_Controller {
             $datos['evaluador_user_cve'] = $this->input->post('iduevaluador', true);
             $datos['curso_cve'] = $this->input->post('idcurso', true);
             $datos['grupo_cve'] = $this->input->post('idgrupo', true);
+            if (!is_null($this->input->post('grupos_ids_text', true))) {
+                $datos['grupos_ids_text'] = $this->input->post('grupos_ids_text', true);
+            }
 //pr($datos);
 //            $parametrosp = array(
 //                'curso_cve' => 838,
@@ -265,7 +269,8 @@ class Encuestausuario extends CI_Controller {
 
     public function guardar_encuesta_usuario() {
         $id_instrumento = $this->input->post('idencuesta', true);
-        //pr($this->input->post());
+//        pr($this->input->post());
+//        exit();
         $campos_evaluacion['encuesta_cve'] = $this->input->post('idencuesta', true);
         $campos_evaluacion['curso_cve'] = $this->input->post('idcurso', true);
         $campos_evaluacion['curso'] = $this->cur_mod->listado_cursos(array('cur_id' => $this->input->post('idcurso', true)));
@@ -273,7 +278,7 @@ class Encuestausuario extends CI_Controller {
         $campos_evaluacion['evaluado_user_cve'] = $this->input->post('iduevaluado', true);
         $campos_evaluacion['evaluador_user_cve'] = $this->input->post('iduevaluador', true);
         $campos_evaluacion['is_bono'] = $this->input->post('is_bono', true);
-        if (is_null($this->input->post('grupos_ids_text', true))) {
+        if (!is_null($this->input->post('grupos_ids_text', true))) {
             $campos_evaluacion['grupos_ids_text'] = $this->input->post('grupos_ids_text', true);
         }
 
@@ -373,7 +378,7 @@ class Encuestausuario extends CI_Controller {
 //                $rolescusercurso = array(14, 18, 32, 5);
                 $parametros = array('role_evaluador' => $rolescusercurso, 'tutorizado' => $tutorizado, 'cur_id' => $idcurso);
                 $reglas_validas = $this->enc_mod->getReglasEvaluacionCurso($parametros);
-                pr($reglas_validas);
+               // pr($reglas_validas);
                 //exit();
                 $reglas_validas = array();
 
@@ -386,7 +391,7 @@ class Encuestausuario extends CI_Controller {
                     $reglas_validas = $this->enc_mod->get_reglas_validas_cur(array('role_evaluador' => $value,
                         'tutorizado' => $datos_curso['data'][0]['tutorizado'], 'cur_id' => $idcurso, 'ord_prioridad' => '1'));
 
-                    pr($reglas_validas);
+                    //pr($reglas_validas);
                     foreach ($reglas_validas as $keyr => $valuer) {
                         //pr($value['is_excepcion']);
                         $reglasgral[] = array('reglas_evaluacion_cve' => $valuer['reglas_evaluacion_cve'],
@@ -491,7 +496,7 @@ class Encuestausuario extends CI_Controller {
 //            pr($this->session->userdata('logueado'));
 //            pr($this->session->userdata('id'));
             $sesion_valida = valida_sesion_activa($idusuario);
-            $sesion_valida = 1;
+//            $sesion_valida = 1;
             if ($sesion_valida) {
                 $this->session->unset_userdata('datos_encuesta_usuario'); //Eliminar la variable ya que puedequedara cargada con datos de otro curso
 
@@ -537,7 +542,7 @@ class Encuestausuario extends CI_Controller {
                     }
                 }
 
-                //pr($reglasgral);
+//                pr($reglasgral);
                 if (isset($reglasgral)) {
                     foreach ($reglasgral as $keyrg => $valuerg) {
 
@@ -545,7 +550,7 @@ class Encuestausuario extends CI_Controller {
                         //echo $valuer['encuesta_cve'];
 
 
-                        if ($valuerg['eva_tipo'] == 1) {//Desempeño
+                        if ($valuerg['eva_tipo'] == 1) {//Por grupo
                             //echo "entra";
                             //por grupo
                             $datos_usuario = $this->enc_mod->get_datos_usuarios(array('user_id' => $idusuario,
@@ -573,29 +578,31 @@ class Encuestausuario extends CI_Controller {
                                     );
                                 }
                             }
-                        } elseif ($valuerg['eva_tipo'] == 2) {//Satisfaccion
+                        } elseif ($valuerg['eva_tipo'] == 2) {//Por bloque
                             //echo "entra2";//por bloque   # code...
                             $datos_usuario_bloque = $this->enc_mod->get_datos_usuarios_bloque(array('user_id' => $idusuario,
                                 'cur_id' => $idcurso,
                                 'rol_evaluado_cve' => $valuerg['rol_evaluado_cve'],
                                 'rol_evaluador_cve' => $valuerg['rol_evaluador_cve'],
                             ));
-                            //pr($datos_usuario_bloque);
+                           // pr('-----------------*****************------------------------');
+//                            pr($datos_usuario_bloque);
 
                             if (isset($datos_usuario_bloque) || isset($datos_curso) || !empty($datos_usuario_bloque) || !empty($datos_curso)) {
-                                foreach ($datos_usuario_bloque as $key_ub => $usu_blo) {
+                                foreach ($datos_usuario_bloque as $key_ub => $usu_blo) {//genera index por rol y bloque de los usuarios que pertenecen a los bloques
                                     $dato_ub[$usu_blo['cve_rol']][$usu_blo['bloque']][] = $usu_blo;
                                 }
                                 //pr($dato_ub);
-                                foreach ($dato_ub as $keyb_r => $valueb_r) {
-                                    foreach ($valueb_r as $keyb_b => $valueb_b) {
-                                        //pr($valueb_b);
+                                foreach ($dato_ub as $keyb_r => $valueb_r) {//Recorre roles 
+                                    foreach ($valueb_r as $keyb_b => $valueb_b) {//Recorre bloques
+//                                        pr($valueb_b);
+//                                        pr($dato_ub);
                                         $role_evaluador = $keyb_r;
                                         $bloque_evaluador = $keyb_b; # code...
 
 
                                         $grupos_ids = NULL;
-                                        foreach ($valueb_b as $key_data => $value_data) {
+                                        foreach ($valueb_b as $key_data => $value_data) {//Genera cadenas de grupos que pertenecen a un grupo
                                             $grupos_ids .= $value_data['cve_grupo'] . ',';
                                         }
 
@@ -635,7 +642,7 @@ class Encuestausuario extends CI_Controller {
 
                                   } */
                             }
-                        } else {
+                        } else {//Por usuario
                             //echo "entra3";      
                             //echo $valuer['encuesta_cve'];   //por usuario
                             //echo $value;

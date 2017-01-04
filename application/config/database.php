@@ -124,3 +124,30 @@ $db['default'] = array(
     'failover' => array(),
     'save_queries' => TRUE
 );
+
+$db['default1'] = array(
+    'dsn' => 'pgsql:host=11.32.41.30;dbname=sied30_2016',// se agrego la base de datos correctamente kio_prod201 -> pwces_db
+//    'dsn' => 'pgsql:host=11.32.41.30;dbname=nueva_kio2',// se agrego la base de datos correctamente kio_prod201 -> pwces_db
+    'hostname' => '11.32.41.30',
+    'username' => 'postgres',
+    'password' => 'postgres',
+    'database' => 'sied30_2016',
+//    'database' => 'nueva_kio2',
+    'dbdriver' => 'pdo',
+    'port' => '5432',
+    'dbprefix' => '',
+    'pconnect' => TRUE,
+    'db_debug' => (ENVIRONMENT !== 'production'),
+    'cache_on' => FALSE,
+    'cachedir' => '',
+    'char_set' => 'utf8',
+    'dbcollat' => 'utf8_general_ci',
+    'swap_pre' => '',
+    'autoinit' => TRUE,
+    'schema' => 'encuestas',
+    'encrypt' => FALSE,
+    'compress' => FALSE,
+    'stricton' => FALSE,
+    'failover' => array(),
+    'save_queries' => TRUE
+);
