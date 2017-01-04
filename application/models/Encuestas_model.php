@@ -1647,8 +1647,6 @@ class Encuestas_model extends CI_Model {
 
 
         if (isset($params['gpo_evaluador']) && !empty($params['gpo_evaluador'])) {//El evaluador es parte de un grupo
-
-
             //$this->db->where('tutorias.mdl_userexp.cursoid', $params['cur_id']);
             //$this->db->where('tutorias.mdl_userexp.role',$params['role_evaluado']);
             $this->db->where('tutorias.mdl_userexp.grupoid', $params['gpo_evaluador']);
@@ -1729,7 +1727,7 @@ class Encuestas_model extends CI_Model {
             $this->db->distinct($consulta);
             $this->db->select($consulta);
 
-            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']  );
+            $this->db->where('tutorias.mdl_userexp.role', $params['role_evaluado']);
 
 
             $this->db->join('public.mdl_user', 'public.mdl_user.id= tutorias.mdl_userexp.userid');
@@ -1915,7 +1913,6 @@ class Encuestas_model extends CI_Model {
         $evaluador_rol_cve = $params['evaluador_rol_id'];
 //        $is_bono = $params['is_bono'];
         $is_bono = 1;
-
         $data = array(
             'encuesta_cve' => $encuesta_cve,
             'course_cve' => $course_cve,
@@ -1937,11 +1934,15 @@ class Encuestas_model extends CI_Model {
 //                }
 //            }
 //        }
-        
-        $grupos_text = 'NULL';//Pone como null el valor de grupos por default
+
+        $grupos_text = ''; //Pone como null el valor de grupos por default
+        $bloque_ = 0;
         if (isset($params['grupos_ids_text'])) {
             $data['grupos_ids_text'] = $params['grupos_ids_text'];
-            $grupos_text = $params['grupos_ids_text'];//Asigna el valor de grupos 
+            $grupos_text = $params['grupos_ids_text']; //Asigna el valor de grupos 
+            if (isset($params['bloque'])) {
+                $bloque_ = $params['bloque'];
+            }
         }
 //        exit();
         //pr($_SESSION);
@@ -1960,17 +1961,23 @@ class Encuestas_model extends CI_Model {
             $data ['reactivos_cve'] = $respuesta;
             $data ['respuesta_abierta'] = $params['respuesta_abierta'];
             $data ['fecha'] = $params['fecha'];
-
             $this->db->where('encuesta_cve', $params['encuesta_cve']);
             $this->db->where('evaluado_user_cve', $params['evaluado_user_cve']);
             $this->db->where('evaluador_user_cve', $params['evaluador_user_cve']);
-            $this->db->where('course_cve', $params['curso_cve']);
+            $this->db->where('ev.course_cve', $params['curso_cve']);
             $this->db->where('group_id', $params['grupo_cve']);
             $this->db->where('preguntas_cve', $pregunta);
+            if ($bloque_ > 0) {
+                $this->db->join('encuestas.sse_curso_bloque_grupo cbg', 'cbg.course_cve = ev.course_cve 
+                    and cbg.mdl_groups_cve = ANY (string_to_array(ev.grupos_ids_text, \', \')::int[])
+                    and cbg.bloque=' . $params['bloque'] . ' and cbg.mdl_groups_cve IN (' . $grupos_text . ') '
+                );
+            }
+//            pr($this->db->last_query());
             //$this->db->where('reactivos_cve', $respuesta);
 
-            $query = $this->db->get('encuestas.sse_evaluacion'); //Obtener conjunto de registros
-            //pr($query);
+            $query = $this->db->get('encuestas.sse_evaluacion ev'); //Obtener conjunto de registros
+//            pr($query);
             if ($query->num_rows() == 0) {
 
                 $pregresp = $this->get_pregunta_respuesta($pregunta, $respuesta);
@@ -1978,7 +1985,7 @@ class Encuestas_model extends CI_Model {
             }
         }
 
-        $validacion = $this->get_validar_encuesta_contestada($data, 'promedio');
+        $validacion = $this->get_validar_encuesta_contestada($data, 'promedio', $bloque_, $grupos_text);
         if ($validacion < 1) {//Valida 
             //curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
             $parametrosp = array(
@@ -1993,7 +2000,7 @@ class Encuestas_model extends CI_Model {
                     )
             ;
 
-            $promedio = $this->get_promedio_encuesta_encuesta($parametrosp);
+            $promedio = $this->get_promedio_encuesta_encuesta($parametrosp, $bloque_, $grupos_text);
 //            $grupos_text = (isset($data['grupos_ids_text'])) ? $data['grupos_ids_text'] : '';
 //            pr($promedio);
             if (!empty($promedio)) {//No encontro información guardada
@@ -2047,7 +2054,7 @@ class Encuestas_model extends CI_Model {
         //return $insert_id;
     }
 
-    public function get_validar_encuesta_contestada($params, $tipo = 'respuestas') {
+    public function get_validar_encuesta_contestada($params, $tipo = 'respuestas', $bloque = 0, $grupos_text = '') {
         if ($tipo == 'respuestas') {
             $where = array(
                 'encuesta_cve', 'course_cve ', 'group_id', 'evaluado_user_cve',
@@ -2055,18 +2062,123 @@ class Encuestas_model extends CI_Model {
             );
             $from = 'encuestas.sse_evaluacion';
         } else if ($tipo == 'promedio') {
+
             $where = array(
-                'encuesta_cve', 'course_cve', 'group_id', 'evaluado_user_cve',
+                'encuesta_cve', 'reec.course_cve', 'group_id', 'evaluado_user_cve',
                 'evaluador_user_cve'
             );
-            $from = 'encuestas.sse_result_evaluacion_encuesta_curso';
+            
+            if ($params['course_cve']) {
+                $valtmp = $params['course_cve'];
+                $params['reec.course_cve'] = $valtmp;
+            }
+            
+            $from = 'encuestas.sse_result_evaluacion_encuesta_curso reec';
+            if ($bloque > 0) {
+                $this->db->join('encuestas.sse_curso_bloque_grupo cbg', 'cbg.course_cve = reec.course_cve 
+                    and cbg.mdl_groups_cve = ANY (string_to_array(reec.grupos_ids_text, \', \')::int[])
+                    and cbg.bloque=' . $bloque . ' and cbg.mdl_groups_cve IN (' . $grupos_text . ') '
+                );
+            }
         }
         foreach ($where as $val) {
             $this->db->where($val, $params[$val]);
         }
         $query = $this->db->get($from);
-        //pr($this->db->last_query());
+//        pr($this->db->last_query());
         return $query->num_rows();
+    }
+    
+    /**
+     * 
+     * @param type $params
+     * @return type
+     * @param curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
+
+
+
+     */
+    public function get_promedio_encuesta_encuesta($params = null, $bloque = 0, $grupos_ids_text = '') {
+        //Entidad de emp_actividad_docente 
+        $select_gral = 'select grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado, sum(netos) as total, '
+                . 'sum(no_puntua) as no_puntua_reg, sum(nos_) total_no, sum(no_aplica_promedio) as total_no_aplica_cuenta_promedio, '
+                . 'sum(puntua) as puntua_reg, (sum(netos) - sum(no_puntua)) as base_reg, '
+                . '(round(sum(puntua)::numeric * 100/(sum(netos) - sum(no_puntua))::numeric,3)) as porcentaje '
+                . ' from ( '
+        ;
+
+
+
+
+        $group_by_gral = ' ) as calculos_promedio '
+                . ' group by grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado ';
+
+
+
+        $join_bloque = '';
+        if($bloque>0){
+            $join_bloque = 'join encuestas.sse_curso_bloque_grupo cbg on 
+            cbg.course_cve = ev.course_cve 
+            and cbg.mdl_groups_cve IN ('.$grupos_ids_text.') 
+            and cbg.mdl_groups_cve = ANY (string_to_array(ev.grupos_ids_text, \',\')::int[])
+            and cbg.bloque = ' . $bloque . ' ';
+        }
+
+        $joins = ' from encuestas.sse_evaluacion ev '
+                . ' join encuestas.sse_respuestas res on res.reactivos_cve = ev.reactivos_cve '
+                . ' join encuestas.sse_preguntas pre on pre.preguntas_cve = ev.preguntas_cve '
+                . ' join encuestas.sse_encuesta_curso encc on encc.encuesta_cve = res.encuesta_cve '
+                .$join_bloque
+        ;
+
+
+        $grupo = '';
+        if (!empty($params['grupo_cve']) and is_numeric($params['grupo_cve']) and intval($params['grupo_cve']) > 0) {
+            $grupo = ' and ev.group_id=' . $params['grupo_cve'] . ' ';
+        }
+        $w_p = array(
+            'curso_cve' => ' encc.course_cve=' . $params['curso_cve'] . ' ',
+            'grupo_cve' => $grupo,
+            'evaluado_user_cve' => ' evaluado_user_cve=' . $params['evaluado_user_cve'] . ' ',
+            'evaluado_rol_id' => ' evaluado_rol_id=' . $params['evaluado_rol_id'] . ' ',
+            'evaluador_user_cve' => ' evaluador_user_cve=' . $params['evaluador_user_cve'] . ' ',
+            'evaluador_rol_id' => ' evaluador_rol_id=' . $params['evaluador_rol_id'] . ' ',
+            'is_bono' => ' pre.is_bono=' . $params['is_bono'] . ' ',
+        );
+
+        $where = array(
+            'total_si' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_is_bono' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_no_aplica' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_nos' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+            'total_no_aplica_val_prom' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
+        );
+        //Select especifico y repetido
+        $s_p = ' ev.evaluador_user_cve "evaluador", ev.evaluador_rol_id "rol_evaluador", ev.evaluado_user_cve "evaluado", ev.evaluado_rol_id "rol_evaluado" ';
+        $select = array(
+            'total_si' => ' select COUNT(res.texto) as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_is_bono' => ' select 0 as puntua, 0 as no_puntua, COUNT(res.texto) as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_no_aplica' => 'select 0 as puntua, COUNT(res.texto) as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_nos' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", COUNT(res.texto) as nos_, 0 as no_aplica_promedio, ' . $s_p,
+            'total_no_aplica_val_prom' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, COUNT(res.texto) as no_aplica_promedio, ' . $s_p,
+        );
+        $g_by = 'group by ev.group_id, ev.evaluador_user_cve, ev.evaluador_rol_id, ev.evaluado_user_cve, ev.evaluado_rol_id';
+
+
+
+        $string_query = $select_gral;
+        $union = '';
+        foreach ($select as $key => $value) {
+            $string_query .= $union . $value . $joins . $where[$key] . $g_by;
+            $union = ' union ';
+        }
+        $string_query .= $group_by_gral;
+//        pr($string_query);
+        $query = $this->db->query($string_query);
+        $result = $query->result_array();
+//        pr($this->db->last_query());
+//        pr($result);
+        return $result;
     }
 
     public function get_pregunta_respuesta($pregunta = null, $respuesta = null) {
@@ -2616,90 +2728,6 @@ class Encuestas_model extends CI_Model {
         return $resultado;
     }
 
-    /**
-     * 
-     * @param type $params
-     * @return type
-     * @param curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
-
-
-
-     */
-    public function get_promedio_encuesta_encuesta($params = null) {
-        //Entidad de emp_actividad_docente 
-        $select_gral = 'select grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado, sum(netos) as total, '
-                . 'sum(no_puntua) as no_puntua_reg, sum(nos_) total_no, sum(no_aplica_promedio) as total_no_aplica_cuenta_promedio, '
-                . 'sum(puntua) as puntua_reg, (sum(netos) - sum(no_puntua)) as base_reg, '
-                . '(round(sum(puntua)::numeric * 100/(sum(netos) - sum(no_puntua))::numeric,3)) as porcentaje '
-                . ' from ( '
-        ;
-
-
-
-
-        $group_by_gral = ' ) as calculos_promedio '
-                . ' group by grupo_cve, evaluador, rol_evaluador, evaluado, rol_evaluado ';
-
-
-
-
-
-
-        $joins = ' from encuestas.sse_evaluacion ev '
-                . ' join encuestas.sse_respuestas res on res.reactivos_cve = ev.reactivos_cve '
-                . ' join encuestas.sse_preguntas pre on pre.preguntas_cve = ev.preguntas_cve '
-                . ' join encuestas.sse_encuesta_curso encc on encc.encuesta_cve = res.encuesta_cve '
-        ;
-
-
-        $grupo = '';
-        if (!empty($params['grupo_cve']) and is_numeric($params['grupo_cve']) and intval($params['grupo_cve']) > 0) {
-            $grupo = ' and ev.group_id=' . $params['grupo_cve'] . ' ';
-        }
-        $w_p = array(
-            'curso_cve' => ' encc.course_cve=' . $params['curso_cve'] . ' ',
-            'grupo_cve' => $grupo,
-            'evaluado_user_cve' => ' evaluado_user_cve=' . $params['evaluado_user_cve'] . ' ',
-            'evaluado_rol_id' => ' evaluado_rol_id=' . $params['evaluado_rol_id'] . ' ',
-            'evaluador_user_cve' => ' evaluador_user_cve=' . $params['evaluador_user_cve'] . ' ',
-            'evaluador_rol_id' => ' evaluador_rol_id=' . $params['evaluador_rol_id'] . ' ',
-            'is_bono' => ' pre.is_bono=' . $params['is_bono'] . ' ',
-        );
-
-        $where = array(
-            'total_si' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('Si', 'Casi siempre', 'Siempre') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
-            'total_is_bono' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
-            'total_no_aplica' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 1 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
-            'total_nos' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and res.texto in('No', 'Casi nunca', 'Nunca', 'Algunas veces') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
-            'total_no_aplica_val_prom' => " where " . $w_p ['is_bono'] . " and " . $w_p['curso_cve'] . " and pre.valido_no_aplica = 0 and res.texto in('No aplica', 'No envió mensaje') and " . $w_p['evaluador_user_cve'] . " and " . $w_p['evaluador_rol_id'] . " and " . $w_p['evaluado_rol_id'] . " and " . $w_p['evaluado_user_cve'] . $w_p['grupo_cve'],
-        );
-        //Select especifico y repetido
-        $s_p = ' ev.evaluador_user_cve "evaluador", ev.evaluador_rol_id "rol_evaluador", ev.evaluado_user_cve "evaluado", ev.evaluado_rol_id "rol_evaluado" ';
-        $select = array(
-            'total_si' => ' select COUNT(res.texto) as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
-            'total_is_bono' => ' select 0 as puntua, 0 as no_puntua, COUNT(res.texto) as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
-            'total_no_aplica' => 'select 0 as puntua, COUNT(res.texto) as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, 0 as no_aplica_promedio, ' . $s_p,
-            'total_nos' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", COUNT(res.texto) as nos_, 0 as no_aplica_promedio, ' . $s_p,
-            'total_no_aplica_val_prom' => ' select 0 as puntua, 0 as no_puntua, 0 as netos, ev.group_id "grupo_cve", 0 as nos_, COUNT(res.texto) as no_aplica_promedio, ' . $s_p,
-        );
-        $g_by = 'group by ev.group_id, ev.evaluador_user_cve, ev.evaluador_rol_id, ev.evaluado_user_cve, ev.evaluado_rol_id';
-
-
-
-        $string_query = $select_gral;
-        $union = '';
-        foreach ($select as $key => $value) {
-            $string_query .= $union . $value . $joins . $where[$key] . $g_by;
-            $union = ' union ';
-        }
-        $string_query .= $group_by_gral;
-//        pr($string_query);
-        $query = $this->db->query($string_query);
-        $result = $query->result_array();
-        //pr($this->db->last_query());
-//        pr($result);
-        return $result;
-    }
 
     /**
      * 

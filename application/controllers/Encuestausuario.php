@@ -241,6 +241,9 @@ class Encuestausuario extends CI_Controller {
             $datos['evaluador_user_cve'] = $this->input->post('iduevaluador', true);
             $datos['curso_cve'] = $this->input->post('idcurso', true);
             $datos['grupo_cve'] = $this->input->post('idgrupo', true);
+            if (!is_null($this->input->post('bloque', true))) {
+            $datos['bloque'] = $this->input->post('bloque', true);
+            }
             if (!is_null($this->input->post('grupos_ids_text', true))) {
                 $datos['grupos_ids_text'] = $this->input->post('grupos_ids_text', true);
             }
@@ -278,6 +281,9 @@ class Encuestausuario extends CI_Controller {
         $campos_evaluacion['evaluado_user_cve'] = $this->input->post('iduevaluado', true);
         $campos_evaluacion['evaluador_user_cve'] = $this->input->post('iduevaluador', true);
         $campos_evaluacion['is_bono'] = $this->input->post('is_bono', true);
+        if (!is_null($this->input->post('bloque', true))) {
+            $campos_evaluacion['bloque'] = $this->input->post('bloque', true);
+        }
         if (!is_null($this->input->post('grupos_ids_text', true))) {
             $campos_evaluacion['grupos_ids_text'] = $this->input->post('grupos_ids_text', true);
         }

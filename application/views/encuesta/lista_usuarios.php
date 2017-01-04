@@ -56,7 +56,7 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
                     //pr($val);
                     foreach ($val as $keyl => $valuel) {
 
-                        //pr($valuel);# code...
+//                        pr($valuel);# code...
                         //}
                         $is_bloques_grupos = 0;
                         if (isset($valuel)) {
@@ -82,6 +82,9 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
                         <input type="hidden" id="idencuesta" name="idencuesta" value="<?php echo $valuel['regla'] ?>">
                         <?php if ($is_bloques_grupos) { ?>
                             <input type = "hidden" id = "grupos_ids_text" name = "grupos_ids_text" value = "<?php echo $valuel['grupos_ids_text'] ?>">
+                        <?php } ?>
+                        <?php if (isset($valuel['bloque'])) { ?>
+                            <input type = "hidden" id = "bloque" name = "bloque" value = "<?php echo $valuel['bloque'] ?>">
                         <?php } ?>
 
                         <input type="hidden" id="iduevaluado" name="iduevaluado" value="<?php echo $valuel['userid'] ?>">

@@ -147,6 +147,9 @@ if (isset($preguntas) && !empty($preguntas) && isset($instrumento) && !empty($in
         if (isset($grupos_ids_text)) {
             echo '<input type="hidden" id="grupos_ids_text" name="grupos_ids_text" value="' . $grupos_ids_text . '">';
         }
+        if (isset($bloque)) {
+            echo '<input type="hidden" id="bloque" name="bloque" value="' . $bloque . '">';
+        }
         echo "<br>";
     }
     if (isset($boton) && !empty($boton)) {
