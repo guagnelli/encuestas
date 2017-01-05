@@ -184,7 +184,12 @@ class config_busqueda {
             'eeec.course_cve', 'reg.tutorizado',
             'eeec.evaluado_user_cve', 'enc.is_bono',
             'reg.rol_evaluado_cve', 'reg.rol_evaluador_cve',
-            'round(sum(total_puntua_si)::numeric * 100/sum(base)::numeric,3) as promedio',
+            //'round(sum(total_puntua_si)::numeric * 100/sum(base)::numeric,3) as promedio',
+            'case sum(base) when 0 then 
+                0
+            else 
+                round(sum(total_puntua_si)::numeric * 100/sum(base)::numeric,3)
+            end as promedio'
         );
     }
 
