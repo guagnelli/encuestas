@@ -2435,8 +2435,8 @@ class Encuestas_model extends CI_Model {
           inner join encuestas.sse_encuesta_curso enc on enc.encuesta_cve=en.encuesta_cve
           where  re.rol_evaluador_cve=18 and re.tutorizado=1 and enc.course_cve=823
           order by ord_prioridad */
-
-
+        $this->db->where('sse_encuestas.status', '1');
+        
         if (isset($params['role_evaluador']) && !empty($params['role_evaluador'])) {
             $this->db->where('sse_reglas_evaluacion.rol_evaluador_cve', $params['role_evaluador']);
         }
@@ -2492,8 +2492,7 @@ class Encuestas_model extends CI_Model {
         $query = $this->db->get('encuestas.sse_reglas_evaluacion');
         //$resultado['data']=$query->result_array();
         $resultado = $query->result_array();
-
-//        pr($this->db->last_query());
+        pr($this->db->last_query());
 
 
 
