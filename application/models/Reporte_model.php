@@ -184,7 +184,7 @@ class Reporte_model extends CI_Model {
             $this->db->limit($params['per_page'], $params['current_row']);
         }
         $query = $this->db->get('mdl_user'); //Obtener conjunto de registros
-        pr($this->db->last_query());
+//        pr($this->db->last_query());
         $resultado['total'] = $num_rows[0]->total;
         $resultado['columns'] = $query->list_fields();
         $resultado['data'] = $query->result_array();
@@ -511,7 +511,7 @@ class Reporte_model extends CI_Model {
 
     private function getCatalogoInfoReportes($key_dato) {
         switch ($key_dato) {
-            case'tipo_encuesta':return array(1 => 'Satisfacción', 0 => 'Desempeño');
+            case'tipo_encuesta':return array(1 => 'Desempeño', 0 => 'Satisfacción');
             case 'anios': return $this->get_listado_anios(2009);
             case 'rol':
                 $rol = $this->config->item('rol_docente');
@@ -622,7 +622,7 @@ class Reporte_model extends CI_Model {
                 foreach ($reglas_db as $value) {
                     $rol_evaluado = $roles_prop[$value['rol_evaluado_cve']]['ab'];
                     $rol_evaluador = $roles_prop[$value['rol_evaluador_cve']]['ab'];
-                    $result[$value['rol_evaluado_cve'] . '-' . $value['rol_evaluador_cve']] = $rol_evaluador . ' a ' . $rol_evaluado . ' -' . $value['text_tutorizado'];
+                    $result[$value['rol_evaluador_cve'] . '-' . $value['rol_evaluado_cve'].'-'.$value['tutorizado']] = $rol_evaluador . ' a ' . $rol_evaluado . ' -' . $value['text_tutorizado'];
                 }
                 break;
         }

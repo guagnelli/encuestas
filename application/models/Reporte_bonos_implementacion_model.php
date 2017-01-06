@@ -38,13 +38,13 @@ class Reporte_bonos_implementacion_model extends CI_Model {
 //        pr($result);
         $datos_result['datos'] = array();
         foreach ($result as $val) {
-            if (isset($val['mdl_groups_cve']) AND isset($val['bloque'])) {
-                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']][$val['mdl_groups_cve']] = $val;
-            } else if (isset($val['bloque'])) {
-                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']] = $val;
-            } else {
-                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']] = $val;
-            }
+//            if (isset($val['mdl_groups_cve']) AND isset($val['bloque'])) {
+//                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']][$val['mdl_groups_cve']] = $val;
+//            } else if (isset($val['bloque'])) {
+//                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['tutorizado']][$val['rol_evaluado_cve'] . '-' . $val['rol_evaluador_cve']][$val['bloque']] = $val;
+//            } else {
+                $datos_result['datos'][$val['course_cve']][$val['evaluado_user_cve']][$val['rol_evaluador_cve'] . '-' . $val['rol_evaluado_cve'] . '-' . $val['tutorizado']] = $val;
+//            }
         }
 //        pr($datos_result);
         return $datos_result;
@@ -110,7 +110,7 @@ class config_busqueda {
             'eeec.course_cve', 'eeec.evaluado_user_cve', 'vdc.clave', 'vdc.namec', 'vdc.tex_tutorizado', 'vdc.tutorizado',
             'vdc.tipo_curso', 'enc.is_bono', "concat(evaluado.firstname, ' ', evaluado.lastname) as name_evaluado",
             "evaluado.username", 'revaluado."name" as "name_rol_evaluado"', 'revaluado.id "id_rol_evaluado"',
-            'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion'
+            'vd.name_region', 'reg.rol_evaluador_cve', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion'
         );
     }
 
@@ -127,7 +127,7 @@ class config_busqueda {
             array('tabla' => 'encuestas.sse_encuestas enc', 'on' => 'enc.encuesta_cve = eeec.encuesta_cve', 'escape' => ''),
             array('tabla' => 'encuestas.sse_reglas_evaluacion reg', 'on' => 'reg.reglas_evaluacion_cve = enc.reglas_evaluacion_cve', 'escape' => ''),
             array('tabla' => 'public.mdl_role revaluado', 'on' => 'revaluado.id=reg.rol_evaluado_cve', 'escape' => 'left'),
-            array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = vdc.idc and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
+                //array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = vdc.idc and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
         );
     }
 
@@ -137,7 +137,7 @@ class config_busqueda {
             'vdc.tex_tutorizado', 'vdc.tipo_curso', 'enc.is_bono',
             'evaluado.firstname',
             'evaluado.lastname', 'evaluado.username', 'revaluado."name"', 'revaluado.id',
-            'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion',
+            'vd.name_region', 'vd.cve_depto_adscripcion', 'vd.nom_delegacion', 'reg.rol_evaluador_cve'
         );
     }
 
@@ -200,7 +200,7 @@ class config_busqueda {
             array('tabla' => 'encuestas.sse_reglas_evaluacion reg', 'on' => 'reg.reglas_evaluacion_cve = enc.reglas_evaluacion_cve', 'escape' => ''),
             array('tabla' => 'public.mdl_user evaluador', 'on' => 'evaluador.id = eeec.evaluado_user_cve', 'escape' => ''),
             array('tabla' => 'tutorias.mdl_userexp uexp', 'on' => 'uexp.userid = evaluador.id', 'escape' => ''),
-            array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = eeec.course_cve and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
+            //array('tabla' => 'encuestas.sse_curso_bloque_grupo cbg', 'on' => 'cbg.course_cve = eeec.course_cve and cbg.mdl_groups_cve = eeec.group_id', 'escape' => ''),
         );
     }
 
@@ -277,14 +277,12 @@ class config_busqueda {
             $tmp_where = $array_where['delegacion'];
             $tmp_where['value'] = $paramPost['delegacion'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
-            
         }
         //Condición umae del evaluado
         if (!empty($paramPost['umae'])) {
             $tmp_where = $array_where['umae'];
             $tmp_where['value'] = $paramPost['umae'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
-            
         }
         //Condición por región
         if (!empty($paramPost['region'])) {
@@ -299,7 +297,7 @@ class config_busqueda {
             $tmp_where['value'] = $paramPost['is_bono'];
             $principal['where'][] = $tmp_where; //Agrega where de curso-clave de curso
         }
-        
+
         //Condición por región
         if (is_numeric($paramPost['tipo_implementacion'])) {
 //            pr($paramPost['tipo_implementacion']);

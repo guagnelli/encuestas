@@ -65,6 +65,7 @@ class Reporte_bonos extends CI_Controller {
 
         $reglas_evaluacion = $this->rep_mod->get_lista_roles_regla_evaluacion('roles', 'excepcion');
         $this->session->set_userdata('reglas_evaluacion', $reglas_evaluacion);
+//        pr($reglas_evaluacion);
 //        $this->session->set_userdata('reglas_evaluacion', $reglas_evaluacion);
 
         $main_contet = $this->filtrosreportes_tpl->getCuerpo(FiltrosReportes_Tpl::RB_IMPLEMENTACION);

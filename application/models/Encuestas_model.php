@@ -1901,7 +1901,7 @@ class Encuestas_model extends CI_Model {
     }
 
     public function guarda_reactivos_evaluacion($params = null) {
-
+        
 //        pr($params);
 //        exit();
         $encuesta_cve = $params['encuesta_cve'];
@@ -1984,7 +1984,7 @@ class Encuestas_model extends CI_Model {
                 $this->db->insert('encuestas.sse_evaluacion', $data);
             }
         }
-
+//        pr($data);
         $validacion = $this->get_validar_encuesta_contestada($data, 'promedio', $bloque_, $grupos_text);
         if ($validacion < 1) {//Valida 
             //curso_cve, grupo_cve, evaluado_user_cve, evaluado_rol_id
