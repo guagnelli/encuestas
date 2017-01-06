@@ -43,7 +43,7 @@ class MY_Form_validation extends CI_Form_validation {
     }
 
     public function alpha_numeric_accent_space_dot_double_quot($str) {
-        $exp = '/^[\p{L}-0123456789,.:?¿"\(\)\/\s]*$/u';
+        $exp = '/^[\p{L}-0123456789,.:_?¿%"\(\)\/\s]*$/u';
         //$exp = '/^[\p{L}-0123456789,.:;\'\"\(\)\/\s]*$/u';
         return (!preg_match($exp, $str)) ? FALSE : TRUE;
     }

@@ -46,10 +46,10 @@ if (isset($preguntas) && !empty($preguntas) && isset($instrumento) && !empty($in
                         <div class="table-responsive">
                             <table class="table table-bordered">
 
-                                <tr>
+                             <!--   <tr>
                                     <td>
                                         <label>Nombre de la implementación:</label>
-                                    </td>
+                                    </td>-->
                                     <!--<td colspan="5">
                                         <h3><?php //echo $instrumento[0]['descripcion_encuestas'];  ?></h3>
                                     </td>
@@ -74,8 +74,8 @@ if (isset($preguntas) && !empty($preguntas) && isset($instrumento) && !empty($in
                                         <h4><a><?php //echo ($instrumento[0]['tutorizado'] != 0) ? $check_ok : $check_no;  ?></a></h4>
                                     </td>
                                 </tr>-->
-                                    <td colspan="4"><h3><?php echo $curso['data'][0]['cur_nom_completo']; ?></h3></td>
-                                </tr>
+                                 <!--   <td colspan="4"><h3><?php echo $curso['data'][0]['cur_nom_completo']; ?></h3></td>
+                                </tr>-->
                                 <tr>
                                     <td>
                                         <label>Nombre del instrumento:</label>
