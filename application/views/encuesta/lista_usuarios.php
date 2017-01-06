@@ -3,8 +3,8 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
 //    pr($datos_user_aeva);
     ?>
     <div class="list-group-item">
-        <div style="text-align:right"><small><?php echo $nombreevaluador ?>
-            </small></div>
+        <div style="text-align:right"><?php echo $nombreevaluador ?>
+        </div>
         <?php
         if (isset($error) AND ! is_null($error) AND ! empty($error)) {
             echo '<div class="row">
@@ -26,7 +26,8 @@ if (isset($datos_user_aeva) && !empty($datos_user_aeva)) {
             </tr>
             <tr>                
                 <td>
-                    <h3> <?php echo $datos_curso['data'][0]['cur_nom_completo']; ?></h3> 
+                    <h3> <?php echo $datos_curso['data'][0]['cur_nom_completo']; ?>
+                        (<?php echo $datos_curso['data'][0]['cur_clave']; ?>)</h3> 
                 </td>
             </tr>
         </table>
