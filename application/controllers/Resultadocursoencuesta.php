@@ -171,7 +171,11 @@ class Resultadocursoencuesta extends CI_Controller {
         $data['curso'] = $curso;
 
         $data_extra['curso_url'] = "site_url+'/resultadocursoencuesta/get_data_ajax/'+" . $curso . ", '#form_curso', '#listado_resultado'";
-        $data_extra['texto_titulo'] = $datos_curso['data'][0]['cur_clave'] . '-' . $datos_curso['data'][0]['cur_nom_completo'];
+        $data_extra['texto_titulo'] = '';
+//        pr($datos_curso);
+        if (!empty($datos_curso['data'])) {
+            $data_extra['texto_titulo'] = $datos_curso['data'][0]['cur_clave'] . '-' . $datos_curso['data'][0]['cur_nom_completo'];
+        }
         $data_extra['curso'] = $curso;
 //data_ajax(site_url+'/resultadocursoencuesta/get_data_ajax/'+838, '#form_curso', '#listado_resultado')
 //data_ajax(site_url+'/resultadocursoencuesta/get_data_ajax/'+838, '#form_curso', '#listado_resultado')

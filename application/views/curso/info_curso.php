@@ -60,10 +60,10 @@
                     <th><?php echo $info_curso['cur_clave']; ?></th>
 
                 </tr>
-                <tr>
-                    <td>CATEGORÍA:</td>
-                    <th><?php echo $info_curso['cat_nom']; ?></th>
-                </tr>
+<!--                <tr>
+                    <td>CATEGORÍA:</td>-->
+                    <!--<th><?php // echo $info_curso['cat_nom']; ?></th>-->
+                <!--</tr>-->
                 <tr>
                     <td>AÑO:</td>
                     <th><?php echo $info_curso['anio']; ?></th>
@@ -150,11 +150,11 @@
                                     <a href="<?php // echo site_url('resultadocursoencuesta/curso_encuesta_resultado_detalle/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Detalle de encuestas contestadas</a>
                                 </td>
                             </tr> -->
-                            <tr>                
-                                <td>
-                                    <a href="<?php echo site_url('resultadocursoindicador/index/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Reporte de encuestas por indicador</a>
-                                </td>
-                            </tr>
+<!--                            <tr>                
+                                <td>-->
+                                    <!--<a href="<?php // echo site_url('resultadocursoindicador/index/' . $info_curso['cur_id']) ?>" class="btn btn-success btn-block">Reporte de encuestas por indicador</a>-->
+<!--                                </td>
+                            </tr>-->
                         </table>
                     </div>
                     <div class="clearfix"></div><br>

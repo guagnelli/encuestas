@@ -12,7 +12,6 @@
                     <th>Nombre docente evaluado</th>
                     <th>Rol evaluado</th>
                     <th>Grupo</th>
-                    <th>Bloque</th>
                     <th>Calificaci&oacute;n de encuesta</th>
                                     
 
@@ -20,6 +19,8 @@
             </thead>
             <tbody>
                 <?php
+//                    <th>Bloque</th>
+//                    <td > ' . $val['bloque'] . '</td >
                 
                 foreach ($empleados as $key => $val) {
                     echo '<tr>
@@ -28,7 +29,6 @@
                     <td >' .htmlentities($val['nombre']) . ' '. htmlentities($val['apellidos']). '</td>
                     <td > ' . $val['nrolevaluado'] . '</td >
                     <td > ' . $val['ngrupo'] . '</td >
-                    <td > ' . $val['bloque'] . '</td >
                     <td > ' . $val['calif_emitida'] . '</td >'; 
                     
 

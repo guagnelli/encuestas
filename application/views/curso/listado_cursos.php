@@ -13,13 +13,13 @@ $check_no = '<h4><span class="glyphicon glyphicon-remove" aria-hidden="true" sty
                 <tr>
                     <th>Clave implementación</th>
                     <th>Nombre curso</th>
-                    <th>Categor&iacute;a</th>
+                    <!--<th>Categor&iacute;a</th>-->
                     <th>Año curso</th>
                     <th>Horas Curso</th>
                     <!--<th>Tipo curso</th>-->
                     <!--<th>Modalidad</th>-->
                     <th>Tutorizado</th>
-                    <th>Bloques</th>
+                    <!--<th>Bloques</th>-->
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -43,14 +43,14 @@ $check_no = '<h4><span class="glyphicon glyphicon-remove" aria-hidden="true" sty
                     </td>
                     ';*/
 
+//                    <td > ' . $val['cat_nom'] . '</td > 
+//                    <td>'.substr(str_shuffle('-123456'), 0, 1).'</td>
                     echo '<tr>
                     <td >' . $val['cur_clave'] . '</td>
                     <td >' . $val['cur_nom_completo'].'</td > 
-                    <td > ' . $val['cat_nom'] . '</td > 
                     <td >' . $val['anio'] . '</td>
                     <td >' . $val['horascur']. '</td > 
                     <td >' . ((isset($val['tutorizado']) && $val['tutorizado'] == '1') ? $check_ok : $check_no) . '</td >
-                    <td>'.substr(str_shuffle('-123456'), 0, 1).'</td>
                     <td>
                         <a href="'.site_url('curso/info_curso/'.$val['cur_id']).'" class="btn btn-info btn-block">
                             <span class="glyphicon glyphicon-search"></span>

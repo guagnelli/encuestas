@@ -93,6 +93,7 @@ class Reporte_bonos_implementacion_model extends CI_Model {
         //Resultados de cálculo de promedios 
         $array_config_calculo = $array_result['calculo_prom'];
 //        pr($num_rows);
+        $parametros['is_bloque_o_grupo'] = '';//Quitar cuando se implemente filtro por bloque y grupos
         $result['result'] = $query;
         $result['result_promedio'] = $this->get_query_calculo($array_config_calculo, $parametros['is_bloque_o_grupo']);
         $result['num_rows'] = $num_rows;
@@ -237,6 +238,7 @@ class config_busqueda {
         $calculo_prom['select'] = $this->getSelectBasicoCalculoPromedio();
 
         //Agregar el grupo como agrupamiento en el grup by y el select
+        $paramPost['is_bloque_o_grupo'] = '';//Para evitar error, quitar después
         switch ($paramPost['is_bloque_o_grupo']) {
             case 'grupo':
                 $principal['select'] = array_merge($principal['select'], $this->getSelectBloque(), $this->getSelectGrupo());
